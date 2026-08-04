@@ -1,0 +1,62 @@
+---
+id: 18
+title: "What is a Message Key?"
+slug: "o-que-e-message-key"
+level: ["pleno", "senior"]
+topics: ["arquitetura"]
+relatedChapters: ["partitions-e-ordenacao"]
+shortAnswer: "Message key is an optional value attached to each message that determines, via hash, which partition it will be stored in — the decision that defines which events stay ordered relative to each other."
+quiz:
+  options:
+    - "Message key is an optional value that determines, via hash, which partition a message is stored in, fixing which events stay ordered relative to each other."
+    - "Using a random UUID as the key is always the best choice, since it maximizes distribution across partitions."
+    - "Message key is a required field on every Kafka message, used only for deduplication on the consumer side."
+    - "Messages with different keys have their relative order guaranteed as long as they're published by the same producer."
+  correctIndex: 0
+---
+
+## Question
+
+"What is the Message Key, and what's its purpose?"
+
+## What the interviewer wants to assess
+
+Whether you understand the key as a domain-modeling decision (which events need to be ordered), not just as
+a technical parameter of the `send` method.
+
+<RespostaCurta>
+Message key is an optional value the producer attaches to each message. Kafka uses that key (via hash) to
+decide which partition the message lands on — messages with the same key always go to the same partition,
+preserving their relative order.
+</RespostaCurta>
+
+<RespostaSenior>
+The right question when choosing a key isn't "which value distributes best across partitions," but "which
+events need to be ordered relative to each other." The key locks in that relationship: events with the same
+key stay on the same partition and are read in the order they were written; events with different keys
+have no guaranteed ordering relationship between them, even if published seconds apart. A
+high-cardinality key (like a UUID per message) distributes better across partitions, but eliminates any
+ordering guarantee between related messages — a common mistake made by people optimizing for distribution
+without considering the domain's real ordering requirement.
+</RespostaSenior>
+
+## In-depth explanation
+
+See "Choosing the key: the most important decision when modeling a topic" in
+[Chapter 4](/en/livro/partitions-e-ordenacao).
+
+<ExemploFinanceiro>
+On the `faturas.eventos` topic, using `contaId` as the key guarantees that `FaturaFechada`,
+`PagamentoRegistrado`, and `FaturaReaberta` for the same account reach the consumer in the correct order —
+processing them out of order would lead to a wrong conclusion about the outstanding balance.
+</ExemploFinanceiro>
+
+<Pegadinha title='"I always use a random UUID as the key to distribute well"'>
+A random UUID per message maximizes distribution, but guarantees related messages (from the same order,
+the same account) land on different partitions — destroying any ordering guarantee between them. If
+relative ordering matters, that's a modeling bug.
+</Pegadinha>
+
+<PerguntaDerivada>
+Likely follow-ups: "how does ordering work in Kafka?" and "does Kafka guarantee global ordering?".
+</PerguntaDerivada>

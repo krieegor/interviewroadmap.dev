@@ -1,0 +1,89 @@
+---
+title: "Reconstrução de índice"
+slug: "reconstrucao-de-indice"
+order: 4
+description: "Um bug no consumer que alimenta o Elasticsearch corrompe o índice de busca; a correção envolve replay completo via um novo Consumer Group."
+relatedChapters: ["retention-e-replay", "consumer-groups-e-rebalance"]
+---
+
+Este estudo de caso é o exemplo mais direto de por que retenção e replay (Capítulo 8) são um diferencial
+estrutural do Kafka: um erro que corrompeu um sistema derivado é corrigido reconstruindo esse sistema do
+zero a partir do histórico de eventos — sem precisar de nenhum backup dedicado do índice em si.
+
+## O cenário
+
+O `busca-service` mantém um índice no Elasticsearch com os dados de transações de todos os clientes,
+alimentado por um consumer que lê o tópico `transacoes.consolidadas` e faz upsert de cada documento no
+índice. Um deploy introduz um bug: um campo de data é indexado no formato errado, quebrando a ordenação
+cronológica das buscas para qualquer transação processada depois do deploy.
+
+## O bug e sua descoberta
+
+<Atencao title="Bugs em consumers que alimentam sistemas derivados são difíceis de detectar rápido">
+Diferente de um erro que derruba a aplicação, esse tipo de bug não gera exceção nem falha visível — o
+documento é indexado "com sucesso", só que com o dado errado. A detecção normalmente vem de um sintoma
+indireto (usuários reclamando que a busca por data não ordena corretamente), não de um alerta técnico
+automático — reforçando a importância de testes de contrato entre o formato publicado pelo producer e o
+formato esperado pelo consumer.
+</Atencao>
+
+## A correção: replay completo
+
+<Diagrama legenda="Depois de corrigir o bug, um novo Consumer Group lê o tópico inteiro desde o início da retenção disponível, reconstruindo o índice do zero.">
+  <ReplayDiagram />
+</Diagrama>
+
+A correção segue três passos:
+
+1. **Corrigir o bug** no código do consumer — o formato de data é ajustado para o esperado pelo
+   Elasticsearch.
+2. **Criar um índice novo** no Elasticsearch (não reaproveitar o corrompido), evitando que documentos
+   antigos com o formato errado convivam com os novos, corretos.
+3. **Criar um novo Consumer Group** (ex.: `busca-service-v2`) apontando para o índice novo, com
+   `auto.offset.reset=earliest` — ele lê o tópico inteiro desde o início da retenção disponível,
+   reconstruindo o índice completo com o bug já corrigido.
+
+Depois que o novo Consumer Group processa todo o histórico e o índice novo está completo e validado, o
+`busca-service` passa a apontar para o índice novo, e o Consumer Group antigo (e o índice corrompido) são
+descomissionados.
+
+## Por que um novo Consumer Group, e não resetar o existente
+
+<Pegadinha title='"Bastava resetar o offset do Consumer Group existente"'>
+Resetar o offset do grupo existente reconstruiria o **mesmo** índice já corrompido, misturando documentos
+corrigidos com os que ainda podem estar com formato errado (se o upsert não sobrescrever completamente o
+documento anterior). Usar um Consumer Group novo, escrevendo em um índice novo, garante uma reconstrução limpa,
+validável antes de substituir o índice em produção — só depois da validação o tráfego é redirecionado.
+</Pegadinha>
+
+## O limite: retenção
+
+Esse reprocessamento só é possível porque o tópico `transacoes.consolidadas` tem retenção suficiente para
+cobrir todo o histórico relevante para a busca (por exemplo, 2 anos, para permitir consulta de transações
+antigas). Se o bug tivesse sido descoberto depois que parte desse histórico já expirou pela retenção, o
+replay não alcançaria esses dados — a reconstrução ficaria incompleta, exigindo uma fonte alternativa (como
+um snapshot do banco transacional original) para preencher a lacuna.
+
+## Idempotência natural do upsert
+
+Esse é um caso onde o consumer já é naturalmente idempotente (Capítulo 11): o upsert no Elasticsearch grava
+o mesmo documento final independentemente de quantas vezes o mesmo evento for processado. Isso significa que
+o replay completo não precisa de nenhum controle adicional de `eventId` — reprocessar o histórico inteiro do
+zero é seguro por construção.
+
+## Observabilidade durante a reconstrução
+
+<Comparacao title="O que monitorar durante um replay completo">
+| Métrica | Por quê |
+|---|---|
+| Progresso do Consumer Group novo (offset atual vs. log end offset) | Estimar quanto tempo falta para a reconstrução completa |
+| Taxa de erro de indexação no Elasticsearch | Detectar se o bug foi realmente corrigido, ou se existe um segundo problema não percebido |
+| Carga no cluster Elasticsearch durante o replay | Um replay completo gera um volume de escrita muito maior que o tráfego normal, podendo exigir throttling |
+</Comparacao>
+
+<Resumo>
+A retenção do Kafka transforma a reconstrução de um índice corrompido em um problema de replay, não de
+restauração de backup. A prática mais segura é reconstruir em um índice novo, via um Consumer Group novo,
+validando antes de redirecionar o tráfego — evitando misturar dados corrigidos com dados já corrompidos no
+mesmo destino. O limite dessa estratégia é sempre a janela de retenção do tópico de origem.
+</Resumo>

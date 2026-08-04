@@ -1,0 +1,61 @@
+---
+id: 34
+title: "What is Retry?"
+slug: "o-que-e-retry"
+level: ["pleno", "senior"]
+topics: ["consumo"]
+relatedChapters: ["retry-e-dlq"]
+shortAnswer: "Retry is a new attempt to process a message that failed, usually with growing backoff between attempts, based on the premise that the error might be transient."
+quiz:
+  options:
+    - "A new attempt to process a message that failed, usually with growing backoff, based on the premise that the error is transient."
+    - "A new attempt to process any failed message, resolving both transient errors and permanent payload errors."
+    - "A native Kafka broker mechanism that automatically resends messages rejected by the consumer, with no application configuration."
+    - "A single, immediate reprocessing attempt with no interval between tries, applied right after the first failure."
+  correctIndex: 0
+---
+
+## Question
+
+"What is Retry in the context of Kafka message processing?"
+
+## What the interviewer wants to assess
+
+Whether you distinguish transient from permanent errors — the basis for knowing when retry helps and when
+it's a waste of attempts.
+
+<RespostaCurta>
+Retry is trying to process a failed message again, expecting the error to be transient (a network timeout,
+a momentarily unavailable database). Usually combined with backoff — a growing interval between attempts —
+to avoid overloading an already unstable system.
+</RespostaCurta>
+
+<RespostaSenior>
+Retry only makes sense for transient errors — failures with a real chance of not repeating on a new
+attempt. For permanent errors (a malformed payload, a business rule that always rejects that data), retry
+is useless: it will fail the same way indefinitely, unless there's a maximum attempt limit, after which the
+message moves to a DLQ. In Kafka, the most robust implementation uses a dedicated retry topic — the
+failing message is republished to it with a header indicating how many attempts have already happened, and
+a separate listener reprocesses it after the backoff, without blocking the main topic (avoiding the poison
+pill effect).
+</RespostaSenior>
+
+## In-depth explanation
+
+See "Retry and Backoff" and "Retry Topic" in [Chapter 9](/en/livro/retry-e-dlq).
+
+<ExemploFinanceiro>
+If the `saldo-service` fails to process an event because the database is momentarily unavailable, Spring
+Kafka retries with 1s, 5s, and 30s backoff before considering the message unrecoverable by simple retry and
+routing it to the DLQ.
+</ExemploFinanceiro>
+
+<Pegadinha title='"Retry solves any kind of error, just try more times"'>
+Retry only solves transient errors. For a permanent error (e.g., a payload that will never deserialize
+correctly), retrying indefinitely just delays detecting the real problem and can stall processing of the
+following messages.
+</Pegadinha>
+
+<PerguntaDerivada>
+Likely follow-ups: "what is DLQ?" and "what is a Poison Pill?".
+</PerguntaDerivada>

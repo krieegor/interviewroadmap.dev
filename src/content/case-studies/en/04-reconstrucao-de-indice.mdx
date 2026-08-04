@@ -1,0 +1,88 @@
+---
+title: "Index rebuild"
+slug: "reconstrucao-de-indice"
+order: 4
+description: "A bug in the consumer feeding Elasticsearch corrupts the search index; the fix involves a full replay via a new Consumer Group."
+relatedChapters: ["retention-e-replay", "consumer-groups-e-rebalance"]
+---
+
+This case study is the most direct example of why retention and replay (Chapter 8) are a structural
+differentiator of Kafka: a bug that corrupted a derived system is fixed by rebuilding that system from
+scratch from the event history — with no need for any dedicated backup of the index itself.
+
+## The scenario
+
+The `busca-service` keeps an Elasticsearch index with transaction data for every customer, fed by a
+consumer that reads the `transacoes.consolidadas` topic and upserts each document into the index. A deploy
+introduces a bug: a date field is indexed in the wrong format, breaking chronological search ordering for
+any transaction processed after the deploy.
+
+## The bug and its discovery
+
+<Atencao title="Bugs in consumers feeding derived systems are hard to detect quickly">
+Unlike an error that crashes the application, this kind of bug produces no exception or visible failure —
+the document is indexed "successfully," just with the wrong data. Detection usually comes from an indirect
+symptom (users complaining that date search doesn't sort correctly), not an automatic technical alert —
+reinforcing the importance of contract tests between the format the producer publishes and the format the
+consumer expects.
+</Atencao>
+
+## The fix: a full replay
+
+<Diagrama legenda="After fixing the bug, a new Consumer Group reads the entire topic from the start of the available retention, rebuilding the index from scratch.">
+  <ReplayDiagramEn />
+</Diagrama>
+
+The fix follows three steps:
+
+1. **Fix the bug** in the consumer's code — the date format is adjusted to what Elasticsearch expects.
+2. **Create a new index** in Elasticsearch (don't reuse the corrupted one), avoiding old documents with the
+   wrong format coexisting with the new, correct ones.
+3. **Create a new Consumer Group** (e.g., `busca-service-v2`) pointing at the new index, with
+   `auto.offset.reset=earliest` — it reads the entire topic from the start of the available retention,
+   rebuilding the full index with the bug already fixed.
+
+After the new Consumer Group processes the entire history and the new index is complete and validated, the
+`busca-service` switches to pointing at the new index, and the old Consumer Group (and the corrupted index)
+are decommissioned.
+
+## Why a new Consumer Group, not resetting the existing one
+
+<Pegadinha title='"You could just reset the existing Consumer Group offset"'>
+Resetting the existing group's offset would rebuild the **same** already-corrupted index, mixing corrected
+documents with ones that might still have the wrong format (if the upsert doesn't fully overwrite the
+previous document). Using a new Consumer Group, writing to a new index, guarantees a clean rebuild,
+validatable before replacing the production index — only after validation is traffic redirected.
+</Pegadinha>
+
+## The limit: retention
+
+This reprocessing is only possible because the `transacoes.consolidadas` topic has enough retention to
+cover the entire history relevant to search (for example, 2 years, to allow querying old transactions). If
+the bug had been discovered after part of that history had already expired under retention, replay
+wouldn't reach that data — the rebuild would be incomplete, requiring an alternative source (like a
+snapshot of the original transactional database) to fill the gap.
+
+## The upsert's natural idempotency
+
+This is a case where the consumer is already naturally idempotent (Chapter 11): the Elasticsearch upsert
+writes the same final document regardless of how many times the same event is processed. That means the
+full replay needs no additional `eventId` control — reprocessing the entire history from scratch is safe by
+construction.
+
+## Observability during the rebuild
+
+<Comparacao title="What to monitor during a full replay">
+| Metric | Why |
+|---|---|
+| New Consumer Group progress (current offset vs. log end offset) | Estimates how much time is left until the rebuild is complete |
+| Elasticsearch indexing error rate | Detects whether the bug was really fixed, or whether a second, unnoticed problem exists |
+| Load on the Elasticsearch cluster during replay | A full replay generates much higher write volume than normal traffic, potentially requiring throttling |
+</Comparacao>
+
+<Resumo>
+Kafka's retention turns rebuilding a corrupted index into a replay problem, not a backup-restore problem.
+The safest practice is rebuilding into a new index, via a new Consumer Group, validating before
+redirecting traffic — avoiding mixing corrected data with already-corrupted data in the same destination.
+This strategy's limit is always the source topic's retention window.
+</Resumo>

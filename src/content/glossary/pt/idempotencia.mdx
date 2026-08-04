@@ -1,0 +1,15 @@
+---
+term: "Idempotência"
+slug: "idempotencia"
+shortDefinition: "Propriedade de um processamento que produz o mesmo efeito final, mesmo se executado mais de uma vez com a mesma entrada."
+relatedTerms: ["consumer", "commit", "dlq"]
+relatedChapters: ["idempotencia"]
+---
+
+Idempotência, no contexto de consumers Kafka, é a capacidade de processar o mesmo evento múltiplas vezes
+sem gerar efeitos colaterais duplicados — creditar um saldo duas vezes, enviar dois e-mails, gerar duas
+cobranças. É um requisito, não um extra, porque garantias at-least-once (a configuração mais comum em
+produção) implicam que o mesmo evento pode ser entregue mais de uma vez, por causa de retries, rebalances ou
+falhas entre o processamento e o commit do offset. A implementação mais comum usa um identificador único do
+evento (`eventId`) e uma constraint de unicidade em banco de dados, verificada e aplicada na mesma transação
+que executa o efeito de negócio.

@@ -1,0 +1,60 @@
+---
+id: 47
+title: "What is Consumer Lag?"
+slug: "o-que-e-consumer-lag"
+level: ["pleno", "senior"]
+topics: ["observabilidade"]
+relatedChapters: ["observabilidade"]
+shortAnswer: "Consumer Lag is the difference between the most recent offset produced on a partition and the offset committed by the consumer — how many messages already exist in the topic but haven't been processed yet."
+quiz:
+  options:
+    - "The difference between the latest offset produced on a partition and the offset committed by the consumer — how many messages exist but haven't been processed yet."
+    - "Any lag value greater than zero already indicates a consumer problem, regardless of the trend over time."
+    - "The difference between the data already replicated by the leader and the data replicated by the followers of a partition."
+    - "The average time, in milliseconds, a message takes between being produced and being consumed."
+  correctIndex: 0
+---
+
+## Question
+
+"What is Consumer Lag, and why is it the most important metric for monitoring a Kafka consumer?"
+
+## What the interviewer wants to assess
+
+Whether you connect the metric to the business symptom it anticipates — not just the isolated technical
+definition.
+
+<RespostaCurta>
+Consumer Lag is the difference between the latest offset already produced on a partition (log end offset)
+and the offset committed by the Consumer Group — it represents how many messages already exist but haven't
+been processed yet.
+</RespostaCurta>
+
+<RespostaSenior>
+Zero lag (or fluctuating close to zero with normal traffic) indicates a healthy consumer, keeping up with
+production's pace. The real warning sign isn't a momentary lag spike during a traffic surge — that's
+expected and usually resolves on its own — but lag that grows consistently over time, which indicates
+consumption throughput is structurally lower than production throughput. It's the most important metric
+precisely because it anticipates a business problem (processing delay) before the end user notices it —
+unlike an error rate, which only shows up after something has already gone wrong.
+</RespostaSenior>
+
+## In-depth explanation
+
+See "Consumer Lag: the most important vital sign" in [Chapter 15](/en/livro/observabilidade).
+
+<ExemploFinanceiro>
+An alert configured in Grafana fires if the `saldo-service`'s consumer lag on the `pix.recebido` topic
+exceeds 1000 messages for more than 2 minutes — because, for this flow, even a few seconds of delay between
+receiving the PIX and crediting the balance is already noticeable to the customer.
+</ExemploFinanceiro>
+
+<Pegadinha title='"Any lag greater than zero is already a problem"'>
+Momentary lag during traffic spikes is normal and expected. The real problem is the trend: lag that doesn't
+drop back down after the spike passes, or that grows continuously — not an isolated instantaneous value.
+</Pegadinha>
+
+<PerguntaDerivada>
+Likely follow-ups: "how would you monitor Kafka?" and "what would you do if consumer lag were growing
+continuously?".
+</PerguntaDerivada>

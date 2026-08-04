@@ -1,0 +1,66 @@
+---
+id: 4
+title: "When should you choose Kafka?"
+slug: "quando-escolher-kafka"
+level: ["senior", "tech-lead"]
+topics: ["fundamentos"]
+relatedChapters: ["o-que-e-apache-kafka"]
+shortAnswer: "Choose Kafka when multiple independent systems need to react to the same business fact, when you need replay/historical reprocessing, or when event volume requires decoupling to avoid compromising availability."
+quiz:
+  options:
+    - "When multiple independent systems need to react to the same business fact, replay is needed, or volume requires decoupling to preserve availability."
+    - "Whenever communication between services is asynchronous, regardless of how many consumers exist or the need for history."
+    - "When the services involved need strong transactional consistency across their writes, like a distributed commit."
+    - "When you need to guarantee a low-latency synchronous response between two specific services."
+  correctIndex: 0
+---
+
+## Question
+
+"In what situation would you choose to use Kafka on a new project?"
+
+## What the interviewer wants to assess
+
+Architectural judgment — not "Kafka solves everything," but concrete criteria that drive the decision. It's
+a question meant to tell apart candidates who apply technology because of hype from those who choose it
+based on real need.
+
+<RespostaCurta>
+  I choose Kafka when multiple independent systems need to react to the same business event, when I
+  need replay to reprocess history, or when event volume is high enough that synchronous coupling
+  becomes an availability risk.
+</RespostaCurta>
+
+<RespostaSenior>
+  I look at three main signals. First, multiple independent consumers of the same fact — if today only
+  notifications react to "payment approved," but tomorrow antifraud, accounting, and analytics will
+  also need to, Kafka avoids rewriting the producer for every new consumer. Second, the need for
+  replay — if the business can ask to reprocess the last 30 days of transactions because a rule was
+  fixed, a traditional queue doesn't keep that history, Kafka does. Third, volume and availability
+  criticality — when I can't let a failure in a slow consumer bring down the producer, Kafka's
+  asynchronous decoupling isolates that failure. If none of these three signals is present, there's
+  usually a simpler solution (queue, synchronous call) that solves it with less operational
+  complexity.
+</RespostaSenior>
+
+## In-depth explanation
+
+See "When to use it" in [Chapter 1](/en/livro/o-que-e-apache-kafka).
+
+<ExemploFinanceiro>
+  A credit-granting system that needs to: (1) notify the customer, (2) update the internal score, (3)
+  feed a data lake for risk models, and (4) allow reprocessing historical decisions when the score
+  model changes — is a clear case for Kafka, because it combines multiple independent consumers with a
+  need for replay at the same time.
+</ExemploFinanceiro>
+
+<Pegadinha title='"I use Kafka whenever I need asynchronous messaging"'>
+  This ignores that simple asynchronous messaging (one task, one worker, no need for replay) is solved
+  at lower operational cost by a queue. Choosing Kafka "by default" is just as problematic as never
+  choosing it.
+</Pegadinha>
+
+<PerguntaDerivada>
+  Expect the follow-up question: "and when would you not choose Kafka?" — almost always asked right
+  after.
+</PerguntaDerivada>

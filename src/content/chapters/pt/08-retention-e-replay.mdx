@@ -1,0 +1,125 @@
+---
+title: "Retention e Replay"
+part: "Parte III — Consumo e reprocessamento"
+partOrder: 3
+chapterOrder: 2
+slug: "retention-e-replay"
+description: "Por quanto tempo o Kafka guarda um evento, e como usar essa retenção para reprocessar histórico com replay."
+---
+
+O Capítulo 1 usou retenção para explicar por que Kafka não é "só uma fila". Este capítulo aprofunda como essa
+retenção é configurada na prática e como ela vira a ferramenta mais poderosa (e mais arriscada) de correção
+de bugs em um sistema orientado a eventos: o replay.
+
+## Retention Period
+
+<Definicao title="Retention Period">
+Retention period é a política, configurada por tópico, que determina por quanto tempo (ou até que tamanho
+acumulado) os registros de uma partition permanecem no log antes de serem elegíveis para descarte.
+</Definicao>
+
+Duas configurações controlam isso, e a que for atingida primeiro dispara a limpeza:
+
+<Comparacao title="Retenção por tempo vs. por tamanho">
+| Configuração | O que controla |
+|---|---|
+| `retention.ms` | Por quanto tempo um registro permanece disponível (ex.: 7 dias) |
+| `retention.bytes` | Tamanho máximo acumulado por partition antes de descartar os registros mais antigos |
+</Comparacao>
+
+<Atencao title="Retenção não depende de consumo">
+Um registro não é removido por ter sido lido — ele é removido apenas quando expira pela política
+configurada, mesmo que nenhum consumer o tenha lido ainda. E o inverso também vale: um registro lido por
+todos os Consumer Groups existentes continua no log até a política de retenção expirá-lo, disponível para
+qualquer consumer futuro.
+</Atencao>
+
+## Replay: reprocessando o que já foi lido
+
+<Definicao title="Replay">
+Replay é o ato de mover a posição de leitura de um Consumer Group (ou de uma nova instância dele) para um
+ponto anterior no log — reprocessando eventos que já haviam sido consumidos, ou lendo pela primeira vez
+eventos antigos que um Consumer Group novo nunca viu.
+</Definicao>
+
+<Diagrama legenda="Antes: offset commitado em 6. Depois de resetar o offset para 2, o Consumer Group reprocessa os offsets 2 a 6 novamente.">
+  <ReplayDiagram />
+</Diagrama>
+
+Tecnicamente, replay é simples: resetar o offset commitado de um Consumer Group para uma posição anterior
+(ou para o início da retenção disponível, com `--to-earliest`) e deixar o consumer avançar normalmente a
+partir dali. A complexidade não está em como fazer — está em saber quando fazer e quais efeitos colaterais
+esperar.
+
+## Para que replay serve
+
+- **Corrigir um bug de processamento**: se uma versão com bug do `extrato-service` gerou lançamentos
+  errados nos últimos 3 dias, corrigir o bug e resetar o offset para 3 dias atrás faz o serviço
+  reconstruir esses lançamentos corretamente — assumindo que a lógica seja idempotente (Capítulo 11).
+- **Popular um sistema novo com histórico existente**: um novo Consumer Group, ao assinar um tópico com
+  `auto.offset.reset=earliest`, lê desde o início da retenção disponível — útil para inicializar um serviço
+  de analytics ou um índice de busca sem precisar que o producer reenvie nada.
+- **Reconstruir um estado derivado**: se um índice do Elasticsearch é populado a partir de eventos Kafka e
+  precisa ser reconstruído do zero (mudança de schema, corrupção de índice), resetar o offset do Consumer
+  Group responsável e deixá-lo reprocessar tudo reconstrói o índice sem tocar no restante do sistema.
+
+## Riscos do replay
+
+<Pegadinha title='"Replay é só resetar o offset, sem mais consequências"'>
+Resetar o offset é a parte fácil. O replay reprocessa eventos que já geraram efeitos colaterais na primeira
+vez — notificações enviadas, e-mails disparados, saldos creditados. Se o consumer não for idempotente, o
+replay duplica esses efeitos: o cliente recebe a notificação de novo, o saldo é creditado uma segunda vez.
+</Pegadinha>
+
+<Atencao title="Replay em produção exige planejamento, não só o comando">
+Antes de fazer replay em um consumer de produção, é preciso confirmar que ele é idempotente (ou aceitar
+explicitamente os efeitos colaterais da duplicação), avisar sistemas downstream que dependem da ordem
+recente de processamento, e considerar o volume: reprocessar dias de eventos pode gerar um pico de carga
+equivalente a um dia inteiro de tráfego normal, concentrado em minutos.
+</Atencao>
+
+Outra limitação prática: replay só alcança o que ainda não expirou. Um bug descoberto depois que a
+retenção já expirou os eventos afetados não pode ser corrigido por replay — a única saída, nesse caso, é
+reconstruir o estado a partir de outra fonte (backup, banco de dados, snapshot), se existir.
+
+## Como aparece em entrevistas
+
+"Como o Kafka consegue reler mensagens já consumidas?" é uma variação comum, geralmente seguida de "e se eu
+precisasse corrigir um bug que afetou os últimos 2 dias de processamento, o que você faria?". A resposta
+esperada conecta retenção (só é possível reler o que ainda está retido), reset de offset (o mecanismo) e
+idempotência (a pré-condição para fazer isso com segurança em produção).
+
+<DicaEntrevista>
+Não descreva replay apenas como "resetar o offset" — mencione explicitamente a dependência da retenção
+(só funciona dentro da janela retida) e o requisito de idempotência do consumer, que é o que separa um
+replay seguro de um replay que duplica efeitos colaterais em produção.
+</DicaEntrevista>
+
+## Relação com Java e Spring Boot
+
+Do lado da aplicação, replay geralmente não exige código novo — é uma operação administrativa feita via
+CLI (`kafka-consumer-groups.sh --reset-offsets`) ou via ferramentas de gestão de cluster, com o Consumer
+Group parado durante a operação. O código Spring Kafka do consumer não muda; o que muda é de onde ele
+recomeça a ler na próxima vez que subir. Por isso, a responsabilidade de tornar o replay seguro recai
+inteiramente sobre o design de idempotência do consumer, não sobre nenhuma configuração especial do client.
+
+<ExemploFinanceiro title="Reconstruindo o dashboard de risco">
+Um bug no cálculo de score de crédito do `risco-service` gerou scores incorretos nos últimos 5 dias. Depois
+de corrigir o bug, o time reseta o offset do Consumer Group `risco-service` para 5 dias atrás. Como o
+serviço grava o score mais recente por cliente (upsert, não incremento), reprocessar os mesmos eventos
+várias vezes é seguro — o replay simplesmente sobrescreve os scores errados pelos corretos, sem duplicar
+nada.
+</ExemploFinanceiro>
+
+<Resumo>
+Retention define por quanto tempo (ou até que tamanho) um evento permanece no log, independentemente de ter
+sido consumido. Replay usa essa retenção para reprocessar eventos — corrigindo bugs, populando sistemas
+novos ou reconstruindo estado derivado — movendo o offset commitado de um Consumer Group para um ponto
+anterior. É poderoso, mas só funciona dentro da janela de retenção disponível, e só é seguro em produção se
+o consumer for idempotente.
+</Resumo>
+
+<PerguntaDerivada>
+Prováveis follow-ups: "qual a diferença entre replay do Kafka e DLQ redrive do SQS?" e "como você faria
+replay em um consumer que não é idempotente, sem duplicar efeitos colaterais?".
+</PerguntaDerivada>

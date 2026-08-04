@@ -1,0 +1,129 @@
+---
+title: "Observability"
+part: "Part V — Java and Spring Boot"
+partOrder: 5
+chapterOrder: 3
+slug: "observabilidade"
+description: "Consumer lag, throughput, structured logs, correlationId, metrics, and tracing — how to know a Kafka pipeline is healthy."
+---
+
+This final chapter closes the book by tying together a thread that ran through nearly every previous one:
+how to know, in production, that everything described in earlier chapters is actually working — without
+waiting for an incident to find out it wasn't.
+
+## Consumer Lag: the most important vital sign
+
+<Definicao title="Consumer Lag">
+Consumer lag is the difference between the latest offset already produced on a partition (log end offset)
+and the offset committed by the Consumer Group. It represents how many messages already exist in the topic
+but haven't been processed yet.
+</Definicao>
+
+<Diagrama legenda="The producer has already written up to offset 9; the consumer has only processed up to offset 4. Consumer lag is the difference: 5 pending messages.">
+  <ConsumerLagDiagramEn />
+</Diagrama>
+
+Zero lag (or close to zero, fluctuating with normal traffic) indicates a healthy consumer. Lag that grows
+consistently over time is the most reliable sign that something is wrong — slow processing, excessive
+rebalances (Chapter 6), or a bug causing the consumer to get stuck reprocessing (Chapter 9).
+
+<Atencao title="Momentary lag is not the same as growing lag">
+A lag spike during a brief traffic surge is expected and usually resolves on its own. The real warning sign
+is the **trend**: lag that doesn't drop back down after the traffic spike passes, or that grows steadily
+over hours — that indicates consumption throughput is structurally lower than production throughput.
+</Atencao>
+
+## Throughput and error rate
+
+<Definicao title="Throughput">
+Throughput is the volume of messages processed (or produced) per unit of time. Combined with consumer lag,
+it's the pair of metrics that diagnoses a pipeline's capacity health: consumption throughput lower than
+production throughput, sustained over time, is the direct cause of growing lag.
+</Definicao>
+
+Error rate (the proportion of messages that fail processing, including those that end up in the Chapter 9
+DLQ) complements that pair: a consumer can have high throughput but also a high error rate, processing fast
+but incorrectly — which is why it's important to monitor both metrics together, not in isolation.
+
+## Structured logs and correlationId
+
+<Comparacao title="Generic log vs. structured log with correlationId">
+| Approach | Example | Problem/advantage |
+|---|---|---|
+| Generic log | `"Error processing event"` | Impossible to trace which event, which account, which flow — useless at volume |
+| Structured log | `{"correlationId": "abc-123", "eventId": "...", "contaId": "...", "erro": "timeout"}` | Lets you filter and correlate logs across multiple services by the same `correlationId` |
+</Comparacao>
+
+The `correlationId`, introduced in Chapter 13 as an event header, is what lets you reconstruct a request's
+full path — from the original HTTP call, through the Kafka publish, to every consumer that processed the
+event — in log aggregation tools like Kibana or Datadog.
+
+## Essential metrics for a Kafka pipeline
+
+<Comparacao title="Metrics worth alerting on">
+| Metric | Why |
+|---|---|
+| Consumer lag per partition/group | Detects throughput degradation before it becomes a user-visible incident |
+| DLQ message rate | Signals persistent failures requiring manual investigation |
+| Rebalance rate | Frequent rebalances indicate a misconfigured `max.poll.interval.ms` or infrastructure instability (Chapter 6) |
+| Producer → consumer latency | Time between publish and processing, relevant to business SLAs |
+| Error rate per consumer | Complements throughput — processing fast and wrong isn't better than processing slow |
+</Comparacao>
+
+## Distributed tracing
+
+Beyond logs and metrics, distributed tracing (OpenTelemetry, integrated with Spring Boot via Micrometer
+Tracing) lets you visualize a transaction's path as a graph of spans — the HTTP call, the Kafka publish,
+processing in each consumer — with the duration of each step. This is particularly valuable for
+diagnosing *where*, in a flow that spans multiple services via Kafka, most of the latency is being spent.
+
+## Ecosystem tools
+
+<Comparacao title="Where each tool fits in">
+| Tool | Typical role |
+|---|---|
+| Prometheus | Collects and stores metrics (consumer lag, throughput, error rate) exposed via Micrometer |
+| Grafana | Dashboard visualization and alert configuration on top of Prometheus metrics |
+| Kibana | Search and visualization of structured logs (typically with an ELK/OpenSearch stack) |
+| Datadog / New Relic | Commercial platforms unifying metrics, logs, and tracing into a single product |
+</Comparacao>
+
+None of these tools is required by Kafka itself — Spring Boot's JVM exposes metrics via Micrometer, and the
+choice of backend (open-source Prometheus+Grafana, or a commercial platform) is an infrastructure decision,
+not part of the event pipeline's design.
+
+## How this shows up in interviews
+
+"How would you monitor Kafka in production?" is almost always the last question in an interview on this
+topic, testing whether the candidate thinks about operations, not just code. The strong answer doesn't list
+tools in isolation — it connects metric to decision: "I'd alert on growing consumer lag, because it signals
+insufficient throughput before the user feels the delay; and on DLQ message rate, because it signals
+persistent failures that got past retry."
+
+<DicaEntrevista>
+When answering about observability, always connect the metric to the business symptom it anticipates. "I
+monitor consumer lag" is an incomplete answer; "I monitor consumer lag because it anticipates processing
+delay before the user notices" shows you think about real operations, not a memorized list of metrics.
+</DicaEntrevista>
+
+## Relation to real systems
+
+<ExemploFinanceiro title="Alerting on delayed PIX credit">
+The payments team configures an alert in Grafana: if the `saldo-service`'s consumer lag on the
+`pix.recebido` topic exceeds 1000 messages for more than 2 minutes, an alert fires on the on-call channel —
+because, for this specific flow, more than a few seconds of delay between receiving the PIX and crediting
+the balance is already a visible problem for the customer.
+</ExemploFinanceiro>
+
+<Resumo>
+Observability for a Kafka pipeline combines consumer lag (processing delay), throughput and error rate
+(capacity and quality), structured logs with correlationId (cross-service traceability), and distributed
+tracing (end-to-end latency view). No single metric tells the whole story — it's the combination of them,
+connected to real business symptoms, that lets you detect problems before the user feels them.
+</Resumo>
+
+<PerguntaDerivada>
+Likely follow-ups: "walk me through a real project using Kafka" and "what errors or challenges have you
+faced with Kafka" — the book's last two questions, asking you to connect all of this to concrete
+experience, not theory.
+</PerguntaDerivada>

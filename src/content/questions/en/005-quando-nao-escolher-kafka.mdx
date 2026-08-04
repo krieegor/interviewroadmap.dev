@@ -1,0 +1,65 @@
+---
+id: 5
+title: "When should you not choose Kafka?"
+slug: "quando-nao-escolher-kafka"
+level: ["senior", "tech-lead"]
+topics: ["fundamentos"]
+relatedChapters: ["o-que-e-apache-kafka"]
+shortAnswer: "Avoid Kafka for synchronous request/response communication, small low-volume systems where the operational complexity doesn't pay off, and when the team lacks the maturity to operate a stateful distributed system."
+quiz:
+  options:
+    - "Avoid Kafka for synchronous request/response communication, small systems where operational complexity doesn't pay off, and without maturity to operate a stateful distributed system."
+    - "There's no scenario where Kafka is a bad choice, since decoupling is always beneficial regardless of system size or team maturity."
+    - "Avoid Kafka when required throughput is high, since brokers become a performance bottleneck under heavy load."
+    - "Avoid Kafka when multiple consumers need to read the same data independently, since that case is better solved by a queue."
+  correctIndex: 0
+---
+
+## Question
+
+"You've mentioned Kafka as a good choice in several scenarios — when would you not use it?"
+
+## What the interviewer wants to assess
+
+Architectural maturity. Candidates who only know how to defend the tool they're skilled in sound like fans,
+not architects. Being able to articulate Kafka's limits is just as important as knowing its benefits.
+
+<RespostaCurta>
+  I don't use Kafka for request/response communication where I need an immediate answer — that's the
+  job of a synchronous call. I also avoid it in small, low-volume systems where the operational
+  complexity of a cluster doesn't pay off, and when the team doesn't have the maturity to operate a
+  stateful distributed system.
+</RespostaCurta>
+
+<RespostaSenior>
+  Three main scenarios. First, genuinely synchronous communication — if I need to authorize a card
+  transaction and return approved/denied within the same HTTP request, an asynchronous event doesn't
+  work; that's the job of a direct call (REST/gRPC) with a short timeout. Second, small systems — a
+  service with two or three low-volume consumers rarely justifies the operational cost of maintaining
+  partitions, replicas, and monitoring for a cluster; a simple queue or even an outbox table processed
+  by a cron job solves it with less effort. Third, operational maturity — Kafka introduces failure
+  modes that a team without distributed-systems experience will take time to diagnose: misunderstood
+  rebalances, poorly sized partitions, lag growing without an alert. Introducing Kafka without that
+  maturity tends to create more incidents than it solves.
+</RespostaSenior>
+
+## In-depth explanation
+
+See "When not to use it" and "Limitations" in [Chapter 1](/en/livro/o-que-e-apache-kafka).
+
+<ExemploFinanceiro>
+  Authorizing a purchase at the point of sale (POS) needs a response in milliseconds — the synchronous
+  authorization flow shouldn't depend on Kafka. But once the purchase is approved, the resulting event
+  ("purchase authorized") can perfectly well be published to Kafka for asynchronous notifications,
+  cashback, and antifraud.
+</ExemploFinanceiro>
+
+<Pegadinha title='"Kafka is always the right choice for decoupling systems"'>
+  This answer ignores operational cost and genuinely synchronous communication cases. A good
+  interviewer will notice the lack of nuance immediately.
+</Pegadinha>
+
+<PerguntaDerivada>
+  May come next: "how would you decide between Kafka and a simpler queue in that small case?" and
+  "what incident have you seen (or can imagine) caused by a lack of operational maturity with Kafka?".
+</PerguntaDerivada>

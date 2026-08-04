@@ -1,0 +1,157 @@
+---
+title: "Brokers, leaders, and replication"
+part: "Part II — Architecture"
+partOrder: 2
+chapterOrder: 3
+slug: "brokers-lideres-e-replicacao"
+description: "Replication Factor, Leader, Follower, ISR, and what happens when a broker goes down."
+---
+
+Chapters 3 and 4 treated the partition as a logical unit of ordering and parallelism. This chapter looks at
+the same partition from the availability angle: where it physically lives, how many copies of it exist, and
+what happens when a broker disappears from the cluster without warning.
+
+## The problem replication solves
+
+A partition, on its own, is a log file on a single broker. If that broker goes down — a corrupted disk, a
+hardware failure, a bad update, an availability zone outage — the entire partition becomes inaccessible: no
+producer can write to it, no consumer can read it, until the broker comes back (if it comes back). For a
+system meant to be the communication backbone between financial microservices, that's an unacceptable
+dependency.
+
+<Definicao title="Replication Factor">
+  Replication Factor is the number of copies of each partition kept on different brokers in the
+  cluster. A replication factor of 3 means each partition of the topic has 3 replicas — one of them
+  the leader, the other two followers — spread across distinct brokers.
+</Definicao>
+
+## Leader and Follower
+
+<Definicao title="Leader">
+  A partition's leader is the broker that serves all of its reads and writes. Producers and
+  consumers only interact with the leader — never directly with a follower (in the default
+  configuration).
+</Definicao>
+
+<Definicao title="Follower">
+  A follower continuously replicates the leader's data, keeping an up-to-date copy of the
+  partition, but without serving client reads or writes. Its only job is to be ready to take over as
+  leader if the current one fails.
+</Definicao>
+
+Every partition has exactly one leader and zero or more followers, depending on the replication factor. A
+cluster with replication factor 3 spreads those 3 replicas across different brokers — never two replicas
+of the same partition on the same broker, which would defeat the protection against losing that broker.
+
+## ISR: who's eligible to become leader
+
+Not every follower is necessarily ready to take over leadership at any given moment. A follower might be
+temporarily lagging — a slow network, an I/O pause — and letting it become leader in that state would mean
+accepting an outdated version of the partition as the source of truth.
+
+<Definicao title="ISR (In-Sync Replicas)">
+  ISR is the subset of replicas — including the leader itself — that are sufficiently caught up
+  with confirmed data. Only replicas in the ISR are eligible for election as the new leader when
+  the current one fails.
+</Definicao>
+
+A follower that falls behind (for example, due to a prolonged network failure) is removed from the ISR
+until it catches up again. That's what prevents an outdated replica from becoming leader and "forgetting"
+messages already confirmed to producers.
+
+## What happens when the Leader goes down
+
+<Diagrama legenda="Before: Broker 1 is the partition's leader. After it goes down, Broker 2 (a follower in the ISR) is elected new leader.">
+  <LeaderFailoverDiagramEn />
+</Diagrama>
+
+When the broker hosting a partition's leader becomes unavailable, the cluster's controller (elected via
+KRaft) detects the missing heartbeat and promotes a follower from the ISR to new leader — automatically,
+with no manual intervention. Producers and consumers that were pointing to the old leader get a transient
+error from the client, which automatically rediscovers the new leader and resumes operation. From the
+application's point of view, this shows up as a brief latency spike during the transition, not a visible
+failure — as long as the producer's `acks` and the client's retry configuration are correct (Chapter 10).
+
+<Atencao title="Automatic failover is not the same as zero impact">
+  Electing a new leader is automatic, but it's neither instant nor free: during the detection and
+  election window (typically seconds, not minutes, in a healthy cluster), writes and reads for that
+  specific partition are temporarily unavailable. Latency-sensitive systems need to account for that
+  window in their availability budget, not assume failover is transparent and instantaneous.
+</Atencao>
+
+## Replica distribution
+
+Kafka tries to distribute each partition's replicas across different brokers in a balanced way — both to
+spread read/write load and to reduce the chance that a single infrastructure failure (a rack, an
+availability zone) takes down multiple replicas of the same partition at once. In clusters running across
+multiple cloud availability zones, you can configure _rack awareness_ to guarantee that replicas of the
+same partition land in different zones — without it, a replication factor of 3 still protects against a
+single broker failure, but not necessarily against an entire zone going down, if all its replicas happen to
+be concentrated there.
+
+## When to increase the Replication Factor
+
+<Comparacao title="Replication Factor: trade-offs">
+| Replication Factor | Fault tolerance | Cost |
+|---|---|---|
+| 1 | None — losing the broker means losing the partition | Minimal (no replication overhead) |
+| 2 | Tolerates losing 1 broker, but with a tight margin during recovery | Moderate |
+| 3 (recommended production default) | Comfortably tolerates losing 1 broker, or 2 non-simultaneous failures | Higher disk and network usage |
+</Comparacao>
+
+Replication factor 1 is only acceptable in a local development environment. In production, 3 is the market
+standard — it's the smallest number that lets you tolerate losing a broker while still keeping more than one
+replica in the ISR during recovery.
+
+## Limitations
+
+- Replication protects against broker failure, not against data corruption at the source: if the producer
+  writes a wrong value, replication propagates that wrong value just as reliably.
+- More replicas mean more disk, network, and I/O usage — replication factor isn't a "bigger is always
+  better" setting with no cost.
+- Replication is about partition availability, not long-term backup or disaster recovery across distinct
+  geographic regions, which require additional strategies (e.g., MirrorMaker, cross-cluster replication).
+
+## How this shows up in interviews
+
+After explaining Leader/Follower, the interviewer typically asks "what happens if the leader broker goes
+down?" — testing whether you know the election is automatic, comes from the ISR, and has a real, non-instant
+unavailability window. A common, incomplete answer is "Kafka automatically elects another leader," without
+mentioning the ISR or the transient impact.
+
+<DicaEntrevista>
+  When answering about a broker going down, explicitly mention that the new leader comes from the
+  ISR (not from any follower) and that there's an unavailability window during detection and
+  election — that shows understanding of the mechanism, not just the end result.
+</DicaEntrevista>
+
+## Relation to Java and Spring Boot
+
+From the Spring Kafka code's point of view, replication and leader election are entirely transparent: the
+Kafka client embedded in Spring Boot discovers each partition's current leader via cluster metadata and
+automatically redirects requests after an election. What the Java developer configures is `acks` on the
+producer (Chapter 10) and the topic's `min.insync.replicas` — which defines how many replicas in the ISR
+must confirm a write for it to be considered successful when `acks=all`.
+
+<ExemploFinanceiro title="Card transactions topic">
+  A `cartao.transacoes.autorizadas` topic runs with replication factor 3 and
+  `min.insync.replicas=2`. That means every write with `acks=all` is only confirmed to the producer
+  after at least 2 of the 3 replicas (leader included) have persisted it — guaranteeing that, even
+  if the leader broker goes down right after, the transaction is already safe on at least one
+  replica that can take over leadership with no data loss.
+</ExemploFinanceiro>
+
+<Resumo>
+  Replication Factor defines how many copies of each partition exist, spread across different
+  brokers. The leader serves all reads and writes; followers replicate passively. The ISR is the
+  subset of replicas caught up enough to be eligible as the new leader. When the leader goes down,
+  the cluster's controller automatically elects a new leader from the ISR — an automatic but
+  non-instant process. Replication factor 3 is the production default, balancing fault tolerance
+  and infrastructure cost.
+</Resumo>
+
+<PerguntaDerivada>
+  Likely follow-ups: "what is `min.insync.replicas` and how does it relate to `acks=all`?", "what
+  happens if every replica in the ISR goes down at the same time?", and "what's the difference
+  between Partition and Replication Factor?".
+</PerguntaDerivada>

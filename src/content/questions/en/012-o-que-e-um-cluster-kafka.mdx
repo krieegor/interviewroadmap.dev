@@ -1,0 +1,62 @@
+---
+id: 12
+title: "What is a Kafka Cluster?"
+slug: "o-que-e-um-cluster-kafka"
+level: ["pleno", "senior"]
+topics: ["arquitetura"]
+relatedChapters: ["arquitetura-interna", "brokers-lideres-e-replicacao"]
+shortAnswer: "A Cluster is the set of brokers coordinated with each other (via KRaft) that together store and serve every topic in a Kafka installation, providing fault tolerance and load distribution."
+quiz:
+  options:
+    - "A Cluster is the set of brokers coordinated with each other that together store and serve every topic in a Kafka installation."
+    - "A Kafka cluster always depends on ZooKeeper to coordinate metadata between brokers."
+    - "A cluster is just a single broker configured with multiple partitions to simulate load distribution."
+    - "A cluster guarantees that losing any broker never causes downtime, regardless of the configured replication factor."
+  correctIndex: 0
+---
+
+## Question
+
+"What is a Kafka Cluster, and why is it made up of multiple brokers?"
+
+## What the interviewer wants to assess
+
+Whether you understand cluster as Kafka's real unit of availability and scale, not just as "several servers
+together" without understanding the coordination between them.
+
+<RespostaCurta>
+A Cluster is the set of brokers that together store and serve every topic in a Kafka installation. The
+brokers coordinate with each other — today via KRaft — to elect a controller, distribute partitions, and
+detect failures, all transparently to producers and consumers.
+</RespostaCurta>
+
+<RespostaSenior>
+A cluster exists so Kafka doesn't depend on a single machine: each topic's partitions are spread across the
+cluster's brokers, and each one is replicated (Chapter 5) to tolerate losing one or more brokers, depending
+on the configured replication factor. Coordination between brokers — who the cluster controller is, which
+broker is leader for each partition, which brokers are alive — is done via KRaft (Kafka Raft), which
+replaced ZooKeeper in current versions, eliminating an external dependency Kafka historically needed for
+cluster metadata.
+</RespostaSenior>
+
+## In-depth explanation
+
+See "Cluster" in [Chapter 3](/en/livro/arquitetura-interna) and replica distribution in
+[Chapter 5](/en/livro/brokers-lideres-e-replicacao).
+
+<ExemploFinanceiro>
+A production cluster for a digital bank might have 6 brokers spread across 3 different availability zones
+(2 per zone), guaranteeing that losing an entire zone doesn't bring down the cluster, as long as the
+replication factor and replica distribution are configured with that topology in mind.
+</ExemploFinanceiro>
+
+<Pegadinha title='"A Kafka cluster needs ZooKeeper"'>
+That was true in older versions, but current Kafka versions use KRaft, a self-contained consensus protocol
+(based on Raft) for cluster metadata coordination, eliminating the ZooKeeper dependency. Mentioning this
+migration shows up-to-date knowledge of the platform.
+</Pegadinha>
+
+<PerguntaDerivada>
+Likely follow-ups: "what is Replication Factor?" and "what happens when a broker in the cluster goes
+down?".
+</PerguntaDerivada>

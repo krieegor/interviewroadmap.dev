@@ -1,0 +1,136 @@
+---
+title: "Retry e DLQ"
+part: "Parte III — Consumo e reprocessamento"
+partOrder: 3
+chapterOrder: 3
+slug: "retry-e-dlq"
+description: "Como distinguir erro transitório de erro permanente, e por que o Kafka não tem DLQ nativa como o SQS."
+---
+
+O Capítulo 7 mostrou que commit manual, feito após o processamento, ainda deixa uma pergunta em aberto: o que
+fazer quando o processamento falha de verdade? Este capítulo fecha a Parte III respondendo isso — e
+encerrando um mal-entendido comum sobre DLQ no Kafka.
+
+## Erro transitório vs. erro permanente
+
+<Definicao title="Erro transitório">
+Um erro transitório é uma falha que tem chance real de não se repetir em uma nova tentativa — timeout de
+rede, banco de dados momentaneamente indisponível, serviço externo fora do ar por instantes.
+</Definicao>
+
+<Definicao title="Erro permanente">
+Um erro permanente é uma falha que vai se repetir independentemente de quantas vezes a mensagem for
+reprocessada — um payload malformado, um campo obrigatório ausente, uma regra de negócio que rejeita aquele
+dado especificamente.
+</Definicao>
+
+Essa distinção é o que decide a estratégia: retry resolve erro transitório; DLQ existe para lidar com o que
+o retry não resolve.
+
+## Retry e Backoff
+
+<Definicao title="Retry com Backoff">
+Retry é a nova tentativa de processar uma mensagem que falhou. Backoff é o intervalo, crescente a cada
+tentativa (backoff exponencial), entre uma tentativa e a próxima — evitando martelar um sistema já
+sobrecarregado com tentativas imediatas e sucessivas.
+</Definicao>
+
+Um esquema comum: 3 tentativas, com intervalos de 1s, 5s e 30s. Se as três falharem, a mensagem é
+considerada não recuperável por retry simples e segue para a DLQ.
+
+## Retry Topic: como o Kafka implementa retry na prática
+
+<Diagrama legenda="Consumer falha ao processar; a mensagem vai para um tópico de retry com backoff; após esgotar as tentativas, ela vai para a DLQ, sem bloquear as demais mensagens do tópico principal.">
+  <RetryDlqDiagram />
+</Diagrama>
+
+Diferente de um simples "tente de novo dentro do mesmo poll", o padrão mais robusto em Spring Kafka usa um
+**retry topic** dedicado: ao falhar, a mensagem é republicada em um tópico separado (`pagamentos-retry`), com
+um cabeçalho indicando quantas tentativas já ocorreram e quando a próxima deve acontecer. Um listener nesse
+tópico de retry reprocessa a mensagem após o backoff, e, se esgotar as tentativas configuradas, republica-a
+em um tópico de DLQ.
+
+<Atencao title="Por que não simplesmente bloquear e tentar de novo no mesmo poll">
+Bloquear a thread do consumer tentando reprocessar a mesma mensagem repetidamente no tópico principal trava
+o processamento de todas as mensagens seguintes daquela partition — esse é exatamente o efeito poison pill.
+Usar um tópico de retry separado permite que o consumer principal siga processando as mensagens seguintes
+enquanto a mensagem problemática aguarda sua próxima tentativa em outro lugar.
+</Atencao>
+
+## Poison Pill
+
+<Definicao title="Poison Pill">
+Poison pill é uma mensagem que trava o processamento de uma partition indefinidamente — porque toda
+tentativa de processá-la falha e o consumer não tem estratégia para segui-la em frente, ficando preso
+reprocessando a mesma mensagem repetidamente.
+</Definicao>
+
+Sem uma estratégia de retry com limite e DLQ, um consumer mal configurado que trata todo erro como
+transitório (retentando para sempre) pode ficar travado indefinidamente em uma única mensagem malformada,
+enquanto todas as mensagens seguintes da mesma partition esperam atrás dela na fila de processamento.
+
+## DLQ no Kafka: não é nativa
+
+<Atencao title='"O Kafka tem DLQ nativa" é uma afirmação incorreta'>
+Diferente do AWS SQS, que tem um mecanismo de DLQ integrado à própria fila, o Kafka **não** tem um recurso
+nativo de dead-lettering. Uma DLQ no Kafka é, na prática, apenas um tópico comum, e a lógica de publicar
+mensagens problemáticas nele é responsabilidade da aplicação (ou de um framework como o Spring Kafka, que
+oferece o `DeadLetterPublishingRecoverer` pronto para uso).
+</Atencao>
+
+Essa diferença é frequentemente mal respondida em entrevista — candidatos assumem que "Kafka tem DLQ" da
+mesma forma que SQS, quando na realidade é uma convenção arquitetural implementada por cima do Kafka, não um
+recurso da plataforma.
+
+## Replay vs. DLQ Redrive
+
+<Comparacao title="Reprocessamento: replay (Kafka) vs. DLQ redrive (SQS)">
+| Aspecto | Replay (Kafka) | DLQ Redrive (SQS) |
+|---|---|---|
+| O que reprocessa | Qualquer intervalo de eventos retidos no tópico original | Apenas as mensagens que já falharam e foram para a DLQ |
+| Mecanismo | Reset do offset commitado do Consumer Group | Comando explícito de redrive movendo mensagens de volta à fila original |
+| Escopo | Histórico completo dentro da retenção, processado ou não | Apenas o subconjunto que já falhou anteriormente |
+</Comparacao>
+
+Replay e DLQ redrive resolvem problemas parecidos mas não idênticos: replay reconstrói processamento a
+partir de qualquer ponto do histórico retido; redrive apenas reencaminha mensagens que já haviam sido
+isoladas por falha.
+
+## Como aparece em entrevistas
+
+"O Kafka tem DLQ nativa?" é uma pergunta direta e comum, quase sempre seguida de "como você implementaria
+uma?". A resposta correta explica que é um tópico comum com lógica de aplicação por trás, não um recurso de
+plataforma — e citar o `DeadLetterPublishingRecoverer` do Spring Kafka demonstra conhecimento prático, não
+só teórico.
+
+<DicaEntrevista>
+Ao ser perguntado sobre DLQ no Kafka, não responda apenas "sim, existe" — explique que é implementada como
+um tópico comum, por convenção da aplicação ou do framework, diferente do mecanismo nativo do SQS.
+</DicaEntrevista>
+
+## Relação com Java e Spring Boot
+
+O Spring Kafka oferece `DefaultErrorHandler` combinado com `DeadLetterPublishingRecoverer` para implementar
+retry com backoff e DLQ de forma declarativa: configura-se o número de tentativas, o backoff entre elas, e o
+recoverer publica automaticamente no tópico de DLQ (por convenção, `<topico-original>.DLT`) quando as
+tentativas se esgotam — sem que o desenvolvedor precise escrever a lógica de republicação manualmente.
+
+<ExemploFinanceiro title="Boleto com CPF inválido">
+Um evento `BoletoGerado` com CPF malformado falha na validação do `cobranca-service` — um erro permanente,
+não transitório. Mesmo com retry configurado, as 3 tentativas falham da mesma forma, e a mensagem é
+publicada em `boletos.gerados.DLT` para investigação manual, enquanto os boletos seguintes da mesma
+partition continuam sendo processados normalmente.
+</ExemploFinanceiro>
+
+<Resumo>
+Erros transitórios justificam retry com backoff; erros permanentes não são resolvidos por retry e devem ir
+para uma DLQ. O Kafka não tem DLQ nativa — é um tópico comum, populado por convenção da aplicação ou
+framework, existindo para isolar o efeito poison pill sem bloquear o processamento das demais mensagens.
+Replay (Kafka) e DLQ redrive (SQS) resolvem reprocessamento de formas diferentes: um reconstrói a partir de
+qualquer ponto do histórico retido, o outro reencaminha apenas o que já foi isolado por falha.
+</Resumo>
+
+<PerguntaDerivada>
+Prováveis follow-ups: "como você decidiria quantas tentativas de retry fazer antes de ir para a DLQ?" e
+"o que você faria com as mensagens que já estão na DLQ?".
+</PerguntaDerivada>

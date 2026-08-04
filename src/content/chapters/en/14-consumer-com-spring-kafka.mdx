@@ -1,0 +1,166 @@
+---
+title: "Consumer with Spring Kafka"
+part: "Part V — Java and Spring Boot"
+partOrder: 5
+chapterOrder: 2
+slug: "consumer-com-spring-kafka"
+description: "@KafkaListener in practice — groupId, concurrency, Acknowledgment, deserialization, and exception handling with retry and DLQ."
+---
+
+Chapter 13 showed the publishing side. This chapter shows the consuming side — where most of the concepts
+from Parts II through IV (Consumer Group, offset/commit, retry/DLQ, idempotency) materialize into real
+code.
+
+## @KafkaListener
+
+<Definicao title="@KafkaListener">
+`@KafkaListener` is the Spring Kafka annotation that registers a method as a consumer of one or more
+topics. Behind it, Spring Kafka manages the native `KafkaConsumer`'s full lifecycle — poll loop,
+deserialization, and (depending on configuration) offset commit.
+</Definicao>
+
+```java
+@Component
+public class PagamentoEventListener {
+
+    @KafkaListener(topics = "pagamentos.aprovados", groupId = "notificacao-service")
+    public void processar(PagamentoAprovadoEvent evento) {
+        notificacaoService.enviarPush(evento.getContaId(), evento.getValor());
+    }
+}
+```
+
+`groupId` defines the Consumer Group (Chapter 6) — if omitted on the method, it falls back to the
+application's `spring.kafka.consumer.group-id` default.
+
+## Concurrency
+
+<Diagrama legenda="Each partition of the topic is assigned to exactly one consumer in the Consumer Group — concurrency defines how many threads the application instance itself registers as additional consumers.">
+  <ProducerConsumerFlowEn />
+</Diagrama>
+
+```java
+@KafkaListener(
+    topics = "pagamentos.aprovados",
+    groupId = "notificacao-service",
+    concurrency = "3"
+)
+public void processar(PagamentoAprovadoEvent evento) { /* ... */ }
+```
+
+<Atencao title="Concurrency doesn't exceed the number of partitions">
+`concurrency = "3"` creates 3 consumer threads within the same application instance, each behaving as an
+additional Consumer Group member. Setting `concurrency` higher than the number of partitions available to
+that instance creates idle threads — the same limit from Chapter 6 applies here, just within a single
+process instead of across multiple pods.
+</Atencao>
+
+## Acknowledgment: manual commit in practice
+
+<Definicao title="Acknowledgment">
+`Acknowledgment` is the object Spring Kafka injects into the listener method when `AckMode` is configured
+as manual, letting the application explicitly decide when the offset should be committed.
+</Definicao>
+
+```java
+@KafkaListener(topics = "pagamentos.aprovados", groupId = "notificacao-service")
+public void processar(PagamentoAprovadoEvent evento, Acknowledgment ack) {
+    notificacaoService.enviarPush(evento.getContaId(), evento.getValor());
+    ack.acknowledge();
+}
+```
+
+This requires, in the `ContainerFactory` configuration, `enable.auto.commit=false` and `AckMode.MANUAL` (or
+`MANUAL_IMMEDIATE`) — the pattern discussed in Chapter 7, applied here in code: `ack.acknowledge()` is only
+called after the business logic (here, sending the notification) finishes successfully.
+
+## Deserialization
+
+The configured `value-deserializer` (JSON, Avro, Protobuf — mirroring the producer's choice in Chapter 13)
+converts the raw payload back into the Java type expected by the listener method. A schema mismatch between
+what the producer serialized and what the consumer expects to deserialize is a common source of
+**permanent** error (Chapter 9) — the message will never deserialize correctly, no matter how many times
+it's retried.
+
+## Exception handling: retry and DLQ in practice
+
+```java
+@Bean
+public DefaultErrorHandler errorHandler(KafkaTemplate<Object, Object> template) {
+    var recoverer = new DeadLetterPublishingRecoverer(template);
+    var backoff = new ExponentialBackOff(1000L, 2.0);
+    backoff.setMaxInterval(30_000L);
+    return new DefaultErrorHandler(recoverer, backoff);
+}
+```
+
+This `DefaultErrorHandler`, registered on the `ContainerFactory`, implements exactly the Chapter 9 pattern:
+attempts with exponential backoff and, once they run out, automatic publishing to the DLQ topic (by
+convention, `<topic>.DLT`) via `DeadLetterPublishingRecoverer` — without the listener method needing to
+handle that manually.
+
+<Pegadinha title='"An unhandled exception in the listener crashes the application"'>
+An exception thrown inside a `@KafkaListener` method doesn't crash the application — it's caught by the
+Spring Kafka container and forwarded to the configured `ErrorHandler` (retry, then DLQ). The real mistake
+of not configuring a proper `ErrorHandler` isn't the application crashing, it's the default behavior
+(indefinite retry, or a generic log) not being what the team expects for that business flow.
+</Pegadinha>
+
+## Idempotency in the consumer
+
+All the care taken with manual commit and retry doesn't replace idempotency (Chapter 11) — they solve
+*when* the offset advances and *what to do* when processing fails, not *what happens* if the same message
+is delivered twice.
+
+```java
+@KafkaListener(topics = "pix.recebido", groupId = "saldo-service")
+@Transactional
+public void processar(PixRecebidoEvent evento, Acknowledgment ack) {
+    try {
+        eventosProcessadosRepository.insert(evento.getEventId());
+    } catch (DataIntegrityViolationException e) {
+        ack.acknowledge();
+        return;
+    }
+    contaRepository.creditar(evento.getContaId(), evento.getValor());
+    ack.acknowledge();
+}
+```
+
+## How this shows up in interviews
+
+"How would you implement a Kafka consumer in Spring Boot with at-least-once guarantees and duplicate
+protection?" is a question that ties together practically the entire book. The complete answer cites:
+`@KafkaListener` with an explicit `groupId`, `AckMode.MANUAL` with `Acknowledgment.acknowledge()` after
+processing, `DefaultErrorHandler` with backoff and DLQ, and an `eventId` check in the same transaction as
+the business effect.
+
+<DicaEntrevista>
+If the interviewer asks you to "sketch out" a complete consumer, build the answer in this order: listener
+and group, manual ack, error handler with retry/DLQ, idempotency. That sequence mirrors exactly the journey
+from Chapters 6 through 11 — and shows the concepts connect, they aren't isolated topics.
+</DicaEntrevista>
+
+## Relation to real systems
+
+<ExemploFinanceiro title="Complete saldo-service consumer">
+The `saldo-service` runs with `concurrency = "6"` (matching the number of partitions on the
+`pix.recebido` topic), `AckMode.MANUAL`, a `DefaultErrorHandler` with 1s/5s/30s backoff and a DLQ, and an
+`eventId` check in the same transaction as the credit. The result: no lost messages (at-least-once), no
+duplicate credits (idempotency), and problematic messages isolated in the DLQ without stalling processing
+for the other accounts.
+</ExemploFinanceiro>
+
+<Resumo>
+`@KafkaListener` registers the consumer; `groupId` defines the Consumer Group; `concurrency` creates
+additional threads within the instance, bounded by the number of available partitions. `Acknowledgment`
+enables manual commit after processing. `DefaultErrorHandler` with `DeadLetterPublishingRecoverer`
+implements retry with backoff and DLQ declaratively. None of these mechanisms replace the `eventId`
+idempotency check within the same transaction as the business effect — they're complementary, not
+alternatives.
+</Resumo>
+
+<PerguntaDerivada>
+Likely follow-ups: "what happens if `ack.acknowledge()` is called before the exception is thrown?" and "how
+would you test this consumer, including the duplicate-message scenario?".
+</PerguntaDerivada>

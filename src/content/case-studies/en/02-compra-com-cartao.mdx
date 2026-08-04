@@ -1,0 +1,126 @@
+---
+title: "Card purchase"
+slug: "compra-com-cartao"
+order: 2
+description: "Synchronous authorization, and a single event consumed independently by antifraud, notifications, cashback, and analytics."
+relatedChapters: ["o-que-e-apache-kafka", "partitions-e-ordenacao", "idempotencia"]
+---
+
+This case study shows the most common event-driven architecture pattern in payment systems: a synchronous,
+critical decision (whether to authorize the purchase) followed by a single event that multiple systems
+consume completely independently, each concerned with a different responsibility.
+
+## The domain event
+
+The authorization itself — approving or denying the purchase at the moment the card is charged — is **not**
+done via Kafka. It's a synchronous call, with a millisecond response, between the payment terminal (or
+payment gateway) and the `autorizacao-service`, which decides based on available balance/limit. This is
+intentional: Chapter 1 already explained that request/response communication needing an immediate answer
+isn't Kafka's use case.
+
+What happens **after** the synchronous decision is where Kafka comes in: as soon as the purchase is
+approved, the `autorizacao-service` publishes a `CompraAutorizada` event — a fact that already happened —
+and moves on, without knowing (or needing to know) who will react to it.
+
+```json
+{
+  "eventId": "3a91f7c2-...",
+  "cartaoId": "card_88213",
+  "clienteId": "cli_50213",
+  "valor": 15990,
+  "estabelecimento": "Loja XYZ",
+  "categoria": "varejo",
+  "autorizadoEm": "2026-07-31T18:44:02Z"
+}
+```
+
+## Topic topology
+
+<Comparacao title="Topic and configuration">
+| Item | Decision |
+|---|---|
+| Topic | `compras.autorizadas` |
+| Key | `cartaoId` |
+| Partitions | 18 |
+| Replication factor | 3 |
+| Retention | 15 days |
+</Comparacao>
+
+## Why the key is `cartaoId`, not `clienteId`
+
+<DicaEntrevista>
+The choice between `cartaoId` and `clienteId` as the key is a great test of ordering understanding
+(Chapter 4). If a customer has multiple cards and the requirement is only "process purchases on the same
+card in order" (e.g., to detect a suspicious sequence of purchases on the same card in a short window), the
+correct key is `cartaoId`. If the requirement were to consolidate the customer's behavior as a whole,
+regardless of which card was used, `clienteId` would be the choice — trading per-card ordering for
+per-customer ordering. There's no universally correct answer; it depends on which ordering relationship the
+domain actually needs.
+</DicaEntrevista>
+
+## Independent consumers
+
+<Diagrama legenda="Multiple Consumer Groups read the same compras.autorizadas topic independently.">
+  <ProducerConsumerFlowEn />
+</Diagrama>
+
+- **antifraude-service**: assesses the purchase against risk rules (spending pattern, geolocation, velocity
+  between transactions). In suspicious cases, it may publish a separate `CompraSuspeita` event to trigger a
+  preventive card block.
+- **notificacao-service**: sends a push notification, "Purchase of R$ 159.90 approved at Loja XYZ."
+- **cashback-service**: calculates and credits applicable cashback, based on the merchant's category.
+- **analytics-service**: feeds a data warehouse for spending dashboards and recommendation models.
+
+None of these four consumers know the other three exist. A slowdown in `analytics-service` (for example,
+during a heavy report-reprocessing load) doesn't delay the push notification, which needs to be nearly
+instant for a good customer experience.
+
+## Idempotency: not every consumer needs the same rigor
+
+<Atencao title="The level of duplication protection varies by consumer">
+The four consumers of this event have very different idempotency requirements — a common mistake is
+applying the same protection pattern (a processed-events table) to all of them, when some are already
+naturally tolerant of duplication.
+</Atencao>
+
+<Comparacao title="Idempotency requirement per consumer">
+| Consumer | Effect of duplication | Required protection |
+|---|---|---|
+| `cashback-service` | Cashback credited twice — direct financial loss | `eventId` + uniqueness constraint, mandatory |
+| `notificacao-service` | Customer gets two notifications — annoying, not critical | No special protection needed |
+| `antifraude-service` | Re-evaluates the same purchase twice — redundant work, not incorrect | Optional, for efficiency, not correctness |
+| `analytics-service` | Purchase counted twice in the aggregation — inflated metrics | Depends on the query: `eventId`-based upsert aggregations solve this naturally |
+</Comparacao>
+
+## Retry and DLQ
+
+The `cashback-service`, since it handles direct financial value, uses retry with backoff and a DLQ
+(Chapter 9): if the cashback calculation rule fails (e.g., the category table is unavailable), the message
+is reprocessed up to 3 times before going to `compras.autorizadas.cashback.dlq`, without blocking cashback
+credit for the following purchases.
+
+## Replay
+
+If the cashback category table is retroactively corrected (a category that should give 2% was configured
+with 1%), the `cashback-service` can replay the last 15 days (within retention) to recalculate and credit
+the difference — as long as the credit logic is an upsert by `eventId`, avoiding duplicating cashback
+already correctly credited.
+
+## Observability
+
+<Comparacao title="What each team monitors">
+| Team | Priority metric |
+|---|---|
+| Cashback | Consumer lag and error rate — a delay here turns into a customer complaint about missing cashback |
+| Notifications | Producer → consumer latency — the push needs to arrive within seconds to have value |
+| Antifraud | DLQ message rate — risk-assessment failures can't go unnoticed |
+| Analytics | Consumer lag aggregated over the day — a delay here is tolerable in minutes, not seconds |
+</Comparacao>
+
+<Resumo>
+This case illustrates the difference between synchronous communication (the authorization itself, outside
+Kafka) and asynchronous (everything reacting to the already-approved purchase). A single event,
+`CompraAutorizada`, is consumed by four systems with completely different latency, idempotency, and
+failure-tolerance needs — each configured according to its own criticality, not a single pattern applied
+indiscriminately to all of them.
+</Resumo>

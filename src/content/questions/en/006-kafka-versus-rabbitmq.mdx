@@ -1,0 +1,66 @@
+---
+id: 6
+title: "Kafka versus RabbitMQ"
+slug: "kafka-versus-rabbitmq"
+level: ["senior", "tech-lead"]
+topics: ["comparacoes"]
+relatedChapters: ["kafka-versus-outras-ferramentas"]
+shortAnswer: "Kafka is a distributed log with retention and replay, built to share events across multiple independent consumers; RabbitMQ is a queue with rich routing (exchanges, routing keys), built to distribute work among workers."
+quiz:
+  options:
+    - "Kafka is a distributed log with retention and replay for multiple independent consumers; RabbitMQ is a queue with rich routing built to distribute work among workers."
+    - "RabbitMQ is simpler, so it's essentially a weaker version of Kafka with fewer features."
+    - "Both retain messages after consumption the same way, differing only in how sophisticated their routing is."
+    - "Kafka, like RabbitMQ, only lets a single consumer process each message, with no support for independent Consumer Groups."
+  correctIndex: 0
+---
+
+## Question
+
+"What's the difference between Kafka and RabbitMQ, and when would you choose one over the other?"
+
+## What the interviewer wants to assess
+
+Whether you know both tools from real experience or just by name. The ideal answer cites decision
+criteria, not just a feature list.
+
+<RespostaCurta>
+  RabbitMQ is a message queue with sophisticated routing — exchanges, routing keys, priorities — built
+  to distribute work among workers; the message disappears once processed. Kafka is a distributed log
+  with configurable retention, built to share events across multiple independent consumers, with
+  native replay. I choose RabbitMQ when I need fine-grained task routing; Kafka when I need several
+  systems to react to the same business fact, with the ability to reprocess history.
+</RespostaCurta>
+
+<RespostaSenior>
+  The core difference isn't performance, it's data model. RabbitMQ models work queues: a message
+  routed by an exchange arrives at a queue and is consumed by a worker; after the ack, it disappears.
+  RabbitMQ's strength is routing — direct, topic, fanout, and headers exchanges enable complex
+  distribution rules, message priority, and fine-grained dead lettering per queue. Kafka models a log:
+  events are appended to a partition and retained for a configurable period, regardless of whether
+  they've been read. This lets multiple Consumer Groups read the same topic completely independently,
+  and lets a new consumer read the retained history via replay — something RabbitMQ doesn't offer
+  natively. In practice, I choose RabbitMQ for internal work queues (processing an email send,
+  generating a PDF) and Kafka for domain events that multiple systems from different teams consume.
+</RespostaSenior>
+
+## In-depth explanation
+
+See the full comparison table in [Chapter 2](/en/livro/kafka-versus-outras-ferramentas).
+
+<ExemploFinanceiro>
+  An invoice-issuing service might use RabbitMQ internally to distribute the "generate invoice PDF"
+  task among workers (work, no need for replay), while at the same time publishing the `BoletoEmitido`
+  event to Kafka, so billing, notifications, and accounting can react independently.
+</ExemploFinanceiro>
+
+<Pegadinha title='"RabbitMQ is simpler, so it is always worse"'>
+  Operational simplicity is a real advantage of RabbitMQ for cases that don't need
+  retention/replay. Treating RabbitMQ as "a weaker Kafka" ignores that they're tools for different
+  problems.
+</Pegadinha>
+
+<PerguntaDerivada>
+  Common follow-ups: "how would you do fan-out (multiple consumers of the same data) in RabbitMQ?" and
+  "have you ever migrated something from RabbitMQ to Kafka or vice versa? Why?".
+</PerguntaDerivada>

@@ -1,0 +1,12 @@
+---
+term: "Retention"
+slug: "retention"
+shortDefinition: "Política que define por quanto tempo (ou até que tamanho) os registros de um tópico permanecem armazenados."
+relatedTerms: ["replay", "topic", "partition"]
+relatedChapters: ["o-que-e-apache-kafka", "retention-e-replay"]
+---
+
+Retention (retenção) determina quando um registro pode ser descartado do log — por tempo (ex.: 7 dias) ou
+por tamanho acumulado da partition, o que ocorrer primeiro. Diferente de uma fila, a retenção no Kafka não
+depende de o registro já ter sido consumido: ele permanece disponível para qualquer consumer (existente ou
+futuro) até expirar pela política configurada. É a retenção que viabiliza o replay.

@@ -1,0 +1,171 @@
+---
+title: "Arquitetura interna"
+part: "Parte II — Arquitetura"
+partOrder: 2
+chapterOrder: 1
+slug: "arquitetura-interna"
+description: "Producer, Broker, Cluster, Topic, Partition, Offset, Consumer e Consumer Group — as peças que compõem o Kafka."
+---
+
+Este capítulo define, de forma precisa, as peças que vão aparecer em praticamente todo o resto do livro. Se
+o Capítulo 1 respondeu "por que Kafka existe", este capítulo responde "do que ele é feito".
+
+## Producer
+
+<Definicao title="Producer">
+  Producer é qualquer aplicação que publica eventos em um tópico Kafka. Na prática, é um
+  microsserviço (ou parte de um) que, ao final de uma operação de negócio, envia uma mensagem
+  representando o fato que acabou de ocorrer.
+</Definicao>
+
+Um Producer decide para qual **tópico** enviar, qual **key** usar (Capítulo 4) e como serializar o valor
+(JSON, Avro, Protobuf). Ele não sabe — nem deveria saber — quantos consumidores existem ou o que fazem com o
+evento. Em Spring Boot, um Producer é tipicamente um `@Service` usando `KafkaTemplate<K, V>` (Capítulo 13).
+
+## Broker
+
+<Definicao title="Broker">
+  Broker é um processo Kafka em execução, responsável por armazenar dados de um subconjunto das
+  partitions do cluster e servir requisições de leitura e escrita para essas partitions.
+</Definicao>
+
+Um broker sozinho já é um Kafka funcional, mas em produção ele sempre roda em conjunto com outros brokers,
+formando um **cluster**, para tolerância a falhas e distribuição de carga.
+
+## Cluster
+
+<Definicao title="Cluster">
+  Cluster é o conjunto de brokers que, juntos, armazenam e servem todos os tópicos de uma instalação
+  Kafka. A coordenação entre brokers (eleição de controlador, metadados do cluster) é feita via
+  Kafka Raft (KRaft) nas versões atuais, substituindo o antigo ZooKeeper.
+</Definicao>
+
+<Diagrama legenda="Um cluster com três brokers replicando as partitions de um tópico entre si.">
+  <BrokerClusterDiagram />
+</Diagrama>
+
+## Topic
+
+<Definicao title="Topic">
+  Topic é o nome lógico sob o qual eventos relacionados são publicados e consumidos — por exemplo,
+  `pagamentos.aprovados` ou `pix.recebido`. Um tópico é uma abstração; fisicamente, ele é dividido
+  em uma ou mais partitions.
+</Definicao>
+
+Um tópico não tem schema imposto pelo Kafka em si (o schema, quando existe, é responsabilidade de uma camada
+como o Schema Registry, fora do escopo deste capítulo). O que o Kafka garante é a ordem de entrega **dentro**
+de cada partition do tópico — não entre tópicos diferentes, nem necessariamente entre partitions do mesmo
+tópico.
+
+## Partition
+
+<Definicao title="Partition">
+  Partition é uma subdivisão ordenada e imutável de um tópico — o log físico propriamente dito. Cada
+  partition é uma sequência de registros identificados por um offset crescente, armazenada em um
+  broker (com réplicas em outros brokers, ver Capítulo 5).
+</Definicao>
+
+Partitions existem por dois motivos: **paralelismo** (múltiplos consumidores podem processar partitions
+diferentes ao mesmo tempo) e **escalabilidade horizontal** (o tópico pode crescer distribuindo partitions
+entre mais brokers). O Capítulo 4 aprofunda como a escolha da key determina em qual partition uma mensagem
+cai, e por que isso é a decisão de design mais importante ao modelar um tópico.
+
+## Offset
+
+<Definicao title="Offset">
+  Offset é a posição sequencial de um registro dentro de uma partition — um número inteiro
+  crescente, único por partition, que identifica univocamente uma mensagem naquela partition.
+</Definicao>
+
+Offset não é global ao tópico; é local a cada partition. O mesmo número de offset existe de forma
+independente em cada partition de um tópico. O Capítulo 7 detalha como consumidores usam o offset para
+saber "até onde já li".
+
+## Consumer
+
+<Definicao title="Consumer">
+  Consumer é qualquer aplicação que lê eventos de um ou mais tópicos, processando-os a partir da
+  posição (offset) em que parou da última vez.
+</Definicao>
+
+Um Consumer, sozinho, lê de todas as partitions às quais está atribuído. Em Spring Boot, o padrão é um método
+anotado com `@KafkaListener` (Capítulo 14).
+
+## Consumer Group
+
+<Definicao title="Consumer Group">
+  Consumer Group é um conjunto de instâncias de consumer que se identificam com o mesmo `group.id` e
+  dividem entre si as partitions de um tópico — cada partition é lida por exatamente um consumer do
+  grupo em um dado momento.
+</Definicao>
+
+É o Consumer Group que transforma o Kafka em uma ferramenta capaz de **tanto** distribuir trabalho (dentro
+de um grupo, cada partition vai para um único consumer, como em uma fila) **quanto** compartilhar o mesmo
+dado com múltiplos sistemas (grupos diferentes leem o mesmo tópico de forma totalmente independente, cada um
+com seu próprio conjunto de offsets). O Capítulo 6 detalha o comportamento de rebalance quando consumers
+entram ou saem de um grupo.
+
+## Juntando as peças
+
+<Diagrama legenda="Producer publica no Topic pagamentos, dividido em 3 partitions; o Consumer Group notificacao-service tem um consumer por partition.">
+  <ProducerConsumerFlow />
+</Diagrama>
+
+O fluxo completo: um Producer publica no tópico `pagamentos`; o Kafka decide (via key/hash, Capítulo 4) em
+qual das partitions do tópico a mensagem cai; ela é persistida com um offset sequencial naquela partition,
+replicada para os brokers de réplica (Capítulo 5); um ou mais Consumer Groups leem a partition de forma
+independente, cada grupo avançando seu próprio conjunto de offsets.
+
+## Quando esse modelo é a escolha certa
+
+Esse desenho compensa quando o número de eventos e de consumidores independentes justifica a complexidade —
+tipicamente a partir de alguns microsserviços reagindo ao mesmo domínio de eventos. Para um único
+produtor/consumidor com baixo volume, a mesma arquitetura tecnicamente funciona, mas o custo operacional de
+manter partitions, réplicas e um cluster raramente se paga.
+
+## Limitações a ter em mente
+
+- O número de partitions de um tópico define o paralelismo máximo de consumo dentro de um Consumer Group —
+  aumentar depois é possível, mas redistribui as chaves (Capítulo 4).
+- Mais partitions não é sempre melhor: cada partition consome recursos de broker (file handles, memória) e
+  aumenta o tempo de rebalance.
+
+## Como aparece em entrevistas
+
+Entrevistadores costumam pedir para desenhar esse fluxo no quadro (ou verbalmente) e depois variar os
+parâmetros: "o que muda se eu tiver 2 partitions e 5 consumers no grupo?", "e se eu tiver dois Consumer
+Groups diferentes lendo o mesmo tópico?". Responder com precisão sobre offset ser local à partition — não ao
+tópico — é um sinal frequentemente usado para diferenciar quem só usou Kafka de quem entende Kafka.
+
+<DicaEntrevista>
+  Ao descrever a arquitetura, deixe explícito que offset é por partition, não por tópico, e que
+  Consumer Groups diferentes são completamente independentes entre si — dois grupos lendo o mesmo
+  tópico não competem pelas mesmas mensagens.
+</DicaEntrevista>
+
+## Relação com Java e Spring Boot
+
+Cada peça mapeia para uma configuração ou classe do Spring Kafka: `bootstrap-servers` aponta para os brokers
+do cluster; `KafkaTemplate.send(topic, key, value)` é o Producer; `@KafkaListener(topics = "...", groupId =
+"...")` define o Consumer e seu Consumer Group; o offset é gerenciado pelo `Acknowledgment` (commit manual)
+ou automaticamente pelo client, conforme configuração (Capítulo 7).
+
+<ExemploFinanceiro title="Faturas de cartão">
+  O tópico `faturas.fechadas` pode ter 12 partitions, uma estratégia de key por `contaId` (para
+  garantir que todos os eventos da mesma conta fiquem ordenados na mesma partition) e dois Consumer
+  Groups: um do serviço de cobrança (que gera o boleto) e outro do serviço de analytics (que
+  alimenta um dashboard) — ambos leem o mesmo tópico, de forma totalmente independente, cada um na
+  sua velocidade.
+</ExemploFinanceiro>
+
+<Resumo>
+  Producer publica, Broker armazena, Cluster é o conjunto de brokers, Topic é o nome lógico,
+  Partition é o log físico ordenado, Offset é a posição dentro da partition, Consumer lê, e Consumer
+  Group é o mecanismo que permite tanto dividir trabalho quanto compartilhar o mesmo dado entre
+  sistemas independentes.
+</Resumo>
+
+<PerguntaDerivada>
+  A seguir, é comum perguntarem: "por que existem partitions?", "como o Kafka escolhe a partition de
+  uma mensagem?" e "o que acontece se eu tiver mais consumers do que partitions?".
+</PerguntaDerivada>

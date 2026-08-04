@@ -1,0 +1,12 @@
+---
+term: "Leader"
+slug: "leader"
+shortDefinition: "Broker responsável por servir todas as leituras e escritas de uma partition específica."
+relatedTerms: ["follower", "broker", "isr", "replication-factor"]
+relatedChapters: ["arquitetura-interna", "brokers-lideres-e-replicacao"]
+---
+
+Cada partition tem exatamente um broker atuando como leader a qualquer momento. Producers e consumers
+interagem com a partition através do leader; os demais brokers que possuem réplica dessa partition atuam
+como followers, replicando os dados do leader. Se o leader falha, um follower atualizado é eleito novo
+leader.

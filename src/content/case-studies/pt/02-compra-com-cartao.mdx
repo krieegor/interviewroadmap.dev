@@ -1,0 +1,124 @@
+---
+title: "Compra com cartão"
+slug: "compra-com-cartao"
+order: 2
+description: "Autorização síncrona, e um único evento consumido de forma independente por antifraude, notificação, cashback e analytics."
+relatedChapters: ["o-que-e-apache-kafka", "partitions-e-ordenacao", "idempotencia"]
+---
+
+Este estudo de caso mostra o padrão mais comum de arquitetura orientada a eventos em sistemas de pagamento:
+uma decisão síncrona e crítica (autorizar ou não a compra) seguida de um evento único que múltiplos sistemas
+consomem de forma completamente independente, cada um preocupado com uma responsabilidade diferente.
+
+## O evento de domínio
+
+A autorização em si — aprovar ou negar a compra no momento em que o cartão é passado — **não** é feita via
+Kafka. É uma chamada síncrona, com resposta em milissegundos, entre a maquininha (ou gateway de pagamento) e
+o `autorizacao-service`, que decide com base em saldo/limite disponível. Isso é intencional: o Capítulo 1
+já explicou que comunicação request/response com resposta imediata não é o caso de uso do Kafka.
+
+O que acontece **depois** da decisão síncrona é onde o Kafka entra: assim que a compra é aprovada, o
+`autorizacao-service` publica um evento `CompraAutorizada` — um fato que já aconteceu — e segue em frente,
+sem saber (nem precisar saber) quem vai reagir a isso.
+
+```json
+{
+  "eventId": "3a91f7c2-...",
+  "cartaoId": "card_88213",
+  "clienteId": "cli_50213",
+  "valor": 15990,
+  "estabelecimento": "Loja XYZ",
+  "categoria": "varejo",
+  "autorizadoEm": "2026-07-31T18:44:02Z"
+}
+```
+
+## Topologia de tópicos
+
+<Comparacao title="Tópico e configuração">
+| Item | Decisão |
+|---|---|
+| Tópico | `compras.autorizadas` |
+| Key | `cartaoId` |
+| Partitions | 18 |
+| Replication factor | 3 |
+| Retention | 15 dias |
+</Comparacao>
+
+## Por que a key é `cartaoId`, não `clienteId`
+
+<DicaEntrevista>
+A escolha entre `cartaoId` e `clienteId` como key é um ótimo teste de entendimento de ordenação
+(Capítulo 4). Se um cliente tem múltiplos cartões e o requisito é apenas "processar compras do mesmo cartão
+em ordem" (ex.: para detectar uma sequência suspeita de compras no mesmo cartão em curto intervalo), a key
+correta é `cartaoId`. Se o requisito fosse consolidar comportamento do cliente como um todo, independente do
+cartão usado, `clienteId` seria a escolha — trocando ordenação por cartão por ordenação por cliente. Não
+existe resposta certa universal; depende de qual relação de ordem o domínio realmente precisa.
+</DicaEntrevista>
+
+## Consumidores independentes
+
+<Diagrama legenda="Múltiplos Consumer Groups leem o mesmo tópico compras.autorizadas de forma independente.">
+  <ProducerConsumerFlow />
+</Diagrama>
+
+- **antifraude-service**: avalia a compra contra regras de risco (padrão de gasto, geolocalização,
+  velocidade entre transações). Pode, em casos suspeitos, publicar um evento separado
+  `CompraSuspeita` para acionar um bloqueio preventivo do cartão.
+- **notificacao-service**: envia push "Compra de R$ 159,90 aprovada em Loja XYZ".
+- **cashback-service**: calcula e credita o cashback aplicável, com base na categoria do estabelecimento.
+- **analytics-service**: alimenta um data warehouse para dashboards de gastos e modelos de recomendação.
+
+Nenhum desses quatro consumers sabe da existência dos outros três. Uma lentidão no `analytics-service` (por
+exemplo, durante uma carga pesada de reprocessamento de relatórios) não atrasa a notificação push, que
+precisa ser quase instantânea para uma boa experiência do cliente.
+
+## Idempotência: nem todo consumer precisa do mesmo rigor
+
+<Atencao title="O nível de proteção contra duplicidade varia por consumer">
+Os quatro consumers deste evento têm exigências de idempotência muito diferentes entre si — um erro comum é
+aplicar o mesmo padrão de proteção (tabela de eventos processados) em todos, quando alguns já são
+naturalmente tolerantes à duplicidade.
+</Atencao>
+
+<Comparacao title="Exigência de idempotência por consumer">
+| Consumer | Efeito de duplicidade | Proteção necessária |
+|---|---|---|
+| `cashback-service` | Cashback creditado duas vezes — perda financeira direta | `eventId` + constraint de unicidade, obrigatório |
+| `notificacao-service` | Cliente recebe duas notificações — irritante, não crítico | Nenhuma proteção especial necessária |
+| `antifraude-service` | Reavalia a mesma compra duas vezes — trabalho redundante, não incorreto | Opcional, por eficiência, não por correção |
+| `analytics-service` | Compra contada duas vezes na agregação — métricas infladas | Depende da consulta: agregações via upsert por `eventId` resolvem naturalmente |
+</Comparacao>
+
+## Retry e DLQ
+
+O `cashback-service`, por lidar com valor financeiro direto, usa retry com backoff e DLQ (Capítulo 9): se a
+regra de cálculo de cashback falhar (ex.: tabela de categorias indisponível), a mensagem é reprocessada até
+3 vezes antes de ir para `compras.autorizadas.cashback.dlq`, sem bloquear o crédito de cashback das compras
+seguintes.
+
+## Replay
+
+Se a tabela de categorias de cashback for corrigida retroativamente (uma categoria que deveria dar 2% e
+estava configurada com 1%), o `cashback-service` pode fazer replay dos últimos 15 dias (dentro da retenção)
+para recalcular e creditar a diferença — desde que a lógica de crédito seja um upsert por `eventId`, evitando
+duplicar o cashback já creditado corretamente.
+
+## Observabilidade
+
+<Comparacao title="O que cada time monitora">
+| Time | Métrica prioritária |
+|---|---|
+| Cashback | Consumer lag e taxa de erro — atraso aqui vira reclamação de cliente sobre cashback não creditado |
+| Notificação | Latência producer → consumer — o push precisa chegar em segundos para ter valor |
+| Antifraude | Taxa de mensagens na DLQ — falhas de avaliação de risco não podem passar despercebidas |
+| Analytics | Consumer lag agregado ao longo do dia — atraso aqui é tolerável em minutos, não segundos |
+</Comparacao>
+
+<Resumo>
+Este caso ilustra a diferença entre comunicação síncrona (a autorização em si, fora do Kafka) e assíncrona
+(tudo que reage à compra já aprovada). Um único evento, `CompraAutorizada`, é consumido por quatro sistemas
+com necessidades completamente diferentes de latência, idempotência e tolerância a falha — cada um
+configurado de acordo com sua própria criticidade, não com um padrão único aplicado indiscriminadamente a
+todos.
+</Resumo>

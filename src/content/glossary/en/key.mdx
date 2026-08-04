@@ -1,0 +1,12 @@
+---
+term: "Key"
+slug: "key"
+shortDefinition: "An optional value attached to each message that determines, via hashing, which partition it's stored in."
+relatedTerms: ["partition", "producer"]
+relatedChapters: ["arquitetura-interna", "partitions-e-ordenacao"]
+---
+
+The key is the mechanism that guarantees relative ordering between messages: all messages with the same
+key land on the same partition (via hashing the key), and are therefore read in the order they were
+written. Messages without a key are distributed across partitions in an approximately uniform way
+(round-robin/sticky), with no ordering guarantee between them.

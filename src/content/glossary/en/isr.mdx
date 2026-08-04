@@ -1,0 +1,12 @@
+---
+term: "ISR"
+slug: "isr"
+shortDefinition: "In-Sync Replicas: the set of replicas (leader + followers) that are sufficiently caught up with the leader."
+relatedTerms: ["leader", "follower", "broker", "replication-factor"]
+relatedChapters: ["arquitetura-interna", "brokers-lideres-e-replicacao"]
+---
+
+ISR (In-Sync Replicas) is the list of a partition's replicas — including the leader itself — that are
+caught up with confirmed data. Only followers in the ISR are eligible for election as the new leader in
+case of failure, preventing a lagging replica from taking over and causing loss of data already confirmed
+to producers.

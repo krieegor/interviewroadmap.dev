@@ -1,0 +1,117 @@
+---
+title: "Kafka versus outras ferramentas"
+part: "Parte I — Fundamentos"
+partOrder: 1
+chapterOrder: 2
+slug: "kafka-versus-outras-ferramentas"
+description: "Comparação técnica entre Kafka, RabbitMQ, AWS SQS, AWS SNS e Google Pub/Sub."
+---
+
+Uma das perguntas mais comuns em entrevista é comparar Kafka com outra ferramenta de mensageria que o
+candidato já usou. Isso não é bizantinismo de nomenclatura — cada ferramenta foi desenhada para um modelo de
+uso diferente, e escolher errado tem custo real em produção.
+
+## O eixo que realmente importa: fila de trabalho vs. log de eventos
+
+Antes de comparar recursos, é preciso separar as ferramentas em duas famílias:
+
+- **Filas de trabalho** (RabbitMQ, AWS SQS): cada mensagem deve ser processada por exatamente um
+  consumidor; depois de processada (ack), ela normalmente desaparece.
+- **Log de eventos / pub-sub com retenção** (Kafka, e — com particularidades — AWS SNS + Google Pub/Sub):
+  o mesmo evento pode ser lido por múltiplos consumidores independentes, e pode continuar disponível depois
+  de lido.
+
+Ignorar essa diferença é a causa mais comum de escolher a ferramenta errada.
+
+## Kafka vs. RabbitMQ
+
+<Comparacao title="Kafka vs. RabbitMQ">
+| Critério | Kafka | RabbitMQ |
+|---|---|---|
+| Modelo | Log distribuído, particionado | Fila de mensagens (com exchanges/routing) |
+| Retenção | Configurável (tempo/tamanho), mensagem persiste após consumo | Mensagem some após ack (a menos que configurado de outra forma) |
+| Replay | Nativo — resetar offset relê o histórico | Não nativo — exige reenvio manual |
+| Ordenação | Garantida por partition | Garantida por fila (FIFO), mais simples de raciocinar em fila única |
+| Múltiplos consumidores do mesmo dado | Natural, via Consumer Groups distintos | Exige fan-out explícito (exchange do tipo *fanout*) |
+| Throughput em alta escala | Muito alto, desenhado para volume | Alto, mas com overhead maior de roteamento por mensagem |
+| Roteamento complexo (regras, prioridade) | Limitado — roteamento é por tópico/partition/key | Rico — exchanges, routing keys, prioridade de mensagem |
+| Curva operacional | Mais alta (cluster, partições, retenção) | Mais baixa para casos simples |
+</Comparacao>
+
+RabbitMQ brilha quando o requisito é roteamento sofisticado de mensagens de trabalho — prioridades, dead
+lettering fino, múltiplos padrões de exchange. Kafka brilha quando o requisito é um histórico de eventos
+compartilhado por múltiplos consumidores, com necessidade de replay.
+
+## Kafka vs. AWS SQS
+
+<Comparacao title="Kafka vs. AWS SQS">
+| Critério | Kafka | AWS SQS |
+|---|---|---|
+| Modelo | Log distribuído | Fila gerenciada (Standard ou FIFO) |
+| Retenção após consumo | Sim (até o limite de retenção do tópico) | Não — mensagem é removida após ack (ou expira) |
+| Replay | Nativo | Não — só via DLQ redrive (reprocessar mensagens que falharam, não histórico completo) |
+| Ordenação | Por partition | FIFO garante ordem por *message group*; Standard não garante ordem |
+| Operação | Você gerencia o cluster (ou usa serviço gerenciado como MSK/Confluent Cloud) | Totalmente gerenciado pela AWS, zero infraestrutura |
+| Escala de consumidores independentes | Nativa (múltiplos Consumer Groups) | Requer SNS + múltiplas filas para fan-out |
+| Throughput | Muito alto | Alto, com limites de throughput por fila (Standard escala melhor que FIFO) |
+</Comparacao>
+
+<Atencao title="SQS FIFO não é Kafka">
+  SQS FIFO garante ordem dentro de um *message group* e evita duplicidade — mas continua sendo uma
+  fila: a mensagem lida some da fila. Ele resolve ordenação, não resolve retenção/replay nem
+  múltiplos consumidores independentes do mesmo dado sem duplicar a mensagem via SNS.
+</Atencao>
+
+## Kafka vs. AWS SNS
+
+SNS é um serviço de **pub/sub puro** (fan-out): uma mensagem publicada é entregue a todos os assinantes
+(filas SQS, endpoints HTTP, Lambda). É comum encontrar o padrão **SNS + SQS**: SNS distribui, cada SQS
+consome de forma independente — isso reproduz parcialmente o que Kafka faz nativamente com Consumer Groups,
+mas sem retenção de longo prazo nem replay do histórico: uma vez entregue e processada, a mensagem não pode
+ser relida a partir do SNS.
+
+## Kafka vs. Google Pub/Sub
+
+<Comparacao title="Kafka vs. Google Pub/Sub">
+| Critério | Kafka | Google Pub/Sub |
+|---|---|---|
+| Modelo | Log particionado, gerenciado por você (ou serviço gerenciado) | Pub/sub totalmente gerenciado |
+| Retenção | Configurável, tipicamente dias | Configurável, até 31 dias (mensagens já confirmadas por padrão não ficam retidas do mesmo jeito) |
+| Replay | Nativo via offset | Via *seek*, suportado, mas com semântica diferente de offset por partition |
+| Ordenação | Por partition (key) | Por *ordering key*, opcional e com custo de throughput |
+| Operação | Requer gestão de cluster (ou serviço gerenciado) | Zero infraestrutura |
+</Comparacao>
+
+Pub/Sub do Google é operacionalmente o mais próximo de "Kafka sem operar Kafka", mas o modelo de partições e
+o ecossistema de client (especialmente para Java/Spring) ainda favorecem o Kafka em times que já têm essa
+stack.
+
+## Critério de decisão prático
+
+<DicaEntrevista>
+  Quando pedirem para comparar, não decore a tabela — explique o critério de decisão: "se preciso
+  que múltiplos serviços independentes leiam o mesmo evento, com possibilidade de replay, penso em
+  Kafka; se preciso distribuir trabalho entre workers, com roteamento rico e baixa necessidade de
+  retenção, penso em RabbitMQ ou SQS". Isso demonstra raciocínio, não memorização.
+</DicaEntrevista>
+
+<ExemploFinanceiro title="Escolhendo a ferramenta certa para cada parte do fluxo de pagamento">
+  Em um sistema de pagamentos real, é comum usar **as duas famílias ao mesmo tempo**: Kafka para o
+  evento de domínio "pagamento aprovado" (que antifraude, contabilidade e notificação consomem de
+  forma independente e podem precisar reprocessar), e uma fila SQS para o trabalho interno de
+  "enviar e-mail de confirmação" (uma tarefa que deve ser processada exatamente uma vez por um
+  worker, sem necessidade de replay).
+</ExemploFinanceiro>
+
+<Resumo>
+  RabbitMQ e SQS modelam filas de trabalho — mensagem processada some. Kafka modela um log de
+  eventos retido, lido por múltiplos consumidores independentes, com replay nativo. SNS resolve
+  fan-out, mas não retenção de longo prazo. Pub/Sub do Google é o mais próximo operacionalmente do
+  Kafka "sem operar cluster", mas com semântica de ordenação e retenção diferente. A escolha certa
+  depende do que se precisa fazer com a mensagem depois que ela é lida a primeira vez.
+</Resumo>
+
+<PerguntaDerivada>
+  Prepare-se também para: "você usaria Kafka para tudo?", "como você faria fan-out sem Kafka?" e "o
+  que aconteceria se você usasse SQS para um caso que precisa de replay?".
+</PerguntaDerivada>

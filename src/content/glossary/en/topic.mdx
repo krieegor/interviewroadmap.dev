@@ -1,0 +1,12 @@
+---
+term: "Topic"
+slug: "topic"
+shortDefinition: "The logical name under which related events are published and consumed, physically split into partitions."
+relatedTerms: ["partition", "producer", "consumer"]
+relatedChapters: ["arquitetura-interna"]
+---
+
+A topic is the abstraction producers and consumers see — for example, `pagamentos.aprovados`. It has no
+schema imposed by Kafka itself; what it guarantees is the split into partitions, each an ordered, immutable
+log. Delivery order is guaranteed within each partition of the topic, not across different topics, and not
+necessarily across partitions of the same topic.

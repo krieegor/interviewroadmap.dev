@@ -1,0 +1,12 @@
+---
+term: "Leader"
+slug: "leader"
+shortDefinition: "The broker responsible for serving all reads and writes for a specific partition."
+relatedTerms: ["follower", "broker", "isr", "replication-factor"]
+relatedChapters: ["arquitetura-interna", "brokers-lideres-e-replicacao"]
+---
+
+Every partition has exactly one broker acting as leader at any given time. Producers and consumers
+interact with the partition through the leader; the other brokers holding a replica of that partition act
+as followers, replicating the leader's data. If the leader fails, an up-to-date follower is elected as the
+new leader.

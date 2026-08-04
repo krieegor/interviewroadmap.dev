@@ -1,0 +1,14 @@
+---
+term: "Commit"
+slug: "commit"
+shortDefinition: "The act of recording the processed offset as a consumer's new read position for that partition."
+relatedTerms: ["offset", "consumer", "consumer-group"]
+relatedChapters: ["offset-e-commit", "garantias-de-entrega"]
+---
+
+Commit is the operation that records, for a Consumer Group, up to which offset of a partition has already
+been successfully processed. It can be automatic (`enable.auto.commit=true`, the client commits
+periodically in the background) or manual (the application decides exactly when to commit, typically after
+confirming that processing of the message has finished). The choice between auto commit and manual commit
+defines the consumer's behavior in the face of a failure: whatever was processed but not yet committed gets
+reprocessed from scratch after a restart or rebalance.

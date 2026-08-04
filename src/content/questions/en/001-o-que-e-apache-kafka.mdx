@@ -1,0 +1,67 @@
+---
+id: 1
+title: "What is Apache Kafka?"
+slug: "o-que-e-apache-kafka"
+level: ["pleno", "senior", "tech-lead"]
+topics: ["fundamentos"]
+relatedChapters: ["o-que-e-apache-kafka"]
+shortAnswer: "Kafka is an event streaming platform: a distributed, partitioned, and replicated log where producers publish immutable events that multiple independent consumers can read, each at their own pace, with the ability to replay."
+quiz:
+  options:
+    - "An event streaming platform: a distributed, replicated log where events stay retained, enabling multiple independent consumers and replay."
+    - "Just another messaging tool, with no structurally relevant differences from other brokers."
+    - "A distributed caching layer that temporarily buffers data between databases and applications."
+    - "An RPC framework for synchronous request/response calls between microservices."
+  correctIndex: 0
+---
+
+## Question
+
+"What is Apache Kafka, and how would you describe it to someone who's never heard of it?"
+
+## What the interviewer wants to assess
+
+Whether you understand Kafka as a concept — a distributed event log — or just memorized that "it's a
+messaging tool." It also assesses whether you can explain complex technology clearly, a core skill for
+senior roles.
+
+<RespostaCurta>
+  Kafka is an event streaming platform: a distributed, partitioned, and replicated log where
+  producers publish events and multiple independent consumers read those events at their own pace.
+  Unlike a traditional queue, the event doesn't disappear once read — it stays retained for a
+  configurable period, enabling replay.
+</RespostaCurta>
+
+<RespostaSenior>
+  Kafka solves the coupling problem between a system that produces a business fact and the several
+  systems that need to react to that fact. Instead of the producer calling each consumer directly, it
+  publishes an event to a topic; Kafka stores that event in a distributed log, partitioned across
+  multiple brokers for scale and replicated for fault tolerance. Any number of consumers can read the
+  same event independently, each keeping its own read position. This is fundamentally different from
+  a queue — the message isn't removed once consumed, which enables multiple consumers of the same
+  data and historical reprocessing (replay).
+</RespostaSenior>
+
+## In-depth explanation
+
+See Chapter 1 — [What is Apache Kafka?](/en/livro/o-que-e-apache-kafka) — for the full explanation of the
+coupling problem that motivated Kafka's creation, the structural difference between an event log and a work
+queue, and the retention model that enables replay.
+
+<ExemploFinanceiro>
+  A digital bank publishes the `PixRecebido` event only once to a Kafka topic. The balance service,
+  the push notification service, the statement service, and the antifraud service all read that same
+  event independently — none of them needs to be called directly by the service that received the
+  PIX.
+</ExemploFinanceiro>
+
+<Pegadinha title='"Kafka is just another messaging tool"'>
+  This answer is too vague and doesn't show understanding of what makes Kafka different. A senior
+  interviewer will push back: "different how?" — and the generic answer doesn't survive the
+  follow-up.
+</Pegadinha>
+
+<PerguntaDerivada>
+  After this one, expect: "what problem does Kafka solve?", "is Kafka a queue?", and "when would you
+  not use Kafka?".
+</PerguntaDerivada>

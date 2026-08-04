@@ -1,0 +1,133 @@
+---
+title: "Observabilidade"
+part: "Parte V — Java e Spring Boot"
+partOrder: 5
+chapterOrder: 3
+slug: "observabilidade"
+description: "Consumer lag, throughput, logs estruturados, correlationId, métricas e tracing — como saber que um pipeline Kafka está saudável."
+---
+
+Este último capítulo fecha o livro amarrando um fio que atravessou quase todos os anteriores: como saber,
+em produção, se tudo que foi descrito nos capítulos anteriores está de fato funcionando — sem esperar um
+incidente para descobrir que não estava.
+
+## Consumer Lag: o sinal vital mais importante
+
+<Definicao title="Consumer Lag">
+Consumer lag é a diferença entre o offset mais recente já produzido em uma partition (log end offset) e o
+offset commitado pelo Consumer Group. Representa quantas mensagens já existem no tópico mas ainda não foram
+processadas.
+</Definicao>
+
+<Diagrama legenda="O producer já escreveu até o offset 9; o consumer só processou até o offset 4. O consumer lag é a diferença: 5 mensagens pendentes.">
+  <ConsumerLagDiagram />
+</Diagrama>
+
+Lag zero (ou próximo de zero, oscilando com o tráfego normal) indica um consumer saudável. Lag que cresce de
+forma sustentada ao longo do tempo é o sinal mais confiável de que algo está errado — processamento lento,
+rebalances excessivos (Capítulo 6), ou um erro fazendo o consumer ficar preso reprocessando (Capítulo 9).
+
+<Atencao title="Lag momentâneo não é o mesmo que lag crescente">
+Um pico de lag durante um aumento pontual de tráfego é esperado e geralmente se resolve sozinho. O sinal de
+alerta real é a **tendência**: lag que não volta a cair depois que o pico de tráfego passa, ou que cresce de
+forma constante ao longo de horas — isso indica que o throughput de consumo é estruturalmente menor que o
+de produção.
+</Atencao>
+
+## Throughput e taxa de erro
+
+<Definicao title="Throughput">
+Throughput é o volume de mensagens processadas (ou produzidas) por unidade de tempo. Combinado com consumer
+lag, é o par de métricas que diagnostica a saúde de capacidade de um pipeline: throughput de consumo menor
+que throughput de produção, sustentado, é a causa direta de lag crescente.
+</Definicao>
+
+Taxa de erro (proporção de mensagens que falham no processamento, incluindo as que acabam na DLQ do
+Capítulo 9) complementa esse par: um consumer pode ter throughput alto mas taxa de erro também alta,
+processando rápido mas incorretamente — daí a importância de monitorar as duas métricas juntas, não isoladas.
+
+## Logs estruturados e correlationId
+
+<Comparacao title="Log genérico vs. log estruturado com correlationId">
+| Abordagem | Exemplo | Problema/vantagem |
+|---|---|---|
+| Log genérico | `"Erro ao processar evento"` | Impossível rastrear qual evento, qual conta, qual fluxo — inútil sob volume |
+| Log estruturado | `{"correlationId": "abc-123", "eventId": "...", "contaId": "...", "erro": "timeout"}` | Permite filtrar e correlacionar logs de múltiplos serviços pelo mesmo `correlationId` |
+</Comparacao>
+
+O `correlationId`, introduzido no Capítulo 13 como header do evento, é o que permite reconstruir o caminho
+completo de uma requisição — da chamada HTTP original, passando pela publicação no Kafka, até cada consumer
+que processou o evento — em ferramentas de agregação de log como Kibana ou Datadog.
+
+## Métricas essenciais para um pipeline Kafka
+
+<Comparacao title="Métricas que valem a pena alertar">
+| Métrica | Por quê |
+|---|---|
+| Consumer lag por partition/grupo | Detecta degradação de throughput antes que vire incidente visível ao usuário |
+| Taxa de mensagens na DLQ | Sinaliza falhas persistentes que exigem investigação manual |
+| Taxa de rebalance | Rebalances frequentes indicam `max.poll.interval.ms` mal configurado ou instabilidade de infraestrutura (Capítulo 6) |
+| Latência producer → consumer | Tempo entre publicação e processamento, relevante para SLAs de negócio |
+| Taxa de erro por consumer | Complementa throughput — processar rápido e errado não é melhor que processar devagar |
+</Comparacao>
+
+## Tracing distribuído
+
+Além de logs e métricas, tracing distribuído (OpenTelemetry, integrado ao Spring Boot via Micrometer
+Tracing) permite visualizar o caminho de uma transação como um grafo de spans — a chamada HTTP, a publicação
+Kafka, o processamento em cada consumer — com duração de cada etapa. Isso é particularmente valioso para
+diagnosticar *onde*, num fluxo que atravessa múltiplos serviços via Kafka, a maior parte da latência está
+sendo gasta.
+
+## Ferramentas do ecossistema
+
+<Comparacao title="Onde cada ferramenta entra">
+| Ferramenta | Papel típico |
+|---|---|
+| Prometheus | Coleta e armazena métricas (consumer lag, throughput, taxa de erro) expostas via Micrometer |
+| Grafana | Visualização de dashboards e configuração de alertas sobre as métricas do Prometheus |
+| Kibana | Busca e visualização de logs estruturados (tipicamente com stack ELK/OpenSearch) |
+| Datadog / New Relic | Plataformas comerciais que unificam métricas, logs e tracing em um único produto |
+</Comparacao>
+
+Nenhuma dessas ferramentas é exigida pelo Kafka em si — a JVM do Spring Boot expõe métricas via Micrometer,
+e a escolha de backend (Prometheus+Grafana open source, ou uma plataforma comercial) é uma decisão de
+infraestrutura, não do design do pipeline de eventos.
+
+## Como aparece em entrevistas
+
+"Como você monitoraria Kafka em produção?" é quase sempre a última pergunta de uma entrevista sobre o tema,
+testando se o candidato pensa em operação, não só em código. A resposta forte não lista ferramentas soltas —
+conecta métrica a decisão: "eu alertaria sobre consumer lag crescente, porque isso indica throughput
+insuficiente antes que o usuário sinta o atraso; e sobre taxa de mensagens na DLQ, porque isso indica falhas
+persistentes que passaram do retry".
+
+<DicaEntrevista>
+Ao responder sobre observabilidade, sempre conecte a métrica ao sintoma de negócio que ela antecipa. "Eu
+monitoro consumer lag" é uma resposta incompleta; "eu monitoro consumer lag porque ele antecipa atraso de
+processamento antes que o usuário perceba" demonstra que você pensa em operação real, não em uma lista de
+métricas decorada.
+</DicaEntrevista>
+
+## Relação com sistemas reais
+
+<ExemploFinanceiro title="Alertando sobre atraso no crédito de PIX">
+O time de pagamentos configura um alerta no Grafana: se o consumer lag do `saldo-service` no tópico
+`pix.recebido` ultrapassar 1000 mensagens por mais de 2 minutos, um alerta é disparado no canal de plantão —
+porque, para esse fluxo específico, mais que alguns segundos de atraso entre o recebimento do PIX e o
+crédito do saldo já é um problema visível para o cliente.
+</ExemploFinanceiro>
+
+<Resumo>
+Observabilidade de um pipeline Kafka combina consumer lag (o atraso de processamento), throughput e taxa de
+erro (capacidade e qualidade), logs estruturados com correlationId (rastreabilidade entre serviços) e
+tracing distribuído (visão fim-a-fim de latência). Nenhuma métrica isolada conta a história completa — é a
+combinação delas, conectada a sintomas de negócio reais, que permite detectar problemas antes que o usuário
+os sinta.
+</Resumo>
+
+<PerguntaDerivada>
+Prováveis follow-ups: "conte um projeto real utilizando Kafka" e "quais erros ou desafios você já enfrentou
+com Kafka" — as duas últimas perguntas do livro, que pedem para conectar tudo isso a uma experiência
+concreta, não a teoria.
+</PerguntaDerivada>

@@ -1,0 +1,12 @@
+---
+term: "Cluster"
+slug: "cluster"
+shortDefinition: "Conjunto de brokers que, juntos, armazenam e servem todos os tópicos de uma instalação Kafka."
+relatedTerms: ["broker", "leader", "follower"]
+relatedChapters: ["arquitetura-interna"]
+---
+
+O cluster é a unidade de implantação do Kafka: um grupo de brokers coordenados entre si (via KRaft nas
+versões atuais) que, em conjunto, oferecem tolerância a falhas e distribuição de carga. Tópicos e suas
+partitions são distribuídos entre os brokers do cluster; perder um broker não derruba o cluster inteiro,
+desde que as partitions afetadas tenham réplicas em outros brokers.

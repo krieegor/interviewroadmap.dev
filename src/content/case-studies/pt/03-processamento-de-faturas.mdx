@@ -1,0 +1,100 @@
+---
+title: "Processamento de faturas"
+slug: "processamento-de-faturas"
+order: 3
+description: "Grande volume concentrado em uma janela curta, particionamento para paralelismo real, consumer lag sob pico e idempotência em reprocessamento em lote."
+relatedChapters: ["partitions-e-ordenacao", "consumer-groups-e-rebalance", "observabilidade"]
+---
+
+Diferente do fluxo de PIX (volume constante ao longo do dia) ou de compra com cartão (evento por transação
+individual), o fechamento de faturas de cartão de crédito tem uma característica própria: milhões de eventos
+concentrados em uma janela de poucas horas, uma vez por dia (ou por ciclo de fechamento) — um padrão de
+picos, não de fluxo contínuo.
+
+## O evento de domínio
+
+Uma vez por dia, o sistema de ciclo de faturamento identifica todas as contas cujo ciclo fecha naquele dia e
+publica um evento `FaturaFechada` para cada uma — potencialmente milhões de eventos em uma janela de 1 a 2
+horas, concentrados justamente no horário de processamento em lote (geralmente de madrugada).
+
+```json
+{
+  "eventId": "c81e...",
+  "contaId": "acc_772341",
+  "faturaId": "fat_2026_07",
+  "valorTotal": 342050,
+  "vencimento": "2026-08-10",
+  "fechadaEm": "2026-08-01T03:15:00Z"
+}
+```
+
+## Topologia de tópicos
+
+<Comparacao title="Tópico e configuração">
+| Item | Decisão |
+|---|---|
+| Tópico | `faturas.fechadas` |
+| Key | `contaId` |
+| Partitions | 48 (dimensionadas para o pico, não para a média diária) |
+| Replication factor | 3 |
+| Retention | 10 dias |
+</Comparacao>
+
+<Atencao title="Dimensionar partitions pela média diária é o erro mais comum aqui">
+Se o volume médio diário de faturas fosse usado para calcular o número de partitions, o tópico ficaria
+subdimensionado para o pico real — que se concentra em poucas horas, não distribuído ao longo do dia
+inteiro. O dimensionamento correto (Capítulo 4) usa o throughput de pico esperado, não a média, exatamente
+porque é no pico que o paralelismo insuficiente vira gargalo visível.
+</Atencao>
+
+## Processamento paralelo e Consumer Lag sob pico
+
+<Diagrama legenda="Durante a janela de fechamento em lote, o producer escreve muito mais rápido que o consumer processa, gerando um pico de consumer lag que precisa ser absorvido dentro de um tempo aceitável.">
+  <ConsumerLagDiagram />
+</Diagrama>
+
+Mesmo com 48 partitions bem dimensionadas, é esperado (e aceitável) que o consumer lag suba durante a janela
+de pico — o volume de escrita supera temporariamente a capacidade de processamento instantânea. O que
+importa não é o lag durante o pico em si, mas se ele **volta a zero** dentro do tempo esperado depois que o
+lote termina de ser publicado (Capítulo 15). Um lag que continua alto horas depois do fim do lote é sinal de
+que o throughput de consumo está estruturalmente insuficiente, não apenas temporariamente sobrecarregado.
+
+## Idempotência em reprocessamento em lote
+
+<Pegadinha title='"Processamento em lote não precisa de idempotência, é tudo no mesmo dia"'>
+Justamente por concentrar volume em uma janela curta, processamento em lote é onde reprocessamentos
+acidentais são mais prováveis — um deploy no meio da janela de fechamento, um rebalance mal absorvido, ou um
+timeout de infraestrutura sob carga alta. A mesma proteção de idempotência (Capítulo 11) — `eventId` com
+constraint de unicidade, na mesma transação do efeito — se aplica aqui, com ainda mais motivo dado o volume
+envolvido.
+</Pegadinha>
+
+O `cobranca-service`, que gera o boleto a partir de cada `FaturaFechada`, mantém a mesma tabela
+`eventos_processados` do padrão geral de idempotência — sem isso, um rebalance no meio do processamento de
+2 milhões de faturas poderia gerar boletos duplicados para uma fração significativa delas.
+
+## Reprocessamento intencional
+
+Diferente de replay para corrigir um bug (Capítulo 8), reprocessamento de faturas às vezes é uma operação de
+negócio planejada: se uma tabela de taxas de juros for corrigida depois do fechamento, o time pode
+deliberadamente resetar o offset do `cobranca-service` para o início da janela de fechamento daquele dia e
+reprocessar tudo com a taxa corrigida — desde que a geração de boleto seja idempotente (substituindo, não
+duplicando, o boleto anterior daquela fatura).
+
+## Observabilidade
+
+<Comparacao title="O que monitorar especificamente em um fluxo de pico">
+| Métrica | Por quê |
+|---|---|
+| Consumer lag ao longo da janela de pico | Detecta se o paralelismo configurado é suficiente para o volume real |
+| Tempo até o lag voltar a zero após o fim do lote | O indicador real de saúde — não o valor de pico em si |
+| Taxa de mensagens na DLQ durante o pico | Falhas sob alta carga costumam ter causas diferentes de falhas em volume normal (ex.: contenção de conexões de banco) |
+</Comparacao>
+
+<Resumo>
+Fluxos de processamento em lote como fechamento de faturas exigem dimensionamento de partitions pelo pico,
+não pela média, e tratam consumer lag como uma métrica de janela (ele sobe e desce em ciclos previsíveis),
+não como um valor instantâneo alarmante. Idempotência continua obrigatória — e arguivelmente mais crítica —
+sob alto volume concentrado, onde a probabilidade de um reprocessamento parcial é maior do que em fluxos de
+volume constante.
+</Resumo>

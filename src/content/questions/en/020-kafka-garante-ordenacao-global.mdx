@@ -1,0 +1,63 @@
+---
+id: 20
+title: "Does Kafka guarantee global ordering?"
+slug: "kafka-garante-ordenacao-global"
+level: ["pleno", "senior", "tech-lead"]
+topics: ["arquitetura"]
+relatedChapters: ["partitions-e-ordenacao"]
+shortAnswer: "No. Kafka guarantees ordering only within a partition. A topic with multiple partitions has no global order between them, even if events were written very close together."
+quiz:
+  options:
+    - "No. Kafka only guarantees ordering within each partition; there's no defined global order across different partitions."
+    - "Yes, Kafka guarantees global ordering because it's fundamentally a message queue."
+    - "Global ordering is only lost if the topic's replication factor is greater than 1."
+    - "Global ordering exists automatically for topics with multiple partitions, as long as they all use the same key."
+  correctIndex: 0
+---
+
+## Question
+
+"Does Kafka guarantee global ordering across every message in a topic?"
+
+## What the interviewer wants to assess
+
+This is the classic Kafka trap question. It tests whether the candidate answers "yes" reflexively (wrong)
+or understands the partition caveat well enough to answer precisely.
+
+<RespostaCurta>
+No. Kafka only guarantees ordering within each partition. A topic with multiple partitions has no global
+order between them — two messages on different partitions have no defined ordering relationship, even if
+they were written milliseconds apart.
+</RespostaCurta>
+
+<RespostaSenior>
+"Ordered" isn't a binary property of the topic — it's a property of each individual partition. If a topic
+has a single partition, it does have total order, because there's only one sequence. But as soon as the
+topic has more than one partition (the common case in production, to enable parallelism), global order
+stops existing by design: they're multiple independent logs, each with its own offset clock. The only
+guaranteed order is between messages sharing the same key, because the key pins the message to a single
+partition (Chapter 4). This is a deliberate design choice — trading global ordering for parallelism — not
+an accidental limitation.
+</RespostaSenior>
+
+## In-depth explanation
+
+See "Ordering within a partition — and the absence of global ordering" in
+[Chapter 4](/en/livro/partitions-e-ordenacao).
+
+<ExemploFinanceiro>
+A "purchase approved" event for customer A and a "purchase approved" event for customer B, published
+almost simultaneously on different partitions, have no ordering relationship between them — which is
+perfectly acceptable, because events for different customers have no real dependency on each other.
+</ExemploFinanceiro>
+
+<Pegadinha title='"Yes, Kafka guarantees ordering, it is a queue"'>
+This answer completely ignores the effect of partitions. It's exactly the kind of answer that reveals the
+candidate doesn't understand Kafka's internal structure — they just memorized that "messaging implies
+order."
+</Pegadinha>
+
+<PerguntaDerivada>
+Likely follow-ups: "and if I needed real global ordering, how would I do it?" (answer: a single partition,
+accepting the cost of losing parallelism) and "what is a Consumer?".
+</PerguntaDerivada>

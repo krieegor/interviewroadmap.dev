@@ -1,0 +1,60 @@
+---
+id: 46
+title: "O que acontece quando o Leader cai?"
+slug: "o-que-acontece-quando-o-leader-cai"
+level: ["senior", "tech-lead"]
+topics: ["arquitetura", "confiabilidade"]
+relatedChapters: ["brokers-lideres-e-replicacao"]
+shortAnswer: "O controlador do cluster detecta a falta de heartbeat e promove automaticamente um follower do ISR a novo leader — automático, mas com uma janela real de indisponibilidade, não instantâneo."
+quiz:
+  options:
+    - "O controlador detecta a falta de heartbeat e promove automaticamente um follower do ISR a novo leader — automático, mas com uma janela real de indisponibilidade."
+    - "A eleição de um novo leader é instantânea e transparente, sem qualquer janela de indisponibilidade para a partition."
+    - "Um operador precisa promover manualmente um follower a novo leader assim que a falha do broker é detectada."
+    - "O controlador promove o follower mais próximo geograficamente, independentemente de seu estado de sincronização com o leader anterior."
+  correctIndex: 0
+---
+
+## Pergunta
+
+"O que acontece quando o broker que hospeda o Leader de uma Partition cai?"
+
+## O que o entrevistador quer avaliar
+
+Se você sabe que a eleição é automática, vem especificamente do ISR (não de qualquer follower), e tem um
+custo real de indisponibilidade — não é transparente e instantâneo.
+
+<RespostaCurta>
+O controlador do cluster detecta a falta de heartbeat do broker e promove automaticamente um follower do
+ISR a novo leader daquela partition — sem intervenção manual. Producers e consumers recebem um erro
+transitório, redescobrem o novo leader automaticamente, e retomam a operação.
+</RespostaCurta>
+
+<RespostaSenior>
+O processo é automático, mas não instantâneo nem gratuito: durante a janela de detecção (heartbeat) e
+eleição — tipicamente segundos em um cluster saudável — escritas e leituras daquela partition específica
+ficam temporariamente indisponíveis. O novo leader é escolhido apenas entre as réplicas no ISR, nunca uma
+réplica atrasada, justamente para não perder dados já confirmados a producers com `acks=all`. Do ponto de
+vista da aplicação, isso se manifesta como uma latência elevada pontual, não como uma falha visível — desde
+que a configuração de retry do client esteja correta.
+</RespostaSenior>
+
+## Explicação aprofundada
+
+Veja "O que acontece quando o Leader cai" no [Capítulo 5](/pt/livro/brokers-lideres-e-replicacao).
+
+<ExemploFinanceiro>
+Se o broker leader da partition que hospeda transações de um lote de contas cai durante um pico de tráfego,
+o cluster elege um novo leader em segundos — mas os producers desse intervalo podem sofrer uma latência
+elevada momentânea até a eleição terminar.
+</ExemploFinanceiro>
+
+<Pegadinha title='"A eleição de novo leader é instantânea e sem impacto perceptível"'>
+Existe uma janela real de indisponibilidade da partition durante a detecção e eleição. Sistemas sensíveis a
+latência precisam considerar esse intervalo no orçamento de disponibilidade, não assumir failover como algo
+transparente.
+</Pegadinha>
+
+<PerguntaDerivada>
+Prováveis follow-ups: "o que é `min.insync.replicas`?" e "o que é Consumer Lag?".
+</PerguntaDerivada>

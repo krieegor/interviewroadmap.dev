@@ -1,0 +1,224 @@
+import type { Dictionary } from "./pt";
+
+export const en: Dictionary = {
+  skipToContent: "Skip to main content",
+  nav: {
+    livro: "Book",
+    perguntas: "Questions",
+    casos: "Case studies",
+    glossario: "Glossary",
+    simulador: "Simulator",
+    sobre: "About",
+  },
+  header: {
+    githubLabel: "GitHub repository",
+    searchButton: "Search",
+    mobileMenuLabel: "Open navigation menu",
+    mobileMenuTitle: "Navigation",
+    mainNavLabel: "Main navigation",
+    mobileNavLabel: "Main navigation (mobile)",
+  },
+  localeSwitcher: {
+    label: "Language",
+    pt: "Português",
+    en: "English",
+  },
+  theme: {
+    enableLight: "Switch to light theme",
+    enableDark: "Switch to dark theme",
+  },
+  search: {
+    dialogTitle: "Search content",
+    placeholder: "Search chapters, questions and terms...",
+    noResults: 'Nothing found for "{query}".',
+    typeChapter: "Chapter",
+    typeQuestion: "Question",
+    typeTerm: "Term",
+  },
+  footer: {
+    disclaimer:
+      "is free, open source material. It has no official affiliation with Apache Kafka, Confluent, or the Apache Software Foundation.",
+    sobre: "About",
+    github: "GitHub",
+  },
+  copyLink: {
+    copy: "Copy link",
+    copied: "Link copied!",
+  },
+  chapterPager: {
+    ariaLabel: "Chapter pagination",
+    previous: "Previous",
+    next: "Next",
+  },
+  chapterProgress: {
+    completed: "Completed",
+    markCompleted: "Mark as completed",
+  },
+  bookSidebar: {
+    ariaLabel: "Book contents",
+    mobileSummary: "Book contents",
+  },
+  toc: {
+    title: "On this page",
+    mobileTitle: "On this page",
+  },
+  notFound: {
+    errorLabel: "Error 404",
+    title: "Page not found",
+    description: "The content you're looking for may have been moved, renamed, or not published yet.",
+    home: "Back to home",
+    book: "Go to the book",
+  },
+  home: {
+    badge: "Free & open source",
+    intro:
+      "For developers who already work with Java, Spring Boot and microservices, have basic to intermediate exposure to messaging, and are preparing for Mid-level, Senior or Tech Lead technical interviews — no need to administer Kafka clusters to get value from this content.",
+    ctaStart: "Start studying",
+    ctaQuestions: "See the 50 questions",
+    ctaSimulate: "Simulate an interview",
+    summaryTitle: "Book contents",
+    seeSummary: "See full contents →",
+    conceptsTitle: "Core concepts",
+    coreConcepts: [
+      "Partitions and ordering",
+      "Consumer groups and rebalance",
+      "Offset and commit",
+      "Retention and replay",
+      "Retry and DLQ",
+      "Idempotency",
+      "Delivery guarantees",
+      "Outbox pattern",
+    ],
+    openSourceText:
+      "This material is 100% free, with no signup and no paywall. The source code is open — content contributions and fixes are welcome.",
+    githubCta: "See on GitHub →",
+  },
+  livroIndex: {
+    title: "The book",
+    description: "Full table of contents of {siteName}, organized by parts and chapters.",
+    intro:
+      "Organized into progressive parts, from fundamentals to production observability. Each chapter can be read independently, but the order below is recommended for beginners.",
+    downloadPdf: "Download PDF (print-ready)",
+    empty: "Chapters are still being published.",
+  },
+  perguntasIndex: {
+    title: "Interview questions",
+    description:
+      "The most common Apache Kafka interview questions for Java developers, with a quick answer and a senior-level answer — {siteName}.",
+    intro:
+      "50 real Kafka interview questions, each with the interviewer's goal, a quick answer, a senior-level answer, an in-depth explanation, a financial example, and common pitfalls.",
+    empty: "Questions are still being published.",
+    questionLabel: "Question {id}",
+  },
+  perguntaDetail: {
+    questionOf: "Question {id} of 50",
+    relatedChapters: "Related chapters",
+    paginationAriaLabel: "Question pagination",
+    previous: "Previous",
+    next: "Next",
+  },
+  casosIndex: {
+    title: "Case studies",
+    description:
+      "Real-world case studies of event-driven financial systems built with Apache Kafka — {siteName}.",
+    intro:
+      "End-to-end financial system scenarios, tying together topic topology, key choice, idempotency, retry, DLQ, replay, and observability.",
+    empty: "Case studies are still being published.",
+  },
+  casoDetail: {
+    relatedChapters: "Related chapters",
+  },
+  glossarioIndex: {
+    title: "Glossary",
+    description:
+      "Essential Apache Kafka terms, with short and detailed definitions and how they relate to other concepts — {siteName}.",
+    intro: "Essential Kafka terms. The glossary doesn't replace the chapters — it points to them.",
+    indexAriaLabel: "Term index",
+    empty: "The glossary is still being published.",
+    relatedLabel: "Related:",
+    seeChapter: "See chapter →",
+  },
+  glossarioDetail: {
+    relatedTerms: "Related terms",
+    relatedChapters: "Related chapters",
+    previous: "Previous",
+    next: "Next",
+  },
+  simuladorPage: {
+    title: "Interview simulator",
+    description: "Simulate a Kafka technical interview: pick a level and topic, answer, and see your result.",
+    intro:
+      "Choose the level and topic, answer each question before revealing the answer, and honestly mark how you did. The result stays only in your browser.",
+  },
+  simulator: {
+    configureTitle: "Set up your practice run",
+    levelLabel: "Level",
+    allLevels: "All",
+    topicLabel: "Topic",
+    allTopics: "All",
+    modeLabel: "Mode",
+    modeLabels: {
+      aberta: "Open-ended",
+      "multipla-escolha": "Multiple choice",
+    },
+    modeDescriptions: {
+      aberta: "You have to explain the concept out loud before revealing the answer.",
+      "multipla-escolha":
+        "Pick the correct option out of 4 choices, ENEM-style, to quickly validate what you know.",
+    },
+    startButton: "Start practice run",
+    noQuestionsFound: "No questions found for this filter.",
+    back: "Back",
+    resultTitle: "Result",
+    questionsCount: "{count} question(s) —",
+    allLevelsResult: "all levels",
+    correct: "Got it",
+    partial: "Partial",
+    unknown: "Didn't know",
+    restart: "Restart",
+    questionOf: "Question {index} of {total}",
+    revealAnswer: "Reveal answer",
+    seeFullAnswer: "See full answer →",
+    nextQuestion: "Next",
+    closeAnswerPanel: "Close",
+    levelLabels: {
+      pleno: "Mid-level",
+      senior: "Senior",
+      "tech-lead": "Tech Lead",
+    },
+  },
+  simulatorHistory: {
+    title: "Your history",
+    testsDone: "Practice runs done",
+    questionsAnswered: "Questions answered",
+    overallAccuracy: "Overall accuracy",
+    byTopic: "By topic",
+    correctSuffix: "correct",
+    partialSuffix: "partial",
+    unknownSuffix: "didn't know",
+    allLevels: "All levels",
+    allTopics: "All topics",
+  },
+  sobre: {
+    title: "About the project",
+    intro1:
+      "is free, open source material created to help Java Backend developers prepare for Apache Kafka technical interviews — from architecture fundamentals to delivery guarantees, idempotency, and observability.",
+    intro2:
+      "This content doesn't replace the official Apache Kafka documentation or the hands-on experience of running the system in production. It exists to consolidate and organize the knowledge needed to explain these concepts confidently in an interview — and, as a result, in the day-to-day work of anyone already using the tool.",
+    intro3:
+      "Contributions are welcome: technical corrections, new chapters, new interview questions, or accessibility and design improvements can be proposed directly in the project's repository.",
+    trademarkDisclaimer:
+      'This project has no official affiliation with the Apache Software Foundation, Apache Kafka, or Confluent. "Apache Kafka" and "Kafka" are trademarks of the Apache Software Foundation.',
+    authorTitle: "Author",
+    authorPlaceholder:
+      "Placeholder for the author to add name, LinkedIn, GitHub, personal site and a short professional bio in src/config/site.ts.",
+    linkedin: "LinkedIn",
+    github: "GitHub",
+    personalSite: "Personal site",
+  },
+  readingProgress: {
+    yourProgress: "Your progress",
+    chaptersCompleted: "{completed} of {total} chapters completed ({percent}%)",
+    continueReading: "Continue where you left off →",
+  },
+};

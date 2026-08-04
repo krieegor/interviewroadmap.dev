@@ -1,0 +1,64 @@
+---
+id: 48
+title: "Como monitorar Kafka?"
+slug: "como-monitorar-kafka"
+level: ["senior", "tech-lead"]
+topics: ["observabilidade"]
+relatedChapters: ["observabilidade"]
+shortAnswer: "Combine consumer lag e throughput (capacidade), taxa de mensagens na DLQ e taxa de erro (qualidade), taxa de rebalance (estabilidade) e logs estruturados com correlationId (rastreabilidade) — nunca uma métrica isolada."
+quiz:
+  options:
+    - "Combinar consumer lag e throughput, taxa de mensagens na DLQ e taxa de erro, taxa de rebalance, e logs estruturados com correlationId — nunca uma métrica isolada."
+    - "Instalar Prometheus e Grafana e monitorar as métricas padrão de infraestrutura dos brokers já é suficiente."
+    - "Acompanhar exclusivamente a taxa de erro dos consumers, pois ela antecipa qualquer problema de capacidade antes que aconteça."
+    - "Uma taxa alta de rebalance é sempre esperada em produção e não costuma indicar problema de configuração."
+  correctIndex: 0
+---
+
+## Pergunta
+
+"Como você monitoraria um pipeline Kafka em produção?"
+
+## O que o entrevistador quer avaliar
+
+A última pergunta técnica típica de uma entrevista sobre Kafka — testa se o candidato pensa em operação
+real, conectando métricas a decisões, não apenas citando nomes de ferramentas.
+
+<RespostaCurta>
+Eu monitoraria consumer lag e throughput (para saber se o consumo acompanha a produção), taxa de mensagens
+na DLQ e taxa de erro (para detectar falhas persistentes), taxa de rebalance (para detectar instabilidade
+de consumers) e logs estruturados com correlationId para rastreabilidade entre serviços.
+</RespostaCurta>
+
+<RespostaSenior>
+Nenhuma métrica isolada conta a história completa. Consumer lag crescente antecipa atraso de processamento
+antes que o usuário sinta; throughput baixo, combinado com lag crescente, aponta que o gargalo é capacidade
+de consumo, não volume anormal de produção. Taxa de mensagens na DLQ sinaliza falhas persistentes que já
+passaram do retry — um sintoma de qualidade, não de capacidade. Taxa de rebalance frequente costuma indicar
+`max.poll.interval.ms` mal configurado ou instabilidade de infraestrutura, não do Kafka em si. E logs
+estruturados com `correlationId`, agregados em uma ferramenta como Kibana ou Datadog, permitem reconstruir o
+caminho de uma transação específica através de múltiplos serviços quando um alerta dispara. A escolha de
+ferramenta (Prometheus+Grafana open source vs. Datadog/New Relic comercial) é uma decisão de infraestrutura
+independente desse conjunto de métricas.
+</RespostaSenior>
+
+## Explicação aprofundada
+
+Veja o capítulo completo — [Observabilidade](/pt/livro/observabilidade).
+
+<ExemploFinanceiro>
+O time de pagamentos monitora consumer lag do `saldo-service`, taxa de mensagens na DLQ do tópico
+`pix.recebido`, e propaga `correlationId` desde a chamada HTTP original até cada consumer — permitindo, em
+um incidente, encontrar em segundos todos os serviços que processaram um PIX específico.
+</ExemploFinanceiro>
+
+<Pegadinha title='"Monitorar Kafka é só instalar Prometheus e Grafana"'>
+Instalar as ferramentas é o passo mais fácil. A parte que separa um sênior é saber quais métricas
+monitorar, quais limiares de alerta fazem sentido para cada fluxo de negócio, e como conectar essas métricas
+a decisões operacionais reais.
+</Pegadinha>
+
+<PerguntaDerivada>
+Prováveis follow-ups: "conte um projeto real utilizando Kafka" e "quais erros ou desafios você já
+enfrentou com Kafka".
+</PerguntaDerivada>

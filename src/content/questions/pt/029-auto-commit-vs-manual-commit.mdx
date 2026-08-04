@@ -1,0 +1,63 @@
+---
+id: 29
+title: "Qual a diferença entre Auto Commit e Manual Commit?"
+slug: "auto-commit-vs-manual-commit"
+level: ["senior", "tech-lead"]
+topics: ["consumo"]
+relatedChapters: ["offset-e-commit"]
+shortAnswer: "Auto commit comita em um intervalo de tempo, desalinhado do processamento real, tendendo a perder mensagens sob falha. Commit manual, feito após o processamento terminar, tende a duplicar em vez de perder."
+quiz:
+  options:
+    - "Auto commit comita offsets em intervalos periódicos, podendo comitar um processamento ainda incompleto; manual commit exige chamada explícita após o processamento terminar."
+    - "Auto commit é a escolha padrão segura, já que sua simplicidade de código reduz o risco de bugs no processamento."
+    - "Manual commit elimina completamente o risco de duplicidade de mensagens, mesmo sob falha do consumer."
+    - "Auto commit e manual commit diferem apenas na sintaxe de configuração, sem impacto real nas garantias de entrega."
+  correctIndex: 0
+---
+
+## Pergunta
+
+"Qual a diferença prática entre Auto Commit e Manual Commit, e quando você usaria cada um?"
+
+## O que o entrevistador quer avaliar
+
+Se você entende que a escolha entre auto e manual commit não é sobre conveniência de código, mas sobre qual
+risco (perda ou duplicidade) o sistema está disposto a aceitar.
+
+<RespostaCurta>
+Auto commit (`enable.auto.commit=true`) faz o client comitar offsets automaticamente em um intervalo
+periódico, sem relação direta com o término do processamento — pode comitar uma mensagem cujo processamento
+ainda está em andamento ou até falhou. Commit manual (`enable.auto.commit=false` com `AckMode.MANUAL`) exige
+que a aplicação chame `acknowledgment.acknowledge()` explicitamente, tipicamente só depois que o
+processamento terminou com sucesso.
+</RespostaCurta>
+
+<RespostaSenior>
+A diferença real está no risco que cada abordagem assume. Auto commit tende ao cenário de perda de
+mensagem: se o consumer cair entre o commit automático (que já aconteceu) e o fim real do processamento, essa
+mensagem é considerada processada pelo Kafka sem ter sido, de fato, processada com sucesso. Commit manual,
+feito estrategicamente depois que o processamento confirma sucesso, elimina esse risco de perda — mas ainda
+permite duplicidade: se o consumer cair entre o fim do processamento e o commit em si, a mensagem será
+reentregue no próximo início. Por isso, em sistemas financeiros, prefiro sempre commit manual combinado com
+processamento idempotente (Capítulo 11) — aceito duplicidade controlada em vez de arriscar perda
+silenciosa.
+</RespostaSenior>
+
+## Explicação aprofundada
+
+Veja "Os riscos de cada abordagem" no [Capítulo 7](/pt/livro/offset-e-commit).
+
+<ExemploFinanceiro>
+Um consumer com auto commit processando pagamentos, se cair logo após um commit automático mas antes de
+persistir o resultado no banco, perde esse pagamento silenciosamente — sem log de erro, sem exceção, porque
+do ponto de vista do Kafka a mensagem já foi processada.
+</ExemploFinanceiro>
+
+<Pegadinha title='"Auto commit é mais simples, então é a escolha padrão segura"'>
+Simplicidade de código não é sinônimo de segurança de dados. Para qualquer fluxo onde perda de mensagem é
+inaceitável, commit manual (com processamento idempotente) é a escolha correta, mesmo exigindo mais código.
+</Pegadinha>
+
+<PerguntaDerivada>
+Prováveis follow-ups: "o que é Retention Period?" e "como evitar processamento duplicado?".
+</PerguntaDerivada>

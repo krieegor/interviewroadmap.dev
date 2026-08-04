@@ -1,0 +1,130 @@
+---
+title: "Offset e Commit"
+part: "Parte III — Consumo e reprocessamento"
+partOrder: 3
+chapterOrder: 1
+slug: "offset-e-commit"
+description: "Como um consumer marca até onde já leu, a diferença entre auto commit e commit manual, e os riscos de cada abordagem."
+---
+
+Os capítulos anteriores mencionaram offset como "a posição de um registro no log". Este capítulo entra no
+detalhe que mais aparece em incidentes de produção: como e quando essa posição é salva — e o que acontece
+quando ela é salva no momento errado.
+
+## Offset como posição de leitura
+
+<Definicao title="Offset">
+Offset é um número inteiro crescente, único por partition, que identifica a posição de um registro no log.
+Para um consumer, o offset também representa "até onde eu já li" — mas essa posição só é oficialmente
+registrada quando o consumer faz o commit dela.
+</Definicao>
+
+É essencial separar dois conceitos que parecem a mesma coisa: a posição de leitura em memória do consumer
+(onde o client já buscou e entregou mensagens à aplicação) e o offset commitado (o que fica persistido no
+Kafka como "o Consumer Group processou até aqui"). Entre um e outro existe uma janela onde mensagens já
+foram entregues à aplicação, mas ainda não estão oficialmente marcadas como processadas.
+
+<Diagrama legenda="Offsets 0-3 já commitados; offsets 4-6 já processados pela aplicação, mas ainda não commitados; offset 7 ainda não lido.">
+  <OffsetCommitDiagram />
+</Diagrama>
+
+## Offset é por partition e por Consumer Group
+
+<Atencao title="Duas dimensões que não podem ser confundidas">
+O offset commitado não é uma propriedade global do tópico nem do consumer isoladamente — ele é armazenado
+por combinação de **partition** e **Consumer Group**. Isso significa que dois Consumer Groups diferentes
+lendo o mesmo tópico têm, cada um, seu próprio conjunto de offsets commitados, completamente independentes
+entre si.
+</Atencao>
+
+É por isso que um novo Consumer Group, ao começar a consumir um tópico existente, não tem nenhum offset
+commitado ainda — e a configuração `auto.offset.reset` (`earliest` ou `latest`) decide se ele começa do
+início da retenção disponível ou apenas dos eventos novos a partir de agora.
+
+## Auto Commit
+
+<Definicao title="Auto Commit">
+Com `enable.auto.commit=true` (o padrão), o client Kafka comita automaticamente os offsets processados em
+um intervalo periódico (`auto.commit.interval.ms`), sem que a aplicação precise chamar nada explicitamente.
+</Definicao>
+
+A vantagem é simplicidade: o desenvolvedor não escreve nenhum código relacionado a commit. O risco é que o
+commit acontece em um intervalo de tempo, não em sincronia com o processamento real da mensagem — é
+perfeitamente possível que o client comite um offset cujo processamento pela aplicação ainda está em
+andamento, ou pior, que falhou silenciosamente.
+
+## Commit Manual
+
+<Definicao title="Commit Manual">
+Com `enable.auto.commit=false`, a aplicação decide explicitamente quando comitar — tipicamente logo depois
+de confirmar que o processamento de uma mensagem (ou lote) terminou com sucesso, via
+`Acknowledgment.acknowledge()` no Spring Kafka ou `consumer.commitSync()`/`commitAsync()` no client puro.
+</Definicao>
+
+Commit manual dá controle preciso sobre a relação entre "processei" e "commitei", ao custo de mais código e
+mais responsabilidade do desenvolvedor em acertar esse acoplamento.
+
+## Os riscos de cada abordagem
+
+<Comparacao title="Auto commit vs. commit manual: o que pode dar errado">
+| Ordem | Risco |
+|---|---|
+| Commit antes do processamento terminar | Se o consumer cair no meio do processamento, a mensagem é considerada processada mesmo sem ter sido — **perda de mensagem** |
+| Processamento termina antes do commit | Se o consumer cair antes do commit acontecer, a mensagem será entregue de novo no próximo início — **duplicidade** |
+</Comparacao>
+
+<Pegadinha title='"Auto commit é mais seguro porque é automático"'>
+Automático não significa seguro — significa que o timing do commit está fora do controle da aplicação. O
+auto commit tende ao cenário de **perda de mensagem**: ele pode comitar um offset cujo processamento ainda
+não terminou (ou falhou), porque o intervalo de commit não sabe nada sobre o estado real do processamento.
+</Pegadinha>
+
+O commit manual, feito **depois** que o processamento termina com sucesso, elimina o risco de perda de
+mensagem, mas não elimina duplicidade: se o consumer cair exatamente entre "terminei de processar" e
+"commitei", a mensagem será reprocessada. Essa é a razão pela qual **at-least-once** (Capítulo 10) exige
+processamento idempotente (Capítulo 11) — a duplicidade não é um bug a ser eliminado, é uma possibilidade
+estrutural que o consumer precisa saber absorver.
+
+## Quando isso vira incidente real
+
+Times que usam auto commit em processamento assíncrono ou multi-thread — onde a mensagem é entregue à
+aplicação e o processamento real acontece em outra thread ou fila interna — costumam descobrir tarde demais
+que o client já comitou o offset antes do processamento de fato terminar. Um crash da aplicação nesse
+intervalo perde a mensagem silenciosamente, sem exceção, sem log de erro — porque, do ponto de vista do
+Kafka, ela já foi processada.
+
+<DicaEntrevista>
+Ao explicar a diferença entre auto commit e commit manual, não pare em "um é automático e o outro manual" —
+explique a consequência: auto commit tende a perder mensagens sob falha, commit manual bem posicionado
+(depois do processamento) tende a duplicar mensagens sob falha. Nenhum dos dois é "mais seguro" em abstrato;
+o design correto depende de aceitar duplicidade e tratar processamento com idempotência.
+</DicaEntrevista>
+
+## Relação com Java e Spring Boot
+
+Em Spring Kafka, `enable.auto.commit=false` combinado com `AckMode.MANUAL` (ou `MANUAL_IMMEDIATE`) no
+`ContainerFactory` é o padrão recomendado para processamento com garantias reais: o método anotado com
+`@KafkaListener` recebe um parâmetro `Acknowledgment`, e chama `acknowledgment.acknowledge()` apenas depois
+que toda a lógica de negócio da mensagem — incluindo qualquer escrita em banco — terminou com sucesso.
+
+<ExemploFinanceiro title="Processamento de boletos vencidos">
+O `cobranca-service` consome o tópico `boletos.vencidos` com commit manual: ele só chama
+`acknowledgment.acknowledge()` depois de confirmar que a notificação de cobrança foi enviada e registrada no
+banco. Se o serviço cair no meio do envio, o offset não avança — o boleto será reprocessado na próxima
+inicialização, gerando no máximo uma notificação duplicada (mitigada por uma checagem de idempotência,
+Capítulo 11), nunca uma cobrança perdida silenciosamente.
+</ExemploFinanceiro>
+
+<Resumo>
+Offset marca a posição de leitura em uma partition; commit é o que efetivamente persiste essa posição para
+um Consumer Group. Auto commit é simples, mas comita em um intervalo de tempo desalinhado do processamento
+real, tendendo a perder mensagens sob falha. Commit manual, feito após o processamento confirmado, tende a
+duplicar mensagens sob falha em vez de perdê-las — por isso processamento idempotente é um requisito, não
+um extra, em qualquer consumer com garantias at-least-once.
+</Resumo>
+
+<PerguntaDerivada>
+Prováveis follow-ups: "o que é `auto.offset.reset` e quando ele entra em ação?", "como você garantiria
+zero perda de mensagens no seu consumer?" e "o que é exactly-once e ele elimina a necessidade de
+idempotência?" (Capítulos 10 e 11).
+</PerguntaDerivada>

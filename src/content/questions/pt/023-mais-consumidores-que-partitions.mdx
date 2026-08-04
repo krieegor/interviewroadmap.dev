@@ -1,0 +1,60 @@
+---
+id: 23
+title: "O que acontece quando existem mais consumidores que Partitions?"
+slug: "mais-consumidores-que-partitions"
+level: ["pleno", "senior"]
+topics: ["arquitetura"]
+relatedChapters: ["consumer-groups-e-rebalance"]
+shortAnswer: "Os consumers excedentes ficam ociosos — não há partition sobrando para atribuir a eles. Eles só passam a processar se outro consumer do grupo cair."
+quiz:
+  options:
+    - "Os consumers excedentes ficam ociosos, sem partition atribuída, porque o número de partitions é o teto real de paralelismo do grupo."
+    - "Mais consumers sempre aumenta o throughput do grupo, mesmo além do número de partitions disponíveis no tópico."
+    - "Os consumers excedentes recebem cópias das mesmas partitions dos demais, processando as mesmas mensagens em paralelo para redundância."
+    - "O Kafka cria automaticamente novas partitions para acomodar os consumers excedentes e manter o paralelismo proporcional."
+  correctIndex: 0
+---
+
+## Pergunta
+
+"O que acontece se um Consumer Group tiver mais instâncias de consumer do que Partitions o tópico possui?"
+
+## O que o entrevistador quer avaliar
+
+Se você entende o limite real de paralelismo imposto pelas partitions — um erro comum é assumir que
+adicionar consumers sempre aumenta throughput.
+
+<RespostaCurta>
+Os consumers excedentes ficam ociosos, sem processar nada, porque não sobra nenhuma partition para atribuir
+a eles. Eles só passam a receber partitions se algum outro consumer do grupo cair ou sair.
+</RespostaCurta>
+
+<RespostaSenior>
+A regra é uma partition, um consumer, por Consumer Group — nunca duas instâncias do mesmo grupo lendo a
+mesma partition ao mesmo tempo. Se o tópico tem 4 partitions e o grupo escala para 6 instâncias, 2 delas
+ficam completamente ociosas, sem receber nenhuma atribuição. Isso surpreende times que escalam consumers via
+Kubernetes/HPA esperando ganho de throughput proporcional, sem considerar que o número de partitions é o
+teto real de paralelismo — escalar além desse número não aumenta capacidade de processamento nenhuma, só
+desperdiça recursos.
+</RespostaSenior>
+
+## Explicação aprofundada
+
+Veja "O que acontece com números diferentes de consumers" no
+[Capítulo 6](/pt/livro/consumer-groups-e-rebalance).
+
+<ExemploFinanceiro>
+O `antifraude-service` roda com 4 partitions no tópico e escala para 6 réplicas no Black Friday esperando
+mais throughput — mas 2 réplicas ficam ociosas, porque não há partitions sobrando, e o throughput real não
+muda.
+</ExemploFinanceiro>
+
+<Pegadinha title='"Mais consumers sempre significa mais throughput"'>
+Só até o limite do número de partitions. Depois disso, cada consumer adicional é puro desperdício de
+recursos computacionais, sem qualquer ganho de processamento.
+</Pegadinha>
+
+<PerguntaDerivada>
+Prováveis follow-ups: "e se houver mais Partitions que consumidores?" e "como você dimensionaria o número
+de réplicas de um consumer no Kubernetes?".
+</PerguntaDerivada>

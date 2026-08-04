@@ -1,0 +1,13 @@
+---
+term: "ACK"
+slug: "ack"
+shortDefinition: "Confirmação de recebimento — no Kafka, o nível de confirmação exigido pelo producer (acks=0, 1 ou all)."
+relatedTerms: ["producer", "isr", "leader"]
+relatedChapters: ["arquitetura-interna", "garantias-de-entrega"]
+---
+
+No contexto do Kafka, ACK (acknowledgment) é a configuração do producer (`acks`) que define quanta
+confirmação ele exige antes de considerar uma escrita bem-sucedida: `acks=0` não espera confirmação nenhuma
+(mais rápido, mais arriscado), `acks=1` espera confirmação apenas do leader, e `acks=all` espera confirmação
+de todas as réplicas no ISR (mais lento, mais durável). Esse trade-off é central na discussão de garantias de
+entrega.

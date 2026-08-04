@@ -1,0 +1,12 @@
+---
+term: "Cluster"
+slug: "cluster"
+shortDefinition: "The set of brokers that together store and serve all topics in a Kafka installation."
+relatedTerms: ["broker", "leader", "follower"]
+relatedChapters: ["arquitetura-interna"]
+---
+
+The cluster is Kafka's unit of deployment: a group of brokers coordinated with each other (via KRaft in
+current versions) that together provide fault tolerance and load distribution. Topics and their partitions
+are spread across the cluster's brokers; losing one broker doesn't bring down the whole cluster, as long as
+the affected partitions have replicas on other brokers.

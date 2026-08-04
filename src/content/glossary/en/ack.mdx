@@ -1,0 +1,13 @@
+---
+term: "ACK"
+slug: "ack"
+shortDefinition: "Acknowledgment — in Kafka, the confirmation level required by the producer (acks=0, 1, or all)."
+relatedTerms: ["producer", "isr", "leader"]
+relatedChapters: ["arquitetura-interna", "garantias-de-entrega"]
+---
+
+In Kafka, ACK (acknowledgment) is the producer setting (`acks`) that defines how much confirmation it
+requires before considering a write successful: `acks=0` waits for no confirmation at all (fastest,
+riskiest), `acks=1` waits for confirmation from the leader only, and `acks=all` waits for confirmation from
+every replica in the ISR (slowest, most durable). This trade-off is central to any discussion of delivery
+guarantees.

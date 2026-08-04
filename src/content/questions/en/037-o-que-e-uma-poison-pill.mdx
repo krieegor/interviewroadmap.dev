@@ -1,0 +1,61 @@
+---
+id: 37
+title: "What is a Poison Pill?"
+slug: "o-que-e-uma-poison-pill"
+level: ["senior", "tech-lead"]
+topics: ["consumo"]
+relatedChapters: ["retry-e-dlq"]
+shortAnswer: "Poison pill is a message that stalls a partition's processing indefinitely, because every attempt to process it fails and the consumer has no strategy to move past it."
+quiz:
+  options:
+    - "A message that stalls a partition's processing indefinitely, because every attempt to process it fails and the consumer never advances the offset."
+    - "A rare problem that only happens in poorly configured consumers of non-critical systems, not justifying systematic prevention."
+    - "A corrupted message that Kafka detects and automatically discards before delivering it to any consumer."
+    - "A message that causes temporary slowness in the consumer, but doesn't prevent it from advancing to the following messages."
+  correctIndex: 0
+---
+
+## Question
+
+"What is a Poison Pill, and how would you avoid that problem?"
+
+## What the interviewer wants to assess
+
+Whether you understand the practical consequence of not having a bounded retry + DLQ strategy — the real
+scenario these mechanisms exist to prevent.
+
+<RespostaCurta>
+Poison pill is a message that stalls a partition's processing indefinitely, because every attempt to
+process it fails and the consumer gets stuck reprocessing the same message, unable to move on to the
+following ones.
+</RespostaCurta>
+
+<RespostaSenior>
+The poison pill effect happens when a consumer treats every error as transient and tries to reprocess
+indefinitely, with no attempt limit or isolation strategy. Since the consumer doesn't advance the offset
+while the message hasn't been processed successfully, every following message in that partition sits
+stuck behind it — even completely healthy messages unrelated to the problem. Prevention is exactly the
+Chapter 9 pattern: distinguish transient from permanent errors, cap the number of retry attempts, and move
+the message to a DLQ once that limit is reached — letting the consumer advance and keep processing the
+following messages.
+</RespostaSenior>
+
+## In-depth explanation
+
+See "Poison Pill" in [Chapter 9](/en/livro/retry-e-dlq).
+
+<ExemploFinanceiro>
+An event with a corrupted monetary value field (non-numeric) always fails deserialization. Without a retry
+limit and a DLQ, that single event would stall processing of every following payment in that partition,
+even if they were perfectly valid.
+</ExemploFinanceiro>
+
+<Pegadinha title='"Poison pill is a rare problem not worth preventing"'>
+All it takes is a serialization bug, an unexpected null field, or a poorly handled business rule to create
+this scenario — it's common enough to justify always configuring a retry limit and DLQ in any production
+consumer, not just the "critical" ones.
+</Pegadinha>
+
+<PerguntaDerivada>
+Likely follow-ups: "what is At Most Once?" and "how would you configure retry and DLQ to avoid this?".
+</PerguntaDerivada>

@@ -1,0 +1,99 @@
+---
+title: "Statement processing"
+slug: "processamento-de-faturas"
+order: 3
+description: "High volume concentrated in a short window, partitioning for real parallelism, consumer lag under a peak, and idempotency in batch reprocessing."
+relatedChapters: ["partitions-e-ordenacao", "consumer-groups-e-rebalance", "observabilidade"]
+---
+
+Unlike the PIX flow (constant volume throughout the day) or card purchases (one event per individual
+transaction), credit card statement closing has a characteristic of its own: millions of events
+concentrated in a window of a few hours, once a day (or once per closing cycle) — a spike pattern, not a
+continuous flow.
+
+## The domain event
+
+Once a day, the billing cycle system identifies every account whose cycle closes that day and publishes a
+`FaturaFechada` event for each one — potentially millions of events in a 1-to-2-hour window, concentrated
+right at batch-processing time (usually overnight).
+
+```json
+{
+  "eventId": "c81e...",
+  "contaId": "acc_772341",
+  "faturaId": "fat_2026_07",
+  "valorTotal": 342050,
+  "vencimento": "2026-08-10",
+  "fechadaEm": "2026-08-01T03:15:00Z"
+}
+```
+
+## Topic topology
+
+<Comparacao title="Topic and configuration">
+| Item | Decision |
+|---|---|
+| Topic | `faturas.fechadas` |
+| Key | `contaId` |
+| Partitions | 48 (sized for the peak, not the daily average) |
+| Replication factor | 3 |
+| Retention | 10 days |
+</Comparacao>
+
+<Atencao title="Sizing partitions by the daily average is the most common mistake here">
+If the average daily statement volume were used to calculate the number of partitions, the topic would end
+up undersized for the real peak — which is concentrated in a few hours, not spread across the entire day.
+The correct sizing (Chapter 4) uses expected peak throughput, not the average, precisely because it's at
+the peak that insufficient parallelism becomes a visible bottleneck.
+</Atencao>
+
+## Parallel processing and Consumer Lag under a peak
+
+<Diagrama legenda="During the batch closing window, the producer writes much faster than the consumer processes, generating a consumer lag spike that needs to be absorbed within an acceptable time.">
+  <ConsumerLagDiagramEn />
+</Diagrama>
+
+Even with 48 well-sized partitions, it's expected (and acceptable) for consumer lag to rise during the peak
+window — write volume temporarily exceeds instantaneous processing capacity. What matters isn't the lag
+during the peak itself, but whether it **returns to zero** within the expected time after the batch
+finishes publishing (Chapter 15). Lag that stays high hours after the batch ends is a sign that consumption
+throughput is structurally insufficient, not just temporarily overloaded.
+
+## Idempotency in batch reprocessing
+
+<Pegadinha title='"Batch processing does not need idempotency, it is all the same day"'>
+Precisely because it concentrates volume into a short window, batch processing is where accidental
+reprocessing is most likely — a deploy in the middle of the closing window, a poorly absorbed rebalance, or
+an infrastructure timeout under high load. The same idempotency protection (Chapter 11) — `eventId` with a
+uniqueness constraint, in the same transaction as the effect — applies here, with even more reason given
+the volume involved.
+</Pegadinha>
+
+The `cobranca-service`, which generates the invoice from each `FaturaFechada`, keeps the same
+`processed_events` table from the general idempotency pattern — without it, a rebalance in the middle of
+processing 2 million statements could generate duplicate invoices for a significant fraction of them.
+
+## Intentional reprocessing
+
+Unlike replay to fix a bug (Chapter 8), statement reprocessing is sometimes a planned business operation:
+if an interest rate table is corrected after closing, the team can deliberately reset the
+`cobranca-service`'s offset to the start of that day's closing window and reprocess everything with the
+corrected rate — as long as invoice generation is idempotent (replacing, not duplicating, that statement's
+previous invoice).
+
+## Observability
+
+<Comparacao title="What to specifically monitor in a peak flow">
+| Metric | Why |
+|---|---|
+| Consumer lag over the peak window | Detects whether the configured parallelism is enough for the real volume |
+| Time until lag returns to zero after the batch ends | The real health indicator — not the peak value itself |
+| DLQ message rate during the peak | Failures under high load often have different causes than failures at normal volume (e.g., database connection contention) |
+</Comparacao>
+
+<Resumo>
+Batch processing flows like statement closing require sizing partitions by the peak, not the average, and
+treat consumer lag as a windowed metric (it rises and falls in predictable cycles), not as an instantaneous
+alarming value. Idempotency remains mandatory — arguably even more critical — under concentrated high
+volume, where the probability of partial reprocessing is higher than in constant-volume flows.
+</Resumo>

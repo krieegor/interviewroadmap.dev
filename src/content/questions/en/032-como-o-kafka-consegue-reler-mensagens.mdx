@@ -1,0 +1,61 @@
+---
+id: 32
+title: "How does Kafka manage to reread consumed messages?"
+slug: "como-o-kafka-consegue-reler-mensagens"
+level: ["senior"]
+topics: ["consumo"]
+relatedChapters: ["retention-e-replay"]
+shortAnswer: "Because consuming a message doesn't remove it from the log — it stays retained until it expires under the retention policy. Rereading is just moving (resetting) the Consumer Group's committed offset to an earlier position."
+quiz:
+  options:
+    - "Because consuming doesn't remove the message from the log — it stays retained until it expires under retention, and rereading is just moving the committed offset back."
+    - "Because Kafka keeps a separate copy of every consumed message specifically to enable future replay."
+    - "Because the broker automatically republishes old messages to the topic whenever a new Consumer Group is created."
+    - "Because the consumer keeps a local cache of read messages and resends them from that cache when requested."
+  correctIndex: 0
+---
+
+## Question
+
+"Technically, how does Kafka manage to reread messages that were already consumed?"
+
+## What the interviewer wants to assess
+
+Whether you understand the real mechanism behind replay — the correct answer is about the nature of the
+log, not about some separate "magic" feature.
+
+<RespostaCurta>
+Because consuming a message doesn't remove it from the log — unlike a traditional queue, Kafka keeps the
+message retained (until it expires under the retention policy) regardless of whether it's been read.
+Rereading is just moving the Consumer Group's committed offset back to an earlier position.
+</RespostaCurta>
+
+<RespostaSenior>
+There's no separate "replay" mechanism in Kafka — it's a direct consequence of how the log works. A
+partition is an immutable sequence of records identified by offset; consuming a message only advances the
+consumer's read position (and, if committed, the Consumer Group's official position). The message itself
+stays on the broker's disk, available for any future read, until the retention policy discards it. So
+"rereading" is simply instructing the consumer (or a new Consumer Group) to fetch from an earlier offset —
+the Kafka client then goes back to reading from exactly that point, as if it had never advanced.
+</RespostaSenior>
+
+## In-depth explanation
+
+See "Replay: reprocessing what's already been read" in [Chapter 8](/en/livro/retention-e-replay).
+
+<ExemploFinanceiro>
+Rebuilding the Elasticsearch index used for transaction search is done by creating a new Consumer Group
+with `auto.offset.reset=earliest` — it reads the entire topic from the start of the available retention,
+rebuilding the index from scratch, with no special action needed on the producer side.
+</ExemploFinanceiro>
+
+<Pegadinha title='"Kafka keeps a separate copy to enable replay"'>
+There's no separate copy — it's the same partition, the same log. Replay doesn't duplicate data or use a
+parallel mechanism; it just repositions where the consumer starts reading within the log that already
+exists.
+</Pegadinha>
+
+<PerguntaDerivada>
+Likely follow-ups: "what happens if I try to reread something that already expired under retention?" and
+"what's the difference between Replay and SQS DLQ Redrive?".
+</PerguntaDerivada>

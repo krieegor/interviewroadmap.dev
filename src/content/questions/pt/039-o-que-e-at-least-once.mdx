@@ -1,0 +1,60 @@
+---
+id: 39
+title: "O que é At Least Once?"
+slug: "o-que-e-at-least-once"
+level: ["pleno", "senior"]
+topics: ["confiabilidade"]
+relatedChapters: ["garantias-de-entrega", "idempotencia"]
+shortAnswer: "At Least Once é a garantia em que a mensagem nunca é perdida, mas pode ser duplicada — o padrão prático em sistemas financeiros, sempre combinado com processamento idempotente no consumer."
+quiz:
+  options:
+    - "A garantia em que a mensagem nunca é perdida, mas pode ser duplicada, exigindo processamento idempotente no consumer para lidar com reentregas."
+    - "A garantia em que a mensagem é processada exatamente uma vez, com segurança adicional em relação ao At Most Once."
+    - "A garantia em que a mensagem nunca é duplicada, mas pode ser perdida em caso de falha entre o processamento e o commit do offset."
+    - "A garantia usada apenas em sistemas não críticos, já que sistemas financeiros exigem exclusivamente exactly-once semantics."
+  correctIndex: 0
+---
+
+## Pergunta
+
+"O que é a garantia At Least Once, e por que ela é tão comum em sistemas financeiros?"
+
+## O que o entrevistador quer avaliar
+
+Se você entende at-least-once não como uma garantia "quase perfeita", mas como uma escolha deliberada que
+exige uma contrapartida específica (idempotência) para funcionar bem em produção.
+
+<RespostaCurta>
+At Least Once significa que a mensagem nunca é perdida, mas pode ser entregue mais de uma vez. Acontece
+quando o commit (ou retry do producer) só ocorre depois que o passo anterior foi confirmado, aceitando
+reprocessamento em caso de falha entre a confirmação e o registro dela.
+</RespostaCurta>
+
+<RespostaSenior>
+É o padrão prático mais usado em sistemas financeiros porque, entre perder e duplicar, duplicar é o risco
+mais gerenciável: uma mensagem duplicada é detectável e corrigível com idempotência (Capítulo 11), enquanto
+uma mensagem perdida sequer deixa rastro. Na prática, isso significa `acks=all` no producer (com retry) e
+commit manual no consumer, feito só depois que o processamento termina com sucesso — se o consumer cair
+entre o fim do processamento e o commit, a mensagem é reentregue no próximo início, e é o processamento
+idempotente que garante que essa reentrega não duplique o efeito de negócio.
+</RespostaSenior>
+
+## Explicação aprofundada
+
+Veja "At Least Once" no [Capítulo 10](/pt/livro/garantias-de-entrega) e o padrão completo de idempotência no
+[Capítulo 11](/pt/livro/idempotencia).
+
+<ExemploFinanceiro>
+O `notificacao-service` roda com At Least Once: se ele cair depois de enviar a notificação mas antes de
+comitar o offset, a notificação pode ser enviada duas vezes — aceitável para esse fluxo, e mitigável se
+necessário com uma checagem de idempotência.
+</ExemploFinanceiro>
+
+<Pegadinha title='"At Least Once garante que a mensagem é processada exatamente uma vez, só que com mais segurança"'>
+Não — At Least Once explicitamente permite duplicidade. Quem precisa de processamento único de verdade
+precisa somar idempotência (ou usar exactly-once semantics dentro do escopo do Kafka).
+</Pegadinha>
+
+<PerguntaDerivada>
+Prováveis follow-ups: "o que é Exactly Once?" e "como evitar processamento duplicado?".
+</PerguntaDerivada>

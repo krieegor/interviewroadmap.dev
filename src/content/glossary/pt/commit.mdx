@@ -1,0 +1,14 @@
+---
+term: "Commit"
+slug: "commit"
+shortDefinition: "Ato de gravar o offset processado como a nova posição de leitura de um consumer para aquela partition."
+relatedTerms: ["offset", "consumer", "consumer-group"]
+relatedChapters: ["offset-e-commit", "garantias-de-entrega"]
+---
+
+Commit é a operação que registra, para um Consumer Group, até qual offset de uma partition já foi
+processado com sucesso. Pode ser automático (`enable.auto.commit=true`, o client comita periodicamente em
+background) ou manual (a aplicação decide exatamente quando comitar, tipicamente depois de confirmar que o
+processamento da mensagem terminou). A escolha entre auto commit e commit manual define o comportamento do
+consumer diante de uma falha: o que já foi processado mas ainda não comitado é reprocessado do zero após um
+restart ou rebalance.

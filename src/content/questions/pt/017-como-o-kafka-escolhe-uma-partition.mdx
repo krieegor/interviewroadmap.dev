@@ -1,0 +1,61 @@
+---
+id: 17
+title: "Como o Kafka escolhe uma Partition?"
+slug: "como-o-kafka-escolhe-uma-partition"
+level: ["pleno", "senior"]
+topics: ["arquitetura"]
+relatedChapters: ["partitions-e-ordenacao"]
+shortAnswer: "Se a mensagem tem key, o particionador calcula hash(key) % número de partitions, sempre resultando na mesma partition para a mesma key; sem key, a distribuição é aproximadamente uniforme (estratégia sticky)."
+quiz:
+  options:
+    - "Com key, o particionador calcula hash(key) % número de partitions de forma determinística; sem key, a distribuição é aproximadamente uniforme."
+    - "Sem key definida, o Kafka escolhe uma partition totalmente aleatória a cada mensagem enviada, sem qualquer padrão de agrupamento."
+    - "A partition de destino é decidida pelo broker que recebe a mensagem, não pelo particionador do producer."
+    - "Mesmo com key definida, mensagens da mesma key podem cair em partitions diferentes dependendo da carga do cluster."
+  correctIndex: 0
+---
+
+## Pergunta
+
+"Como o Kafka decide em qual Partition uma mensagem vai ser armazenada?"
+
+## O que o entrevistador quer avaliar
+
+Se você entende o mecanismo de particionamento como determinístico e ligado à key — a base para a próxima
+pergunta quase inevitável sobre ordenação.
+
+<RespostaCurta>
+Se a mensagem tem uma key, o particionador padrão calcula `hash(key) % número_de_partitions` — como o hash
+de uma mesma key é sempre o mesmo, ela cai consistentemente na mesma partition. Sem key, o Kafka distribui as
+mensagens entre as partitions de forma aproximadamente uniforme.
+</RespostaCurta>
+
+<RespostaSenior>
+O particionador do producer decide isso no momento do envio. Com key definida, o cálculo é determinístico:
+`hash(key) % número_de_partitions`, garantindo que toda mensagem com aquela key vá sempre para a mesma
+partition — o que preserva ordenação relativa entre mensagens da mesma key. Sem key, as versões recentes do
+client Java usam uma estratégia *sticky*, que agrupa lotes de mensagens em uma partition por vez antes de
+rotacionar, otimizando batching de rede sem comprometer a distribuição geral entre partitions. É possível
+também fornecer um `Partitioner` customizado, para casos onde a lógica de distribuição padrão não atende
+(por exemplo, priorizar uma partition específica para clientes VIP).
+</RespostaSenior>
+
+## Explicação aprofundada
+
+Veja "Message key e a decisão de particionamento" no [Capítulo 4](/pt/livro/partitions-e-ordenacao).
+
+<ExemploFinanceiro>
+Ao publicar eventos do tópico `pix.recebido` usando `contaId` como key, todo evento de uma mesma conta é
+roteado de forma determinística para a mesma partition — permitindo que o `saldo-service` processe os
+eventos daquela conta estritamente na ordem em que ocorreram.
+</ExemploFinanceiro>
+
+<Pegadinha title='"A partition é escolhida aleatoriamente a cada envio"'>
+Mesmo sem key, a distribuição não é aleatória "pura" a cada mensagem — as versões modernas do client usam
+uma estratégia sticky que agrupa mensagens por lote antes de rotacionar de partition, otimizando throughput
+de rede. E com key, a escolha é sempre determinística, nunca aleatória.
+</Pegadinha>
+
+<PerguntaDerivada>
+Prováveis follow-ups: "o que é Message Key?" e "como funciona a ordenação no Kafka?".
+</PerguntaDerivada>

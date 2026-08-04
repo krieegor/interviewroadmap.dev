@@ -1,0 +1,121 @@
+---
+title: "Transações e Outbox Pattern"
+part: "Parte IV — Confiabilidade"
+partOrder: 4
+chapterOrder: 3
+slug: "transacoes-e-outbox-pattern"
+description: "O problema do dual write entre banco e Kafka, e como o transactional outbox resolve com consistência garantida."
+---
+
+A pergunta 10 já levantou o problema: o que acontece se a escrita no banco tiver sucesso mas a publicação no
+Kafka falhar (ou vice-versa)? Este capítulo fecha a Parte IV respondendo isso — e mostra por que a resposta
+não é "usar uma transação distribuída".
+
+## O problema do Dual Write
+
+<Definicao title="Dual Write">
+Dual write é o padrão (problemático) de escrever em dois sistemas diferentes — um banco de dados e o Kafka
+— como duas operações separadas e não atômicas entre si. Se uma tiver sucesso e a outra falhar, os dois
+sistemas ficam inconsistentes.
+</Definicao>
+
+Um `pagamento-service` típico, ao aprovar um pagamento, faz duas coisas: grava o resultado no banco (tabela
+`pagamentos`) e publica um evento `PagamentoAprovado` no Kafka. Se essas duas escritas não forem atômicas,
+existem duas janelas de falha:
+
+- O banco é gravado, mas a publicação no Kafka falha (rede, broker indisponível) — o pagamento existe, mas
+  nenhum sistema downstream (notificação, contabilidade, antifraude) fica sabendo.
+- O evento é publicado no Kafka, mas a gravação no banco falha depois — sistemas downstream reagem a um
+  pagamento que, na verdade, nunca foi persistido com sucesso.
+
+<Atencao title="Kafka e bancos relacionais não compartilham uma transação nativa">
+Não existe uma transação distribuída nativa e simples entre um banco de dados relacional e o Kafka (XA/2PC
+entre os dois é tecnicamente possível em teoria, mas praticamente não utilizado em produção pela
+complexidade operacional e impacto de performance). O dual write, feito de forma ingênua, é uma fonte
+garantida de inconsistência em produção.
+</Atencao>
+
+## Transactional Outbox: a solução
+
+<Diagrama legenda="O serviço grava a tabela de negócio e a tabela outbox na mesma transação de banco. Um processo relay (CDC) lê a tabela outbox e publica os eventos no Kafka.">
+  <OutboxPatternDiagram />
+</Diagrama>
+
+<Definicao title="Transactional Outbox">
+Transactional outbox é o padrão que resolve o dual write escrevendo a intenção de publicar um evento em uma
+tabela auxiliar (`outbox`) **na mesma transação de banco** que grava o efeito de negócio. Um processo
+separado — o relay — lê essa tabela e publica os eventos no Kafka de forma assíncrona e confiável.
+</Definicao>
+
+A ideia central: como a tabela de negócio e a tabela outbox são gravadas na mesma transação relacional
+(algo que o banco já garante nativamente), elas nunca ficam inconsistentes entre si — ou as duas existem, ou
+nenhuma existe. O problema de "publicar no Kafka de forma confiável" vira "ler uma tabela e publicar", que é
+mais simples de tornar robusto (com retry, at-least-once) do que coordenar duas escritas heterogêneas.
+
+## Como o relay lê a tabela outbox
+
+Duas abordagens comuns:
+
+<Comparacao title="Estratégias de relay para a tabela outbox">
+| Estratégia | Como funciona |
+|---|---|
+| Polling | Um processo consulta periodicamente a tabela outbox por registros não publicados, publica no Kafka, e marca como publicado |
+| CDC (Change Data Capture) | Uma ferramenta como o Debezium lê o log de transações do próprio banco (WAL/binlog) e publica automaticamente qualquer inserção na tabela outbox, sem polling |
+</Comparacao>
+
+<DicaEntrevista>
+CDC via Debezium é considerado a abordagem mais robusta porque lê diretamente o log de transações do banco
+— não depende de uma consulta periódica com atraso, e captura o evento no exato momento em que a transação
+é confirmada. Mencionar isso demonstra conhecimento além do padrão em si.
+</DicaEntrevista>
+
+## Outbox garante publicação — não elimina duplicidade
+
+<Pegadinha title='"Outbox pattern resolve tudo, inclusive duplicidade"'>
+Outbox garante que o evento **será** publicado se a transação de negócio foi confirmada — resolve o
+problema de publicação perdida (o cenário "banco gravado, Kafka não publicado"). Ele não impede que o mesmo
+evento seja publicado mais de uma vez (por exemplo, se o relay falhar depois de publicar mas antes de
+marcar como publicado, e tentar de novo). O consumer do outro lado ainda precisa ser idempotente
+(Capítulo 11) — outbox e idempotência resolvem problemas complementares, não substituem um ao outro.
+</Pegadinha>
+
+## Quando usar
+
+- Sempre que uma operação de negócio precisa, de forma confiável, tanto persistir estado quanto notificar
+  outros sistemas via evento — o caso mais comum em arquiteturas orientadas a eventos com banco relacional.
+- Especialmente importante quando a ausência do evento (silenciosamente) seria pior do que um evento
+  duplicado — que é o caso da maioria dos sistemas financeiros.
+
+## Quando não vale o custo
+
+Para operações onde a publicação do evento não é crítica (perder ocasionalmente é aceitável, ex.: um evento
+de analytics de baixo valor), o custo operacional de manter uma tabela outbox e um relay pode não se
+justificar frente a uma publicação direta simples, aceitando a rara janela de inconsistência.
+
+## Relação com Java e Spring Boot
+
+Em Spring Boot, a implementação mais comum grava a tabela outbox usando o mesmo `EntityManager`/transação
+JPA da operação de negócio, dentro do mesmo método `@Transactional`. O relay geralmente é um processo
+separado — seja um scheduler simples (`@Scheduled`) fazendo polling, seja um conector Debezium configurado
+para monitorar a tabela outbox e publicar automaticamente no Kafka, sem código adicional na aplicação.
+
+<ExemploFinanceiro title="Aprovação de pagamento com outbox">
+O `pagamento-service` grava, na mesma transação, a linha em `pagamentos` (status = aprovado) e uma linha em
+`outbox` com o payload do evento `PagamentoAprovado`. Se a transação falhar por qualquer motivo, nenhuma das
+duas é persistida — não existe cenário onde o pagamento é aprovado sem o evento correspondente ser
+eventualmente publicado, nem o inverso. O Debezium, monitorando a tabela outbox via CDC, publica o evento no
+Kafka assim que a transação é confirmada.
+</ExemploFinanceiro>
+
+<Resumo>
+Dual write — escrever em banco e Kafka como operações separadas — é uma fonte estrutural de inconsistência,
+porque as duas escritas não compartilham uma transação nativa. Transactional outbox resolve isso gravando a
+intenção do evento na mesma transação da operação de negócio, delegando a publicação real a um processo
+relay (polling ou CDC via Debezium). Outbox garante que o evento será publicado, mas não elimina a
+possibilidade de duplicidade — o consumer ainda precisa ser idempotente.
+</Resumo>
+
+<PerguntaDerivada>
+Prováveis follow-ups: "por que não usar uma transação distribuída (2PC) entre o banco e o Kafka?" e "como
+você monitoraria se o relay da tabela outbox está atrasado ou travado?" (Capítulo 15).
+</PerguntaDerivada>

@@ -1,0 +1,150 @@
+---
+title: "Producer with Spring Kafka"
+part: "Part V — Java and Spring Boot"
+partOrder: 5
+chapterOrder: 1
+slug: "producer-com-spring-kafka"
+description: "KafkaTemplate in practice — topic, key, value, serialization, callbacks, headers, and correlationId."
+---
+
+Previous chapters explained concepts that apply to any Kafka client. From here on, Part V shows how those
+concepts show up in real Java code using Spring Kafka — starting with the side that publishes events.
+
+## KafkaTemplate
+
+<Definicao title="KafkaTemplate">
+`KafkaTemplate<K, V>` is Spring Kafka's abstraction for publishing messages — the event-production
+equivalent of `JdbcTemplate` for database access. It wraps the Java client's native `KafkaProducer`,
+exposing a simpler API integrated with the rest of Spring (dependency injection, configuration properties,
+metrics).
+</Definicao>
+
+```java
+@Service
+public class PagamentoEventPublisher {
+
+    private final KafkaTemplate<String, PagamentoAprovadoEvent> kafkaTemplate;
+
+    public PagamentoEventPublisher(KafkaTemplate<String, PagamentoAprovadoEvent> kafkaTemplate) {
+        this.kafkaTemplate = kafkaTemplate;
+    }
+
+    public void publicar(PagamentoAprovadoEvent evento) {
+        kafkaTemplate.send("pagamentos.aprovados", evento.getContaId(), evento);
+    }
+}
+```
+
+## Topic, Key, and Value
+
+The most common `send` takes three arguments: the topic, the key (Chapter 4 — decides the destination
+partition and relative ordering), and the value (the event payload). Two-argument overloads
+(`send(topic, value)`) publish with no key, subject to the approximately uniform distribution across
+partitions.
+
+<Atencao title="Never forget the key on events that require ordering">
+A refactor that removes the key "to simplify the code" silently destroys relative ordering between events
+for the same entity (Chapter 4). Treat the key as part of the topic's contract, documented alongside it —
+not as an implicit detail of the producer's code.
+</Atencao>
+
+## Serialization
+
+Spring Kafka delegates key and value serialization to `Serializer<T>` classes configured via
+`spring.kafka.producer.key-serializer` / `value-serializer`. The most common options in production:
+
+<Comparacao title="Serialization strategies">
+| Format | Characteristics |
+|---|---|
+| JSON (`JsonSerializer`) | Simple, readable, but no schema verification — incompatible changes only break at runtime |
+| Avro (with Schema Registry) | Versioned schema with compatibility checked at build/publish time; compact binary payload |
+| Protobuf | Similar schema guarantees to Avro, with strong typing in the Java code generated from the `.proto` file |
+</Comparacao>
+
+Teams that don't yet have a Schema Registry usually start with JSON and migrate to Avro/Protobuf once the
+number of consumers grows enough that incompatible payload changes become a real risk of breaking things
+between different teams' services.
+
+## Callbacks: handling the send result
+
+`send()` is asynchronous — it returns a `CompletableFuture<SendResult<K, V>>` immediately, without waiting
+for the broker's confirmation. Ignoring that return value means not knowing whether the publish succeeded.
+
+<Diagrama legenda="KafkaTemplate.send() is asynchronous; the result arrives via callback, onSuccess with the SendResult or onFailure with the exception.">
+  <ProducerCallbackDiagramEn />
+</Diagrama>
+
+```java
+kafkaTemplate.send("pagamentos.aprovados", evento.getContaId(), evento)
+    .whenComplete((result, exception) -> {
+        if (exception != null) {
+            log.error("Falha ao publicar evento de pagamento", exception);
+        } else {
+            log.debug("Evento publicado no offset {}", result.getRecordMetadata().offset());
+        }
+    });
+```
+
+<Pegadinha title='"I called send(), so the event was published"'>
+Calling `send()` only queues the message for asynchronous delivery — it doesn't guarantee it reached the
+broker. Without handling the callback (or synchronously calling `.get()`, with the latency cost that
+implies), publish failures pass silently unnoticed — exactly the dual write scenario discussed in Chapter
+12.
+</Pegadinha>
+
+## Headers and correlationId
+
+Besides key and value, a Kafka message carries **headers** — arbitrary metadata, typically used for
+traceability and integration between services, without polluting the business payload.
+
+```java
+ProducerRecord<String, PagamentoAprovadoEvent> record =
+    new ProducerRecord<>("pagamentos.aprovados", evento.getContaId(), evento);
+record.headers().add("correlationId", correlationId.getBytes(StandardCharsets.UTF_8));
+
+kafkaTemplate.send(record);
+```
+
+<DicaEntrevista>
+Mentioning a `correlationId` propagated via headers shows practical knowledge of observability in
+distributed systems: it lets you trace a request from the original HTTP call, through the Kafka event, all
+the way to the consumers that process it — essential for debugging a flow that spans multiple services
+(covered in depth in Chapter 15).
+</DicaEntrevista>
+
+## Handling producer failures
+
+Publish failures fall into the same categories as Chapter 9: transient (broker temporarily unavailable —
+the Kafka client already retries automatically internally, configurable via `retries` and
+`delivery.timeout.ms`) and permanent (a message larger than `max.request.size`, serialization that throws
+an exception). The `onFailure` callback is the right place to log, alert, or — in critical cases — persist
+the failed message for manual resend, since `send()` doesn't block the application waiting for that result.
+
+## How this shows up in interviews
+
+"How would you guarantee an event was successfully published to Kafka?" is the most common practical
+question about producers. The expected answer cites `send()`'s asynchronous return, handling the callback
+(not just calling it and moving on), and — for the consistency-with-database scenario — Chapter 12's outbox
+pattern, since no producer callback alone solves the dual write problem.
+
+## Relation to real systems
+
+<ExemploFinanceiro title="Publishing an authorized purchase with traceability">
+The `autorizacao-service`, when approving a card purchase, publishes the `CompraAutorizada` event using
+`cartaoId` as the key (ordering by card, Chapter 4), propagates the original HTTP request's
+`correlationId` via header, and handles the `send()` callback by recording a publish-failure metric — which
+feeds an alert if the failure rate crosses a threshold (Chapter 15).
+</ExemploFinanceiro>
+
+<Resumo>
+`KafkaTemplate` wraps the Kafka producer in Spring Boot: `send(topic, key, value)` publishes
+asynchronously, returning a `CompletableFuture` that should be handled via callback to know whether the
+publish succeeded. Serialization (JSON, Avro, Protobuf) and headers (like `correlationId`, for
+traceability) round out the contract of a well-made publish. None of these mechanisms alone solves
+consistency with the database — for that, the pattern is outbox (Chapter 12).
+</Resumo>
+
+<PerguntaDerivada>
+Likely follow-ups: "what happens if `send()` fails silently with no callback handled?" and "how would you
+propagate a `correlationId` from an HTTP call all the way to the consumer on the other side of Kafka?".
+</PerguntaDerivada>

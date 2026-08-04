@@ -1,0 +1,62 @@
+---
+id: 15
+title: "Why do Partitions exist?"
+slug: "por-que-existem-partitions"
+level: ["pleno", "senior"]
+topics: ["arquitetura"]
+relatedChapters: ["partitions-e-ordenacao"]
+shortAnswer: "Partitions exist to parallelize consumption (each one is read by a different consumer within a Consumer Group) and to scale writes (a topic's partitions can live on different brokers)."
+quiz:
+  options:
+    - "Partitions exist to parallelize consumption within a Consumer Group and to scale writes by spreading partitions across brokers."
+    - "Partitions exist solely to improve write performance, with no relation to consumption parallelism."
+    - "Partitions exist to guarantee global ordering across every message published to a topic."
+    - "Adding more consumers to a Consumer Group always increases throughput, regardless of the topic's number of partitions."
+  correctIndex: 0
+---
+
+## Question
+
+"Why does Kafka split a topic into Partitions? What problem does that solve?"
+
+## What the interviewer wants to assess
+
+Whether you understand the motivation behind partitions, not just the definition — this question usually
+comes right after "what is a partition," testing whether the candidate understands the "why," not just
+memorized the "what."
+
+<RespostaCurta>
+Partitions exist to solve two problems at once: consumption parallelism (more partitions means more
+consumers processing in parallel within a Consumer Group) and write scalability (partitions of the same
+topic can live on different brokers, spreading the load).
+</RespostaCurta>
+
+<RespostaSenior>
+A topic could, in principle, be a single giant log — but that would limit consumption parallelism to a
+single sequential stream, no matter how many consumers were added to the group. Partitions solve this by
+splitting the topic into independent units: within a Consumer Group, each partition is assigned to exactly
+one consumer at a time, so consumption parallelism scales with the number of partitions. On the write side,
+partitions of the same topic can be spread across multiple brokers, multiplying the topic's simultaneous
+write capacity.
+</RespostaSenior>
+
+## In-depth explanation
+
+See "Why partitions exist" in [Chapter 4](/en/livro/partitions-e-ordenacao).
+
+<ExemploFinanceiro>
+A card transactions topic with a single partition would limit processing to one consumer at a time, even
+if the team scaled the service to 10 replicas — 9 of them would sit idle. With 10 partitions, all 10
+replicas process in genuine parallel.
+</ExemploFinanceiro>
+
+<Pegadinha title='"Partitions only exist for write performance"'>
+Write performance is half the answer. The other half — just as important and often forgotten — is
+consumption parallelism: without partitions, adding more consumers to a Consumer Group wouldn't increase
+processing throughput at all.
+</Pegadinha>
+
+<PerguntaDerivada>
+Likely follow-ups: "how would you choose the number of Partitions?" and "what happens if I have more
+consumers than Partitions?".
+</PerguntaDerivada>

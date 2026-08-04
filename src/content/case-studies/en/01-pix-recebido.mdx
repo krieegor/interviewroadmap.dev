@@ -1,0 +1,114 @@
+---
+title: "PIX received"
+slug: "pix-recebido"
+order: 1
+description: "Topic topology, key choice, idempotency, retry, DLQ, replay, and observability in a PIX-receiving flow."
+relatedChapters: ["o-que-e-apache-kafka", "arquitetura-interna", "retention-e-replay", "retry-e-dlq"]
+---
+
+This case study describes, end-to-end, how a digital bank models receiving a PIX (Brazil's instant payment
+system) as an event-driven flow — covering the decisions that typically come up in an interview when the
+interviewer asks you to "describe a real system you'd design with Kafka."
+
+## The domain event
+
+When the Central Bank's Instant Payment System (SPI) confirms a PIX settlement, the service responsible for
+that integration publishes a `PixRecebido` event — a fact that already happened, not a command.
+
+```json
+{
+  "eventId": "8f14e45f-...",
+  "endToEndId": "E00000000202401010000abcdef12345",
+  "contaId": "acc_9182734",
+  "valor": 15000,
+  "moeda": "BRL",
+  "pagador": { "nome": "...", "documento": "..." },
+  "recebidoEm": "2026-07-31T14:02:11Z"
+}
+```
+
+## Topic topology
+
+<Comparacao title="Topic and configuration">
+| Item | Decision |
+|---|---|
+| Topic | `pix.recebido` |
+| Key | `contaId` |
+| Partitions | 24 (sized for the receiving peak, not the average volume) |
+| Replication factor | 3 |
+| Retention | 7 days (enough for operational replay; long-term audit lives in a data lake, not the topic) |
+</Comparacao>
+
+## Why the key is `contaId`
+
+<DicaEntrevista>
+  The key choice isn't about distributing uniformly — it's about **which events need to stay
+  ordered relative to each other**. Every event for the same account (PIX received, PIX sent,
+  balance hold) must land on the same partition so consumers process them in the correct order.
+  Using `eventId` as the key, for example, would distribute better across partitions, but would
+  destroy per-account ordering — a common mistake made by people optimizing for throughput without
+  understanding the ordering requirement.
+</DicaEntrevista>
+
+## Independent consumers
+
+<Diagrama legenda="Multiple Consumer Groups read the same pix.recebido topic independently.">
+  <ProducerConsumerFlowEn />
+</Diagrama>
+
+- **saldo-service**: credits the amount to the account, within an idempotent transaction (see below).
+- **notificacao-service**: sends a push notification, "You received a PIX of R$ 150.00."
+- **extrato-service**: writes the entry to the statement for later lookup.
+- **antifraude-service**: assesses the receipt against risk rules (e.g., too many PIX transfers to new
+  accounts in a short window).
+
+Each of these is an independent Consumer Group. A slowdown in antifraude-service doesn't delay crediting
+the balance — they advance offsets completely decoupled from each other.
+
+## Idempotency
+
+<Atencao title="Why idempotency is mandatory here">
+  *At-least-once* delivery guarantees (the most common setup in production) imply the same
+  `PixRecebido` event can be delivered to the `saldo-service` more than once — for example, after a
+  rebalance or a commit retry. Without protection, that would credit the same PIX twice.
+</Atencao>
+
+The `saldo-service` keeps a `processed_events` table with a uniqueness constraint on `eventId`. Before
+applying the credit, it tries to insert the `eventId`; if the insert fails due to a uniqueness violation,
+the event has already been processed and the operation is skipped — the check and the credit application
+happen in the same database transaction, guaranteeing atomicity even under concurrency.
+
+## Retry and DLQ
+
+If the `saldo-service` fails to process an event (e.g., the database is momentarily unavailable), the error
+is treated as transient: Spring Kafka retries with exponential backoff. After a configured number of
+attempts, the event is published to the `pix.recebido.dlq` topic (Dead Letter Topic) for manual
+investigation — without blocking processing of the following events in the same partition (avoiding the
+"poison pill" effect).
+
+## Replay
+
+If a bug in the `extrato-service` generates entries with the wrong amount, the fix involves: (1) fixing the
+bug, (2) resetting the `extrato-service` Consumer Group's offset to the start of the affected range
+(respecting the 7-day retention), and (3) letting the fixed service reprocess the events, rebuilding the
+statement entries from scratch for that range — with no interaction with `saldo-service`,
+`notificacao-service`, or `antifraude-service`, which aren't affected by another group's replay.
+
+## Observability
+
+<Comparacao title="Monitored metrics">
+| Metric | Why |
+|---|---|
+| Consumer lag per group | Detects whether antifraud or statement processing is falling behind incoming volume |
+| DLQ message rate | Signals persistent failures requiring investigation |
+| Producer → consumer latency | Time between PIX confirmation and balance update, critical to user experience |
+| correlationId/eventId in logs | Lets you trace a specific PIX across every service that processed it |
+</Comparacao>
+
+<Resumo>
+  The PIX-received flow illustrates why Kafka gets chosen for this kind of problem: a single domain
+  event, a key chosen to preserve per-account ordering, multiple independent consumers, idempotency
+  required because of at-least-once guarantees, a DLQ to isolate persistent failures, and replay as
+  a correction tool — all without coupling the service that receives the PIX to the services that
+  react to it.
+</Resumo>

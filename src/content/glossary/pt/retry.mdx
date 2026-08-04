@@ -1,0 +1,13 @@
+---
+term: "Retry"
+slug: "retry"
+shortDefinition: "Nova tentativa de processar uma mensagem que falhou, geralmente com backoff crescente entre as tentativas."
+relatedTerms: ["dlq", "consumer-group"]
+relatedChapters: ["retry-e-dlq"]
+---
+
+Retry é a tentativa de reprocessar uma mensagem depois de uma falha, partindo da premissa de que o erro pode
+ser transitório (banco de dados momentaneamente indisponível, timeout de rede) e que uma nova tentativa,
+talvez segundos ou minutos depois, tem chance de suceder. A prática recomendada é usar backoff exponencial
+(o intervalo entre tentativas cresce a cada falha) e um limite máximo de tentativas, após o qual a mensagem
+é encaminhada para uma DLQ em vez de ser tentada indefinidamente.

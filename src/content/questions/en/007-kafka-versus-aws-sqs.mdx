@@ -1,0 +1,67 @@
+---
+id: 7
+title: "Kafka versus AWS SQS"
+slug: "kafka-versus-aws-sqs"
+level: ["senior", "tech-lead"]
+topics: ["comparacoes"]
+relatedChapters: ["kafka-versus-outras-ferramentas"]
+shortAnswer: "SQS is a fully managed queue, with no retention after consumption and no native replay; Kafka retains events for a configurable period and lets multiple independent consumers read the same data, with replay via offset reset."
+quiz:
+  options:
+    - "SQS is a managed queue with no retention after consumption and no native replay; Kafka retains events for a configurable period, with multiple independent consumers and replay via offset reset."
+    - "SQS FIFO solves the same problems as Kafka, since it also guarantees ordering and avoids message duplication."
+    - "SQS retains messages indefinitely until manually deleted, exactly like Kafka's retention policy."
+    - "Kafka, like SQS, removes the message from the topic as soon as one consumer reads it."
+  correctIndex: 0
+---
+
+## Question
+
+"How do you compare Kafka with AWS's SQS? Have you ever had to choose between the two?"
+
+## What the interviewer wants to assess
+
+Practical cloud knowledge, beyond Kafka itself — very common at companies with AWS infrastructure. It
+checks whether you know when SQS's zero-config management pays off versus Kafka's flexibility.
+
+<RespostaCurta>
+  SQS is a queue fully managed by AWS, with no retention after consumption and no native replay — only
+  redrive of failed messages via a DLQ. Kafka retains events for a configurable period and lets
+  multiple independent consumers read the same data, with full replay via offset reset. I choose SQS
+  when I want zero operations and the case is a simple work queue; Kafka when I need history shared
+  across several systems.
+</RespostaCurta>
+
+<RespostaSenior>
+  SQS Standard and FIFO are managed queues: you don't operate infrastructure, but the message
+  disappears after the ack (or expires). SQS FIFO guarantees order within a message group and avoids
+  duplication, but that solves ordering, not long-term retention or multiple independent consumers of
+  the same data — for that, the AWS pattern is combining SNS (fan-out) with multiple SQS queues, one
+  per consumer. Kafka natively offers this with Consumer Groups, plus retaining the event for days and
+  allowing an offset reset to reread history — something SQS has no direct equivalent for, because
+  once a message is removed from the queue, it can't be reread from there. The trade-off is operations:
+  SQS requires no cluster management; Kafka (self-hosted) does, unless you use a managed service like
+  MSK or Confluent Cloud.
+</RespostaSenior>
+
+## In-depth explanation
+
+See the full comparison table in [Chapter 2](/en/livro/kafka-versus-outras-ferramentas), including the
+difference between Kafka's replay and SQS's DLQ redrive.
+
+<ExemploFinanceiro>
+  An SQS queue can process the "send PIX receipt by email" task — one-off work, no need for replay.
+  The `PixRecebido` domain event, though, which matters to balance, statement, and antifraud
+  independently and may need to be reprocessed for an audit, is better modeled as a Kafka topic.
+</ExemploFinanceiro>
+
+<Pegadinha title='"SQS FIFO solves the same problems as Kafka"'>
+  SQS FIFO solves ordering and deduplication within a message group, but it's still a queue — with no
+  long-term retention or history replay. Treating it as a full Kafka replacement is a common interview
+  mistake.
+</Pegadinha>
+
+<PerguntaDerivada>
+  Be ready for: "how would you replay events if you were only using SQS?" and "what's the difference
+  between DLQ redrive and Kafka replay?".
+</PerguntaDerivada>

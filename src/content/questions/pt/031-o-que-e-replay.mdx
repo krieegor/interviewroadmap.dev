@@ -1,0 +1,61 @@
+---
+id: 31
+title: "O que é Replay?"
+slug: "o-que-e-replay"
+level: ["pleno", "senior"]
+topics: ["consumo"]
+relatedChapters: ["retention-e-replay"]
+shortAnswer: "Replay é reprocessar eventos já retidos no log, movendo o offset commitado de um Consumer Group para um ponto anterior — usado para corrigir bugs, popular sistemas novos ou reconstruir estado."
+quiz:
+  options:
+    - "Reprocessar eventos ainda retidos no log, movendo o offset commitado de um Consumer Group para um ponto anterior, dentro da janela de retenção."
+    - "Resetar o offset sem outras consequências, já que o Kafka trata isso como uma operação isolada e sem efeitos colaterais."
+    - "Reenviar mensagens que o broker guardou numa cópia separada criada especificamente para permitir reprocessamento."
+    - "Reprocessar apenas mensagens que falharam anteriormente e foram isoladas pelo consumer em uma estrutura de erro."
+  correctIndex: 0
+---
+
+## Pergunta
+
+"O que é Replay no Kafka?"
+
+## O que o entrevistador quer avaliar
+
+Se você conecta replay a um caso de uso real (não só a definição técnica) e entende sua dependência da
+retenção.
+
+<RespostaCurta>
+Replay é mover a posição de leitura de um Consumer Group para um ponto anterior no log, reprocessando
+eventos que já haviam sido consumidos — ou lendo pela primeira vez eventos antigos, no caso de um Consumer
+Group novo.
+</RespostaCurta>
+
+<RespostaSenior>
+Tecnicamente, replay é resetar o offset commitado de um Consumer Group (via `kafka-consumer-groups.sh` ou
+ferramenta equivalente) e deixar o consumer avançar normalmente a partir dali. Os três usos mais comuns:
+corrigir um bug de processamento (corrigir o código e reprocessar o intervalo afetado), popular um sistema
+novo com histórico existente (um Consumer Group novo lendo desde o início da retenção), e reconstruir um
+estado derivado, como um índice de busca. O requisito não óbvio é que replay só funciona dentro da janela de
+retenção — e que, em produção, exige que o consumer seja idempotente, porque ele vai reprocessar eventos
+que já geraram efeitos colaterais na primeira vez.
+</RespostaSenior>
+
+## Explicação aprofundada
+
+Veja "Replay: reprocessando o que já foi lido" no [Capítulo 8](/pt/livro/retention-e-replay).
+
+<ExemploFinanceiro>
+Um bug no `extrato-service` gerou lançamentos incorretos nos últimos 3 dias. Depois de corrigir o bug, o
+time reseta o offset do Consumer Group para 3 dias atrás — o serviço reconstrói os lançamentos corretamente,
+assumindo que a operação seja idempotente (um upsert por lançamento, não um incremento).
+</ExemploFinanceiro>
+
+<Pegadinha title='"Replay é só resetar o offset, sem mais consequências"'>
+Resetar o offset é a parte fácil. Replay reprocessa eventos que já geraram efeitos colaterais na primeira
+vez — se o consumer não for idempotente, ele duplica esses efeitos (notificações, créditos, e-mails).
+</Pegadinha>
+
+<PerguntaDerivada>
+Prováveis follow-ups: "como o Kafka consegue reler mensagens já consumidas?" e "qual a diferença entre
+Replay e SQS DLQ Redrive?".
+</PerguntaDerivada>

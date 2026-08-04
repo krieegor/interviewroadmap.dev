@@ -1,0 +1,12 @@
+---
+term: "Producer"
+slug: "producer"
+shortDefinition: "Aplicação que publica eventos em um tópico Kafka, decidindo tópico, key e serialização do valor."
+relatedTerms: ["topic", "key", "consumer"]
+relatedChapters: ["arquitetura-interna", "o-que-e-apache-kafka"]
+---
+
+O producer é o papel assumido por qualquer aplicação — normalmente um microsserviço — que envia mensagens a
+um tópico. Ele decide o tópico de destino, a key da mensagem (que determina a partition) e o formato de
+serialização do valor. Um producer não conhece seus consumers; essa ausência de acoplamento é o que
+viabiliza a arquitetura orientada a eventos.

@@ -1,0 +1,14 @@
+---
+term: "Event"
+slug: "event"
+shortDefinition: "An immutable record representing a fact that already happened — the unit of data flowing through a Kafka topic."
+relatedTerms: ["topic", "producer", "consumer"]
+relatedChapters: ["o-que-e-apache-kafka"]
+---
+
+An event is the fundamental unit of data in Kafka: an immutable record, published to a topic, representing
+a business fact that already occurred — "payment approved," "PIX received," "account blocked." Unlike a
+command (which instructs a future action), an event only reports something that already happened; whoever
+consumes it independently decides what to do with that information. It's this nature — a past fact, not an
+instruction — that lets multiple consumers react to the same event in completely different ways, without
+the producer needing to know any of them.

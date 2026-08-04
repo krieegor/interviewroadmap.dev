@@ -1,0 +1,12 @@
+---
+term: "Follower"
+slug: "follower"
+shortDefinition: "Broker que replica os dados de uma partition a partir do leader, servindo como réplica para failover."
+relatedTerms: ["leader", "broker", "isr", "replication-factor"]
+relatedChapters: ["arquitetura-interna", "brokers-lideres-e-replicacao"]
+---
+
+Um follower mantém uma cópia dos dados da partition que replica, buscando continuamente os novos registros
+do leader. Ele não serve leituras nem escritas de clientes diretamente (na configuração padrão) — sua função
+é permitir que, se o leader falhar, um follower atualizado assuma como novo leader sem perda de dados
+confirmados.

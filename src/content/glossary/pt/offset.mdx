@@ -1,0 +1,12 @@
+---
+term: "Offset"
+slug: "offset"
+shortDefinition: "Posição sequencial de um registro dentro de uma partition — identifica univocamente uma mensagem naquela partition."
+relatedTerms: ["partition", "consumer", "commit"]
+relatedChapters: ["arquitetura-interna", "offset-e-commit"]
+---
+
+O offset é um número inteiro crescente, único por partition, que marca a posição de um registro no log.
+Ele não é global ao tópico — é local a cada partition; a mesma numeração de offset existe de forma
+independente em cada partition. Consumers usam o offset para saber até onde já leram, e o commit do offset
+(automático ou manual) é o que marca esse progresso.

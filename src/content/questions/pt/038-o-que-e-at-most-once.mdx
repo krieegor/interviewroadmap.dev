@@ -1,0 +1,59 @@
+---
+id: 38
+title: "O que é At Most Once?"
+slug: "o-que-e-at-most-once"
+level: ["pleno", "senior"]
+topics: ["confiabilidade"]
+relatedChapters: ["garantias-de-entrega"]
+shortAnswer: "At Most Once é a garantia de entrega em que a mensagem nunca é duplicada, mas pode ser perdida — ocorre quando o commit (ou o ack do producer) acontece antes de qualquer confirmação de sucesso do passo seguinte."
+quiz:
+  options:
+    - "A garantia em que a mensagem nunca é duplicada, mas pode ser perdida, porque o commit (ou ack) ocorre antes da confirmação de sucesso do processamento."
+    - "A garantia em que a mensagem nunca é perdida nem duplicada, sendo a opção mais segura para qualquer tipo de sistema."
+    - "A garantia em que a mensagem pode ser perdida e também duplicada, dependendo apenas da configuração de partições do tópico."
+    - "A garantia sempre inadequada para qualquer sistema, já que qualquer perda de mensagem é considerada um defeito grave de arquitetura."
+  correctIndex: 0
+---
+
+## Pergunta
+
+"O que é a garantia At Most Once?"
+
+## O que o entrevistador quer avaliar
+
+Se você entende que essa garantia troca segurança contra perda por simplicidade/velocidade — e sabe dizer
+quando (raramente) ela é aceitável.
+
+<RespostaCurta>
+At Most Once significa que a mensagem é entregue no máximo uma vez — nunca duplicada, mas pode ser perdida.
+Acontece quando o commit do offset (ou o ack do producer) ocorre antes de qualquer confirmação de que o
+processamento realmente teve sucesso.
+</RespostaCurta>
+
+<RespostaSenior>
+Do lado do producer, `acks=0` (ou `acks=1` sem tratar falhas de retry) tende a essa garantia — a mensagem
+pode nunca chegar ao broker sem que o producer saiba. Do lado do consumer, auto commit (ou commit manual
+feito antes do processamento terminar) tem o mesmo efeito: se o consumer cair depois do commit mas antes de
+concluir o processamento, aquela mensagem nunca será reprocessada, porque o Kafka já a considera consumida.
+Essa garantia raramente é aceitável em sistemas financeiros — perder um evento de pagamento silenciosamente
+é geralmente pior do que processá-lo duas vezes (que pelo menos é corrigível com idempotência).
+</RespostaSenior>
+
+## Explicação aprofundada
+
+Veja "At Most Once" no [Capítulo 10](/pt/livro/garantias-de-entrega).
+
+<ExemploFinanceiro>
+Um sistema de coleta de métricas de uso (não crítico) pode aceitar At Most Once: perder ocasionalmente um
+evento de clique não tem impacto de negócio relevante, e a simplicidade/velocidade compensa o risco.
+</ExemploFinanceiro>
+
+<Pegadinha title='"At Most Once é sempre a pior escolha"'>
+Não é sempre errada — para dados de baixo valor onde perda ocasional é aceitável e performance importa mais
+que completude, ela é uma escolha válida. O erro é usá-la por padrão em fluxos onde perda é inaceitável, sem
+essa análise consciente.
+</Pegadinha>
+
+<PerguntaDerivada>
+Prováveis follow-ups: "o que é At Least Once?" e "o que é Exactly Once?".
+</PerguntaDerivada>

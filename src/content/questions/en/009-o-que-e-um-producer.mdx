@@ -1,0 +1,63 @@
+---
+id: 9
+title: "What is a Producer?"
+slug: "o-que-e-um-producer"
+level: ["pleno", "senior"]
+topics: ["arquitetura"]
+relatedChapters: ["arquitetura-interna"]
+shortAnswer: "A Producer is any application that publishes events to a Kafka topic, deciding the topic, the key, and the value's serialization, without needing to know its consumers."
+quiz:
+  options:
+    - "Any application that publishes events to a topic, deciding the topic, the key, and the value's serialization, without needing to know its consumers."
+    - "The application that knows which consumers will process each message it publishes to the topic."
+    - "The application that must wait for the consumer's acknowledgment before considering the send complete."
+    - "The application that only chooses the destination topic — the key and serialization are decided by the broker."
+  correctIndex: 0
+---
+
+## Question
+
+"What is a Producer in Kafka, and what does it need to decide when publishing a message?"
+
+## What the interviewer wants to assess
+
+Basic architecture knowledge — usually a warm-up question before moving on to deeper topics like key
+choice and delivery guarantees.
+
+<RespostaCurta>
+  A Producer is the application that publishes events to a Kafka topic. When sending a message, it
+  decides which topic to send to, which key to use (which determines the destination partition), and
+  how to serialize the value — usually JSON, Avro, or Protobuf. The producer doesn't know, and doesn't
+  need to know, who will consume that event.
+</RespostaCurta>
+
+<RespostaSenior>
+  A Producer is any application — typically a microservice — that publishes a business fact as an
+  event to a topic. Three decisions fall to the producer on every send: the destination topic, the
+  message's key (which determines which partition it's stored in, and therefore its ordering relative
+  to other messages with the same key), and the value's serialization format. In Spring Boot, this
+  translates into a call to `KafkaTemplate.send(topic, key, value)`. One point that's often missed: the
+  producer also decides (via configuration) the delivery guarantee level it wants — `acks=0`, `1`, or
+  `all` — a latency-versus-durability trade-off that comes back in Chapter 10, on delivery guarantees.
+</RespostaSenior>
+
+## In-depth explanation
+
+See "Producer" in [Chapter 3](/en/livro/arquitetura-interna). For the key decision, see
+[Chapter 4 on partitions and ordering](/en/livro/partitions-e-ordenacao).
+
+<ExemploFinanceiro>
+  The card authorization service, when approving a purchase, acts as a producer by publishing the
+  `CompraAutorizada` event to the `compras.autorizadas` topic, using `cartaoId` as the key — ensuring
+  all purchases on the same card land on the same partition, in order.
+</ExemploFinanceiro>
+
+<Pegadinha title='"The producer knows which consumers will process the message"'>
+  No — that's exactly Kafka's decoupling point. The producer publishes to the topic with no knowledge
+  of how many Consumer Groups exist or what each one does with the event.
+</Pegadinha>
+
+<PerguntaDerivada>
+  Expect: "can a producer be a microservice?" (next question) and "what happens if the producer
+  doesn't specify a key?".
+</PerguntaDerivada>

@@ -1,0 +1,14 @@
+---
+term: "DLQ"
+slug: "dlq"
+shortDefinition: "Dead Letter Queue/Topic: a separate topic where messages that failed repeatedly are sent, without blocking processing of the rest."
+relatedTerms: ["retry", "consumer-group", "partition"]
+relatedChapters: ["retry-e-dlq"]
+---
+
+DLQ (Dead Letter Queue, or Dead Letter Topic in Kafka's vocabulary) is a dedicated topic where messages
+that repeatedly failed processing are published, after retry attempts are exhausted. Kafka has no native
+DLQ mechanism like SQS does — it's implemented by the application (or by a framework, like Spring Kafka via
+`DeadLetterPublishingRecoverer`), publishing the problematic message to a separate topic. The main benefit
+is isolating the "poison pill" effect: a message that gets stuck doesn't block the rest of that partition's
+messages indefinitely.

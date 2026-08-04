@@ -1,0 +1,11 @@
+---
+term: "Consumer"
+slug: "consumer"
+shortDefinition: "An application that reads events from one or more topics, starting from the position (offset) where it last stopped."
+relatedTerms: ["consumer-group", "offset", "topic", "idempotencia"]
+relatedChapters: ["arquitetura-interna", "consumer-groups-e-rebalance", "offset-e-commit"]
+---
+
+A consumer reads records from one or more partitions of a topic, advancing sequentially from the last
+processed offset. Consumers almost always operate within a Consumer Group, which determines how the
+topic's partitions are split across the running instances.

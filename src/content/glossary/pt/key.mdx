@@ -1,0 +1,12 @@
+---
+term: "Key"
+slug: "key"
+shortDefinition: "Valor opcional anexado a cada mensagem que determina, via hash, em qual partition ela será armazenada."
+relatedTerms: ["partition", "producer"]
+relatedChapters: ["arquitetura-interna"]
+---
+
+A key é o mecanismo que garante ordenação relativa entre mensagens: todas as mensagens com a mesma key caem
+na mesma partition (via hash da key), e portanto são lidas na ordem em que foram escritas. Mensagens sem key
+são distribuídas entre partitions de forma aproximadamente uniforme (round-robin/sticky), sem garantia de
+ordenação entre elas.

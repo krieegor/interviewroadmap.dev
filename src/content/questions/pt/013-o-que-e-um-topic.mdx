@@ -1,0 +1,60 @@
+---
+id: 13
+title: "O que é um Topic?"
+slug: "o-que-e-um-topic"
+level: ["pleno", "senior"]
+topics: ["arquitetura"]
+relatedChapters: ["arquitetura-interna"]
+shortAnswer: "Topic é o nome lógico sob o qual eventos relacionados são publicados e consumidos; fisicamente, ele é dividido em uma ou mais partitions, que são os logs de fato."
+quiz:
+  options:
+    - "Topic é o nome lógico sob o qual eventos relacionados são publicados e consumidos, fisicamente dividido em uma ou mais partitions."
+    - "Topic é equivalente a uma tabela de banco de dados, com ordem garantida entre todas as suas linhas."
+    - "Topic é o log físico único e ordenado onde os registros são armazenados sequencialmente."
+    - "O schema dos dados publicados em um tópico é imposto e validado diretamente pelo próprio Kafka."
+  correctIndex: 0
+---
+
+## Pergunta
+
+"O que é um Topic no Kafka?"
+
+## O que o entrevistador quer avaliar
+
+Se você distingue a abstração lógica (tópico) da estrutura física real (partitions) — um erro comum é tratar
+"tópico" como se fosse o próprio log, quando na verdade ele é dividido em partitions independentes.
+
+<RespostaCurta>
+Topic é o nome lógico sob o qual eventos relacionados são publicados e consumidos — por exemplo,
+`pagamentos.aprovados`. Fisicamente, um tópico é dividido em uma ou mais partitions, que são os logs
+ordenados onde os dados realmente residem.
+</RespostaCurta>
+
+<RespostaSenior>
+Um tópico não tem schema imposto pelo Kafka em si — o schema, quando existe, é responsabilidade de uma
+camada como o Schema Registry. O que o Kafka garante sobre um tópico é a divisão em partitions e a ordem de
+entrega dentro de cada uma delas — não entre partitions diferentes do mesmo tópico. Ao criar um tópico, as
+decisões relevantes são o número de partitions (paralelismo, Capítulo 4), o replication factor
+(disponibilidade, Capítulo 5) e a política de retenção (Capítulo 8) — o tópico em si é só o nome que amarra
+essas decisões.
+</RespostaSenior>
+
+## Explicação aprofundada
+
+Veja "Topic" no [Capítulo 3](/pt/livro/arquitetura-interna).
+
+<ExemploFinanceiro>
+O tópico `boletos.emitidos` pode ter 8 partitions, replication factor 3 e retenção de 30 dias — três
+decisões de design independentes, todas amarradas ao mesmo nome lógico de tópico que producers e consumers
+referenciam no código.
+</ExemploFinanceiro>
+
+<Pegadinha title='"Um tópico Kafka é como uma tabela de banco de dados"'>
+A analogia ajuda a entender que um tópico agrupa dados relacionados, mas quebra ao considerar ordenação: uma
+tabela normalmente não tem noção de "ordem garantida apenas para um subconjunto de linhas" — um tópico
+Kafka tem exatamente essa característica, por causa das partitions.
+</Pegadinha>
+
+<PerguntaDerivada>
+Prováveis follow-ups: "o que é uma Partition?" e "por que existem Partitions?".
+</PerguntaDerivada>

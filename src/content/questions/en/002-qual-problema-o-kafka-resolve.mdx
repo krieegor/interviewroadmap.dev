@@ -1,0 +1,67 @@
+---
+id: 2
+title: "What problem does Kafka solve?"
+slug: "qual-problema-o-kafka-resolve"
+level: ["pleno", "senior", "tech-lead"]
+topics: ["fundamentos"]
+relatedChapters: ["o-que-e-apache-kafka"]
+shortAnswer: "Kafka solves the coupling problem between an event producer and multiple independent consumers, letting systems react to business facts without direct synchronous calls and without the producer needing to know its consumers."
+quiz:
+  options:
+    - "The coupling between an event's producer and multiple independent consumers, avoiding direct synchronous calls and the need for the producer to know them."
+    - "Mainly the volume and performance problem in systems with high message throughput."
+    - "Guaranteed delivery of a single message to a single recipient, like a point-to-point queue."
+    - "The need for a central database, since Kafka replaces the application's state storage."
+  correctIndex: 0
+---
+
+## Question
+
+"What problem does Kafka actually solve, in practice? Why not just call the other services over HTTP?"
+
+## What the interviewer wants to assess
+
+Whether you understand the motivation behind event-driven architecture, not just Kafka's technical
+mechanics. It's common for candidates to know how to operate Kafka without being able to articulate the
+business problem it solves.
+
+<RespostaCurta>
+  Kafka solves the coupling problem: when a business event matters to multiple systems, calling each
+  one via synchronous HTTP creates a direct dependency between the producer and every consumer, and
+  each new consumer requires changing the producer. Kafka decouples this — the producer publishes
+  once, and any number of consumers read independently.
+</RespostaCurta>
+
+<RespostaSenior>
+  In systems with few services, synchronous calls work fine. The problem shows up when the same
+  business event — say, "payment approved" — starts to matter to multiple systems: notifications,
+  antifraud, accounting, analytics. If the payments service calls each one directly, it becomes
+  coupled to all of their availability, and adding a new consumer requires changing the producer's
+  code. Kafka solves this by inverting the model: the producer publishes the event once to a topic and
+  moves on; each interested consumer reads that event at its own pace, without the producer needing to
+  know it exists. This decouples both technically (a slow consumer failing doesn't bring down the
+  producer) and organizationally (teams evolve their consumers without coordinating deploys with the
+  producer's team).
+</RespostaSenior>
+
+## In-depth explanation
+
+See "The problem before Kafka" in [Chapter 1](/en/livro/o-que-e-apache-kafka) for the full reasoning,
+including why this isn't primarily a performance question, but a coupling one.
+
+<ExemploFinanceiro>
+  Before Kafka, adding a cashback system that reacts to "purchase approved" would require changing the
+  card authorization service to call it directly. With Kafka, the cashback team simply creates a new
+  consumer on the `compras.aprovadas` topic — the authorization service doesn't change a single line.
+</ExemploFinanceiro>
+
+<Pegadinha title='"Kafka solves the volume/performance problem"'>
+  Volume is a consequence of the design, not the original motivation. A system can justify Kafka even
+  with moderate volume, just because it has many independent consumers of the same event — the core
+  problem is coupling, not just throughput.
+</Pegadinha>
+
+<PerguntaDerivada>
+  Be ready for: "couldn't this be solved with a queue?" and "give me a real example where you saw this
+  coupling become a problem."
+</PerguntaDerivada>

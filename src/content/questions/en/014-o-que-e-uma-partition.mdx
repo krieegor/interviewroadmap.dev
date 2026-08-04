@@ -1,0 +1,60 @@
+---
+id: 14
+title: "What is a Partition?"
+slug: "o-que-e-uma-partition"
+level: ["pleno", "senior"]
+topics: ["arquitetura"]
+relatedChapters: ["arquitetura-interna", "partitions-e-ordenacao"]
+shortAnswer: "Partition is an ordered, immutable subdivision of a topic — the actual physical log, where records are stored sequentially and identified by an increasing offset."
+quiz:
+  options:
+    - "Partition is an ordered, immutable subdivision of a topic — the actual physical log, with records identified by an increasing offset."
+    - "The more partitions a topic has, the better, with no meaningful cost in metadata overhead or rebalance time."
+    - "Partition is the logical name of the topic that producers and consumers reference in application code."
+    - "A partition guarantees that records across every partition of a topic stay ordered relative to each other."
+  correctIndex: 0
+---
+
+## Question
+
+"What is a Partition in Kafka?"
+
+## What the interviewer wants to assess
+
+Whether you understand partition as the real unit of storage, ordering, and parallelism — the piece cited
+most often in practically every subsequent Kafka question.
+
+<RespostaCurta>
+Partition is an ordered, immutable subdivision of a topic — the actual physical log. Each partition is a
+sequence of records identified by an increasing offset, stored on a broker (with replicas on other
+brokers, when the replication factor is greater than 1).
+</RespostaCurta>
+
+<RespostaSenior>
+A partition is an append-only log: new records are always added at the end, never modified in place, each
+identified by an offset local to that partition. It's the unit that enables consumption parallelism (each
+partition is read by a single consumer within a Consumer Group) and write scalability (partitions of the
+same topic can live on different brokers). A message's key (Chapter 4) determines, via hash, which
+partition it's stored in — and it's that decision that defines which events stay ordered relative to each
+other.
+</RespostaSenior>
+
+## In-depth explanation
+
+See "Partition" in [Chapter 3](/en/livro/arquitetura-interna) and the deep dive on ordering in
+[Chapter 4](/en/livro/partitions-e-ordenacao).
+
+<ExemploFinanceiro>
+On the `pix.recebido` topic, each event's destination partition is determined by the hash of `contaId` —
+every event for the same account lands on the same partition, preserving their relative order.
+</ExemploFinanceiro>
+
+<Pegadinha title='"More partitions is always better"'>
+More partitions increase maximum parallelism, but also the cluster's metadata overhead, rebalance time, and
+the number of file handles per broker. The right number is sized by target throughput and the number of
+consumers the team plans to scale to — not an arbitrary "just to be safe" value.
+</Pegadinha>
+
+<PerguntaDerivada>
+Likely follow-ups: "why do Partitions exist?" and "how does Kafka choose a Partition for a message?".
+</PerguntaDerivada>

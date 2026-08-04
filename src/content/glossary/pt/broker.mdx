@@ -1,0 +1,13 @@
+---
+term: "Broker"
+slug: "broker"
+shortDefinition: "Processo Kafka que armazena um subconjunto das partitions do cluster e serve leituras/escritas para elas."
+relatedTerms: ["cluster", "leader", "follower", "partition", "replication-factor"]
+relatedChapters: ["arquitetura-interna", "brokers-lideres-e-replicacao"]
+---
+
+Um broker é uma instância do servidor Kafka em execução. Ele armazena fisicamente os dados de uma ou mais
+partitions e responde a requisições de producers (escrita) e consumers (leitura) para essas partitions. Um
+cluster Kafka é composto por múltiplos brokers, cada um responsável por um subconjunto das partitions de
+todos os tópicos — e, para cada partition, um broker atua como leader e os demais (se houver réplicas) como
+followers.

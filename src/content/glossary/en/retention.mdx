@@ -1,0 +1,12 @@
+---
+term: "Retention"
+slug: "retention"
+shortDefinition: "The policy defining how long (or up to what size) a topic's records stay stored."
+relatedTerms: ["replay", "topic", "partition"]
+relatedChapters: ["o-que-e-apache-kafka", "retention-e-replay"]
+---
+
+Retention determines when a record can be discarded from the log — by time (e.g., 7 days) or by the
+partition's accumulated size, whichever comes first. Unlike a queue, retention in Kafka doesn't depend on
+the record having already been consumed: it stays available to any consumer (existing or future) until it
+expires under the configured policy. Retention is what makes replay possible.

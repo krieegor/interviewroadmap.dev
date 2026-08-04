@@ -1,0 +1,64 @@
+---
+id: 19
+title: "Como funciona a ordenação?"
+slug: "como-funciona-a-ordenacao"
+level: ["pleno", "senior"]
+topics: ["arquitetura"]
+relatedChapters: ["partitions-e-ordenacao"]
+shortAnswer: "O Kafka garante ordenação apenas dentro de uma partition: como uma partition é um log linear e imutável, a ordem de escrita é, por construção, a ordem de leitura."
+quiz:
+  options:
+    - "O Kafka garante ordenação apenas dentro de uma partition, já que cada partition é um log linear e imutável lido na ordem de escrita."
+    - "O Kafka processa e entrega tudo estritamente na ordem em que foi publicado, tópico inteiro incluso."
+    - "A ordenação depende da ordem em que os consumers leem as partitions, não da estrutura do log."
+    - "Como cada partition é um log ordenado, o tópico inteiro também mantém ordem total entre suas partitions."
+  correctIndex: 0
+---
+
+## Pergunta
+
+"Como funciona a ordenação de mensagens no Kafka?"
+
+## O que o entrevistador quer avaliar
+
+O entendimento correto e completo do mecanismo de ordenação — não uma resposta vaga de "sim, o Kafka é
+ordenado", mas a explicação de *onde* essa garantia realmente vive.
+
+<RespostaCurta>
+O Kafka garante que mensagens escritas em uma mesma partition são lidas exatamente na ordem em que foram
+escritas. Isso vem da estrutura de log: uma partition é uma sequência linear e imutável, então a ordem de
+escrita é, por construção, a ordem de leitura.
+</RespostaCurta>
+
+<RespostaSenior>
+Ordenação no Kafka é uma propriedade da partition, não do tópico. Cada partition é um log append-only, onde
+cada registro recebe um offset sequencial crescente — como a estrutura é estritamente sequencial, ler do
+início ao fim reproduz exatamente a ordem de escrita. Um tópico com múltiplas partitions, porém, não é uma
+única sequência: é um conjunto de sequências independentes, cada uma com seu próprio relógio de offsets.
+Duas mensagens em partitions diferentes não têm relação de ordem definida entre si. É a key (Capítulo 4) que
+decide em qual partition uma mensagem cai, e portanto qual conjunto de mensagens fica de fato ordenado entre
+si.
+</RespostaSenior>
+
+## Explicação aprofundada
+
+Veja "Ordenação dentro da partition — e a ausência de ordenação global" no
+[Capítulo 4](/pt/livro/partitions-e-ordenacao).
+
+<ExemploFinanceiro>
+Dois eventos do mesmo `contaId` — "PIX recebido" seguido de "saldo debitado por estorno" — chegam ao
+consumer na ordem correta porque compartilham a mesma key e, portanto, a mesma partition. Eventos de contas
+diferentes, em partitions diferentes, não têm relação de ordem entre si — o que é aceitável, porque não há
+dependência real entre eles.
+</ExemploFinanceiro>
+
+<Pegadinha title='"Kafka processa tudo na ordem em que foi publicado"'>
+Essa afirmação ignora que um tópico com múltiplas partitions distribui mensagens entre elas — a ordem global
+entre partitions diferentes não é garantida, mesmo que os eventos tenham sido publicados em sequência muito
+próxima no tempo real.
+</Pegadinha>
+
+<PerguntaDerivada>
+Prováveis follow-ups: "o Kafka garante ordenação global?" e "o que aconteceria se eu usasse um UUID
+aleatório como key?".
+</PerguntaDerivada>

@@ -1,0 +1,14 @@
+---
+term: "Consumer Lag"
+slug: "consumer-lag"
+shortDefinition: "Diferença entre o offset mais recente produzido em uma partition e o offset commitado pelo consumer — quanto o consumer está atrasado."
+relatedTerms: ["offset", "consumer-group", "throughput"]
+relatedChapters: ["observabilidade"]
+---
+
+Consumer lag é a métrica mais importante para saber se um Consumer Group está acompanhando o ritmo de
+produção de um tópico. Calculado por partition como `log end offset - offset commitado`, ele representa
+quantas mensagens já foram escritas mas ainda não foram processadas. Lag zero significa que o consumer está
+em dia; lag crescente ao longo do tempo indica que o consumer processa mais devagar do que o producer
+escreve — um sinal de que é preciso investigar throughput de processamento, aumentar paralelismo (mais
+partitions e consumers, Capítulo 6) ou otimizar o código do consumer.

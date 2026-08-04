@@ -1,0 +1,63 @@
+---
+id: 25
+title: "What is Rebalance?"
+slug: "o-que-e-rebalance"
+level: ["pleno", "senior"]
+topics: ["arquitetura"]
+relatedChapters: ["consumer-groups-e-rebalance"]
+shortAnswer: "Rebalance is the redistribution of a topic's partitions among a group's active consumers, triggered whenever the group's membership changes — a consumer joins, leaves, or is considered dead."
+quiz:
+  options:
+    - "Rebalance is the redistribution of partitions among a group's active consumers, triggered whenever the group's membership changes."
+    - "Rebalance is an instant, transparent process that never interrupts the group's message processing at any point."
+    - "Rebalance is the operation that replicates a topic's partitions across brokers to guarantee fault tolerance."
+    - "Rebalance only triggers when a consumer process actually crashes or is manually shut down by the operator."
+  correctIndex: 0
+---
+
+## Question
+
+"What is Rebalance, and when does it happen?"
+
+## What the interviewer wants to assess
+
+Whether you understand rebalance as an automatic process, but with a real cost — not something
+transparent and without consequences.
+
+<RespostaCurta>
+Rebalance is the process of redistributing a topic's partitions among a Consumer Group's active consumers,
+triggered whenever the group's membership changes: a consumer joins, a consumer leaves, or a consumer is
+declared dead for not sending a heartbeat in time.
+</RespostaCurta>
+
+<RespostaSenior>
+The most common trigger in production isn't an abrupt process crash — it's a consumer that takes too long
+processing a batch of messages (exceeding `max.poll.interval.ms`) and gets declared dead by the group even
+though it's still alive, just slow. In the classic rebalance strategy (eager), every consumer in the group
+revokes all of its partitions at the start of the process, even the ones that will stay with the same
+consumer afterward — the entire group pauses processing during the reassignment window. More recent
+strategies (cooperative sticky) reduce that impact, only revoking the partitions that actually need to
+change owners.
+</RespostaSenior>
+
+## In-depth explanation
+
+See "What triggers a rebalance" and "The impact of a rebalance" in
+[Chapter 6](/en/livro/consumer-groups-e-rebalance).
+
+<ExemploFinanceiro>
+A `saldo-service` deploy that restarts every replica at the same time triggers a rebalance on every
+restart — if the deploy doesn't use a rolling update, the Consumer Group can go through multiple successive
+rebalances, repeatedly pausing processing during the deploy window.
+</ExemploFinanceiro>
+
+<Pegadinha title='"Rebalance is instant and transparent"'>
+Rebalance is automatic, but it's neither instant nor free. During the detection and reassignment window,
+that group's processing (partial or total, depending on the assignor strategy) is paused — a detail often
+forgotten in shallow answers.
+</Pegadinha>
+
+<PerguntaDerivada>
+Likely follow-ups: "what happens when a Consumer goes down?" and "how would you reduce the impact of
+rebalances in production?".
+</PerguntaDerivada>

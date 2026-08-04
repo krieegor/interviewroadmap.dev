@@ -1,0 +1,59 @@
+---
+id: 45
+title: "What are Leader and Follower?"
+slug: "o-que-sao-leader-e-follower"
+level: ["pleno", "senior"]
+topics: ["arquitetura"]
+relatedChapters: ["brokers-lideres-e-replicacao"]
+shortAnswer: "Leader is the broker that serves all reads and writes for a partition. Follower passively replicates the leader's data, ready to take over leadership if it fails."
+quiz:
+  options:
+    - "The leader serves all reads and writes for a partition; the follower passively replicates the leader's data, ready to take over if it fails."
+    - "Followers also serve client reads in parallel with the leader, to balance load across brokers."
+    - "A partition can have more than one leader at the same time, distributing writes between them."
+    - "Any follower of the partition can become the new leader at any moment, regardless of whether it's caught up with confirmed data."
+  correctIndex: 0
+---
+
+## Question
+
+"What are Leader and Follower in the context of a Partition?"
+
+## What the interviewer wants to assess
+
+Fundamental replication knowledge — usually the entry point for questions about failover and ISR.
+
+<RespostaCurta>
+A partition's leader is the broker that serves all of its reads and writes — producers and consumers only
+interact with the leader. The follower continuously replicates the leader's data, without serving clients
+directly, staying ready to take over as the new leader if the current one fails.
+</RespostaCurta>
+
+<RespostaSenior>
+Every partition has exactly one leader and zero or more followers, depending on the configured replication
+factor — never two replicas of the same partition on the same broker, which would defeat the protection
+against losing that broker. Not every follower is necessarily ready to become leader at any given moment:
+only the ones in the ISR (In-Sync Replicas) — replicas sufficiently caught up with confirmed data — are
+eligible. A lagging follower (due to a slow network, for example) is removed from the ISR until it catches
+up again, preventing an outdated replica from taking over and "forgetting" messages already confirmed to
+producers.
+</RespostaSenior>
+
+## In-depth explanation
+
+See "Leader and Follower" and "ISR" in [Chapter 5](/en/livro/brokers-lideres-e-replicacao).
+
+<ExemploFinanceiro>
+On the `cartao.transacoes` topic, each partition has a leader responsible for serving the
+`autorizacao-service` (producer) and the `antifraude-service` (consumer), while the followers replicate
+passively, ready to take over if the leader broker fails.
+</ExemploFinanceiro>
+
+<Pegadinha title='"Followers also respond to read requests, to balance load"'>
+In Kafka's default configuration, only the leader serves client reads and writes. Followers exist
+exclusively for replication and failover — it's not a distributed-read mechanism like in some databases.
+</Pegadinha>
+
+<PerguntaDerivada>
+Likely follow-ups: "what happens when the Leader goes down?" and "what is ISR?".
+</PerguntaDerivada>

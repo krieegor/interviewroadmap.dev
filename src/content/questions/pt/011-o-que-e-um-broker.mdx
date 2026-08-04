@@ -1,0 +1,61 @@
+---
+id: 11
+title: "O que é um Broker?"
+slug: "o-que-e-um-broker"
+level: ["pleno", "senior"]
+topics: ["arquitetura"]
+relatedChapters: ["arquitetura-interna", "brokers-lideres-e-replicacao"]
+shortAnswer: "Broker é um processo Kafka em execução que armazena um subconjunto das partitions do cluster e serve requisições de leitura e escrita para elas; um cluster é composto por múltiplos brokers."
+quiz:
+  options:
+    - "Broker é um processo Kafka em execução que armazena um subconjunto das partitions do cluster e atende requisições de leitura e escrita para elas."
+    - "Broker é apenas o nome dado à máquina física ou virtual que hospeda o processo Kafka."
+    - "Broker é o processo que apenas coordena metadados do cluster, sem armazenar partitions de tópicos."
+    - "Cada broker do cluster mantém uma cópia completa de todas as partitions de todos os tópicos."
+  correctIndex: 0
+---
+
+## Pergunta
+
+"O que é um Broker no Kafka?"
+
+## O que o entrevistador quer avaliar
+
+Se você entende o broker como a unidade de infraestrutura real por trás da abstração de tópico/partition —
+não apenas como sinônimo vago de "servidor Kafka".
+
+<RespostaCurta>
+Broker é um processo Kafka em execução. Ele armazena fisicamente os dados de uma ou mais partitions e
+responde a requisições de producers (escrita) e consumers (leitura) para essas partitions. Um cluster Kafka
+é formado por múltiplos brokers trabalhando juntos.
+</RespostaCurta>
+
+<RespostaSenior>
+Um broker é a unidade de armazenamento e serviço do Kafka: um processo que mantém em disco os arquivos de
+log de um subconjunto das partitions de todos os tópicos do cluster. Para cada partition que hospeda, um
+broker atua como leader (servindo todas as leituras e escritas dela) ou como follower (replicando
+passivamente os dados do leader, Capítulo 5). Um cluster distribui as partitions entre seus brokers para
+paralelizar carga e tolerar a perda de qualquer um deles, desde que o replication factor configurado
+permita.
+</RespostaSenior>
+
+## Explicação aprofundada
+
+Veja "Broker" no [Capítulo 3](/pt/livro/arquitetura-interna) e o aprofundamento sobre réplicas no
+[Capítulo 5](/pt/livro/brokers-lideres-e-replicacao).
+
+<ExemploFinanceiro>
+Um cluster de 3 brokers hospedando o tópico `pagamentos.aprovados` (12 partitions, replication factor 3)
+distribui essas partitions e suas réplicas entre os 3 brokers de forma balanceada — nenhum broker isolado
+concentra todo o tráfego de escrita do tópico.
+</ExemploFinanceiro>
+
+<Pegadinha title='"Broker é só um nome bonito para servidor"'>
+Broker é especificamente o processo Kafka, não a máquina física ou virtual que o hospeda. É comum (mas não
+obrigatório) rodar um broker por máquina em produção, mas a distinção entre "processo broker" e "máquina"
+importa ao discutir escala e distribuição de réplicas.
+</Pegadinha>
+
+<PerguntaDerivada>
+Prováveis follow-ups: "o que é um Cluster Kafka?" e "o que acontece quando um broker cai?".
+</PerguntaDerivada>
