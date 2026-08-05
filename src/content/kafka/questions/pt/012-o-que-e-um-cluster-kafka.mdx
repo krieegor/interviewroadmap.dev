@@ -1,0 +1,61 @@
+---
+id: 12
+title: "O que é um Cluster Kafka?"
+slug: "o-que-e-um-cluster-kafka"
+level: ["pleno", "senior"]
+topics: ["arquitetura"]
+relatedChapters: ["arquitetura-interna", "brokers-lideres-e-replicacao"]
+shortAnswer: "Cluster é o conjunto de brokers coordenados entre si (via KRaft) que, juntos, armazenam e servem todos os tópicos de uma instalação Kafka, oferecendo tolerância a falhas e distribuição de carga."
+quiz:
+  options:
+    - "Cluster é o conjunto de brokers coordenados entre si que, juntos, armazenam e servem todos os tópicos de uma instalação Kafka."
+    - "Um cluster Kafka depende obrigatoriamente do ZooKeeper para coordenar metadados entre os brokers."
+    - "Cluster é apenas um broker configurado com múltiplas partitions para simular distribuição de carga."
+    - "Um cluster garante que a perda de qualquer broker nunca causa indisponibilidade, independente do replication factor configurado."
+  correctIndex: 0
+---
+
+## Pergunta
+
+"O que é um Cluster Kafka e por que ele é composto por múltiplos brokers?"
+
+## O que o entrevistador quer avaliar
+
+Se você entende cluster como a unidade real de disponibilidade e escala do Kafka, não apenas como "vários
+servidores juntos" sem entender a coordenação entre eles.
+
+<RespostaCurta>
+Cluster é o conjunto de brokers que, juntos, armazenam e servem todos os tópicos de uma instalação Kafka. Os
+brokers se coordenam entre si — hoje via KRaft — para eleger um controlador, distribuir partitions e
+detectar falhas, tudo isso de forma transparente para producers e consumers.
+</RespostaCurta>
+
+<RespostaSenior>
+Um cluster existe para que o Kafka não dependa de uma única máquina: as partitions de cada tópico são
+distribuídas entre os brokers do cluster, e cada uma delas é replicada (Capítulo 5) para tolerar a perda de
+um ou mais brokers, dependendo do replication factor configurado. A coordenação entre brokers — quem é o
+controlador do cluster, qual broker é leader de cada partition, quais brokers estão vivos — é feita via
+KRaft (Kafka Raft), que substituiu o ZooKeeper nas versões atuais, eliminando uma dependência externa que o
+Kafka historicamente precisava para metadados de cluster.
+</RespostaSenior>
+
+## Explicação aprofundada
+
+Veja "Cluster" no [Capítulo 3](/pt/kafka/livro/arquitetura-interna) e a distribuição de réplicas no
+[Capítulo 5](/pt/kafka/livro/brokers-lideres-e-replicacao).
+
+<ExemploFinanceiro>
+Um cluster de produção para um banco digital pode ter 6 brokers distribuídos em 3 zonas de disponibilidade
+diferentes (2 por zona), garantindo que a perda de uma zona inteira não derrube o cluster, desde que o
+replication factor e a distribuição de réplicas estejam configurados para considerar essa topologia.
+</ExemploFinanceiro>
+
+<Pegadinha title='"Um cluster Kafka precisa de ZooKeeper"'>
+Isso era verdade em versões mais antigas, mas as versões atuais do Kafka usam KRaft, um protocolo de
+consenso próprio (baseado em Raft) para coordenação de metadados do cluster, eliminando a dependência do
+ZooKeeper. Mencionar essa migração demonstra conhecimento atualizado da plataforma.
+</Pegadinha>
+
+<PerguntaDerivada>
+Prováveis follow-ups: "o que é Replication Factor?" e "o que acontece quando um broker do cluster cai?".
+</PerguntaDerivada>

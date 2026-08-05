@@ -1,0 +1,53 @@
+import type { Locale } from "@/lib/i18n/config";
+import type { Tech } from "@/lib/tech/config";
+
+type TechConfig = {
+  name: string;
+  shortName: string;
+  description: string;
+};
+
+const localizedTechConfig: Record<Tech, Record<Locale, TechConfig>> = {
+  kafka: {
+    pt: {
+      name: "Apache Kafka para Entrevistas Java Sênior",
+      shortName: "Kafka",
+      description:
+        "Guia prático e gratuito sobre mensageria, arquitetura, reprocessamento, ordenação, idempotência e sistemas distribuídos com Apache Kafka, voltado para desenvolvedores Java Backend em entrevistas técnicas.",
+    },
+    en: {
+      name: "Apache Kafka for Senior Java Interviews",
+      shortName: "Kafka",
+      description:
+        "A practical, free guide to messaging, architecture, reprocessing, ordering, idempotency and distributed systems with Apache Kafka, for Java Backend developers preparing for technical interviews.",
+    },
+  },
+  java: {
+    pt: {
+      name: "Java",
+      shortName: "Java",
+      description: "Trilha de preparação para entrevistas de Java — em construção.",
+    },
+    en: {
+      name: "Java",
+      shortName: "Java",
+      description: "Java interview prep track — coming soon.",
+    },
+  },
+  elastic: {
+    pt: {
+      name: "Elastic Search",
+      shortName: "Elastic",
+      description: "Trilha de preparação para entrevistas de Elastic Search — em construção.",
+    },
+    en: {
+      name: "Elastic Search",
+      shortName: "Elastic",
+      description: "Elastic Search interview prep track — coming soon.",
+    },
+  },
+};
+
+export function getTechConfig(tech: Tech, locale: Locale): TechConfig {
+  return localizedTechConfig[tech][locale];
+}

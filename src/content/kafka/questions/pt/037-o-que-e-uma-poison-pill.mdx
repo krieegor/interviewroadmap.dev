@@ -1,0 +1,61 @@
+---
+id: 37
+title: "O que é uma Poison Pill?"
+slug: "o-que-e-uma-poison-pill"
+level: ["senior", "tech-lead"]
+topics: ["consumo"]
+relatedChapters: ["retry-e-dlq"]
+shortAnswer: "Poison pill é uma mensagem que trava o processamento de uma partition indefinidamente, porque toda tentativa de processá-la falha e o consumer não tem estratégia para segui-la em frente."
+quiz:
+  options:
+    - "Uma mensagem que trava o processamento de uma partition indefinidamente, porque toda tentativa de processá-la falha e o consumer não avança o offset."
+    - "Um problema raro que só ocorre em consumers mal configurados de sistemas não críticos, sem justificar prevenção sistemática."
+    - "Uma mensagem corrompida que o Kafka detecta e descarta automaticamente antes de entregá-la a qualquer consumer."
+    - "Uma mensagem que causa lentidão temporária no consumer, mas que não impede o avanço para as mensagens seguintes."
+  correctIndex: 0
+---
+
+## Pergunta
+
+"O que é uma Poison Pill e como você evitaria esse problema?"
+
+## O que o entrevistador quer avaliar
+
+Se você entende a consequência prática de não ter uma estratégia de retry limitado + DLQ — o cenário real
+que esses mecanismos existem para prevenir.
+
+<RespostaCurta>
+Poison pill é uma mensagem que trava o processamento de uma partition indefinidamente, porque toda
+tentativa de processá-la falha e o consumer fica preso reprocessando a mesma mensagem, sem conseguir avançar
+para as seguintes.
+</RespostaCurta>
+
+<RespostaSenior>
+O efeito poison pill acontece quando um consumer trata todo erro como transitório e tenta reprocessar
+indefinidamente, sem limite de tentativas nem estratégia de isolamento. Como o consumer não avança o offset
+enquanto a mensagem não é processada com sucesso, todas as mensagens seguintes daquela partition ficam
+paradas atrás dela — mesmo sendo mensagens completamente saudáveis e não relacionadas ao problema. A
+prevenção é exatamente o padrão do Capítulo 9: distinguir erro transitório de permanente, limitar o número
+de tentativas de retry, e mover a mensagem para uma DLQ quando esse limite é atingido — permitindo que o
+consumer avance e continue processando as mensagens seguintes.
+</RespostaSenior>
+
+## Explicação aprofundada
+
+Veja "Poison Pill" no [Capítulo 9](/pt/kafka/livro/retry-e-dlq).
+
+<ExemploFinanceiro>
+Um evento com um campo de valor monetário corrompido (não numérico) faz a desserialização falhar sempre. Sem
+limite de retry e DLQ, esse único evento travaria o processamento de todos os pagamentos seguintes daquela
+partition, mesmo que eles estivessem perfeitamente válidos.
+</ExemploFinanceiro>
+
+<Pegadinha title='"Poison pill é um problema raro que não vale a pena prevenir"'>
+Basta um bug de serialização, um campo nulo inesperado, ou uma regra de negócio mal tratada para criar esse
+cenário — é comum o suficiente para justificar sempre configurar limite de retry e DLQ em qualquer consumer
+de produção, não apenas nos "críticos".
+</Pegadinha>
+
+<PerguntaDerivada>
+Prováveis follow-ups: "o que é At Most Once?" e "como você configuraria retry e DLQ para evitar isso?".
+</PerguntaDerivada>

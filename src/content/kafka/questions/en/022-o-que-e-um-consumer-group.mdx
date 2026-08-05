@@ -1,0 +1,59 @@
+---
+id: 22
+title: "What is a Consumer Group?"
+slug: "o-que-e-um-consumer-group"
+level: ["pleno", "senior"]
+topics: ["arquitetura"]
+relatedChapters: ["consumer-groups-e-rebalance"]
+shortAnswer: "Consumer Group is a set of consumers sharing the same group.id that split a topic's partitions among themselves — each partition goes to exactly one consumer in the group at a time."
+quiz:
+  options:
+    - "Consumer Group is the set of consumers sharing the same group.id that split a topic's partitions among themselves, one partition per consumer at a time."
+    - "Consumer Group is the mechanism by which different groups compete with each other for the same topic partitions, fighting over who processes each message."
+    - "Consumer Group is the set of broker replicas that keep identical copies of partitions for fault tolerance."
+    - "Consumer Group is automatically defined by Kafka based on the topic's number of partitions, with no client-side identification needed."
+  correctIndex: 0
+---
+
+## Question
+
+"What is a Consumer Group, and why does it exist?"
+
+## What the interviewer wants to assess
+
+Whether you understand the Consumer Group as the mechanism that lets Kafka both distribute work and share
+data across independent systems — the central piece for explaining consumption scalability.
+
+<RespostaCurta>
+Consumer Group is a set of consumer instances identified by the same `group.id`. Kafka guarantees each
+partition of a subscribed topic is assigned to exactly one consumer in the group at a time — never two
+consumers from the same group reading the same partition simultaneously.
+</RespostaCurta>
+
+<RespostaSenior>
+Consumer Group is what makes Kafka capable of doing two things at once: distributing work (within a group,
+each partition goes to a single consumer, similar to what a queue does) and sharing data (different groups
+reading the same topic are completely independent of each other, each with its own set of committed
+offsets). The topic's number of partitions defines the maximum consumption parallelism within a single
+group — there's no way for a group to process with more parallelism than the available partitions.
+</RespostaSenior>
+
+## In-depth explanation
+
+See "How a Consumer Group splits the work" in [Chapter 6](/en/kafka/livro/consumer-groups-e-rebalance).
+
+<ExemploFinanceiro>
+The `pix.recebido` topic might have two Consumer Groups reading simultaneously: `saldo-service` (credits
+the amount) and `antifraude-service` (assesses risk) — each with its own group, advancing offsets
+completely independently, with no effect on the other.
+</ExemploFinanceiro>
+
+<Pegadinha title='"Two different Consumer Groups compete for the same messages"'>
+No — that's exactly the most common confusion. Different Consumer Groups are completely independent; each
+one reads the topic in its own way. Competition for partitions only happens **within** the same group,
+among its own instances.
+</Pegadinha>
+
+<PerguntaDerivada>
+Likely follow-ups: "what happens when there are more consumers than partitions?" and "what is Rebalance?".
+</PerguntaDerivada>

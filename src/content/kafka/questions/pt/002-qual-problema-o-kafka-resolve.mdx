@@ -1,0 +1,68 @@
+---
+id: 2
+title: "Qual problema o Kafka resolve?"
+slug: "qual-problema-o-kafka-resolve"
+level: ["pleno", "senior", "tech-lead"]
+topics: ["fundamentos"]
+relatedChapters: ["o-que-e-apache-kafka"]
+shortAnswer: "Kafka resolve o acoplamento entre um produtor de eventos e múltiplos consumidores independentes, permitindo que sistemas reajam a fatos de negócio sem chamadas síncronas diretas e sem que o produtor precise conhecer seus consumidores."
+quiz:
+  options:
+    - "O acoplamento entre o produtor de um evento e múltiplos consumidores independentes, evitando chamadas síncronas diretas e a necessidade de o produtor conhecê-los."
+    - "Principalmente o problema de volume e performance em sistemas com alto throughput de mensagens."
+    - "A entrega garantida de uma única mensagem a um único destinatário, como em uma fila ponto a ponto."
+    - "A necessidade de um banco de dados central, já que o Kafka substitui o armazenamento de estado da aplicação."
+  correctIndex: 0
+---
+
+## Pergunta
+
+"Qual problema, na prática, o Kafka resolve? Por que não simplesmente chamar os outros serviços via HTTP?"
+
+## O que o entrevistador quer avaliar
+
+Quer ver se você entende a motivação por trás da arquitetura orientada a eventos, não apenas o funcionamento
+técnico do Kafka. É comum candidatos saberem operar Kafka sem conseguir articular o problema de negócio que
+ele resolve.
+
+<RespostaCurta>
+  Kafka resolve o problema de acoplamento: quando um evento de negócio interessa a múltiplos
+  sistemas, chamar cada um via HTTP síncrono cria dependência direta entre o produtor e todos os
+  consumidores, e cada novo consumidor exige alterar o produtor. Kafka desacopla isso — o produtor
+  publica uma vez, e qualquer número de consumidores lê de forma independente.
+</RespostaCurta>
+
+<RespostaSenior>
+  Em sistemas com poucos serviços, chamadas síncronas resolvem bem. O problema aparece quando um
+  mesmo evento de negócio — por exemplo, "pagamento aprovado" — passa a interessar a múltiplos
+  sistemas: notificação, antifraude, contabilidade, analytics. Se o serviço de pagamentos chamar
+  cada um diretamente, ele fica acoplado à disponibilidade de todos eles, e adicionar um novo
+  consumidor exige alterar o código do produtor. Kafka resolve isso invertendo o modelo: o produtor
+  publica o evento uma única vez em um tópico e segue em frente; cada consumidor interessado lê esse
+  evento no seu próprio ritmo, sem que o produtor precise saber que ele existe. Isso desacopla tanto
+  tecnicamente (falha de um consumidor não derruba o produtor) quanto organizacionalmente (times
+  evoluem seus consumidores sem coordenar deploy com o time do produtor).
+</RespostaSenior>
+
+## Explicação aprofundada
+
+Veja "O problema antes do Kafka" no [Capítulo 1](/pt/kafka/livro/o-que-e-apache-kafka) para o racional completo,
+incluindo por que isso não é primariamente uma questão de performance, mas de acoplamento.
+
+<ExemploFinanceiro>
+  Antes do Kafka, adicionar um sistema de cashback que reage a "compra aprovada" exigiria alterar o
+  serviço de autorização de cartão para chamá-lo diretamente. Com Kafka, o time de cashback
+  simplesmente cria um novo consumer no tópico `compras.aprovadas` — o serviço de autorização não
+  muda uma linha.
+</ExemploFinanceiro>
+
+<Pegadinha title='"Kafka resolve o problema de volume/performance"'>
+  Volume é uma consequência do desenho, não o motivo original. Um sistema pode ter Kafka mesmo com
+  volume moderado, só porque tem muitos consumidores independentes do mesmo evento — o problema
+  central é acoplamento, não apenas throughput.
+</Pegadinha>
+
+<PerguntaDerivada>
+  Prepare-se para: "isso não poderia ser resolvido com uma fila?" e "me dê um exemplo real onde você
+  viu esse acoplamento virar problema".
+</PerguntaDerivada>

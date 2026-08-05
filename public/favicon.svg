@@ -1,4 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" role="img" aria-label="Favicon">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" role="img" aria-label="trainer.dev">
   <rect width="32" height="32" rx="6" fill="#0a0e14" />
-  <text x="16" y="22" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="15" font-weight="700" fill="#fb923c">K</text>
+  <path d="M16 6 9 26" fill="none" stroke="#fb923c" stroke-width="4" stroke-linecap="square" />
+  <path d="M13 16 21 26" fill="none" stroke="#fb923c" stroke-width="4" stroke-linecap="square" />
 </svg>

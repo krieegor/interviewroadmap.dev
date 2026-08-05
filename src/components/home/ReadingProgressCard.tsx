@@ -4,15 +4,18 @@ import Link from "next/link";
 import { useReadingProgress } from "@/lib/progress/reading-progress";
 import type { Locale } from "@/lib/i18n/config";
 import type { Dictionary } from "@/lib/i18n/get-dictionary";
+import type { Tech } from "@/lib/tech/config";
 import { formatTemplate } from "@/lib/i18n/format";
 
 export function ReadingProgressCard({
   totalChapters,
   locale,
+  tech,
   dict,
 }: {
   totalChapters: number;
   locale: Locale;
+  tech: Tech;
   dict: Dictionary;
 }) {
   const { progress } = useReadingProgress();
@@ -36,7 +39,7 @@ export function ReadingProgressCard({
       </p>
       {progress.lastVisited ? (
         <Link
-          href={`/${locale}/livro/${progress.lastVisited}`}
+          href={`/${locale}/${tech}/livro/${progress.lastVisited}`}
           className="mt-3 inline-block text-sm font-medium text-[var(--color-accent)] hover:underline"
         >
           {dict.readingProgress.continueReading}

@@ -1,0 +1,68 @@
+---
+id: 49
+title: "Tell me about a real project using Kafka."
+slug: "conte-um-projeto-real-utilizando-kafka"
+level: ["senior", "tech-lead"]
+topics: ["experiencia"]
+relatedChapters: ["arquitetura-interna"]
+shortAnswer: "Structure the answer like the PIX received case study: domain event, topic topology, key choice, independent consumers, idempotency, retry/DLQ, and observability — adapted to your real project."
+quiz:
+  options:
+    - "A strong answer is specific: business context, topology (topics, partitions, chosen key), independent consumers, reliability decisions, and a real challenge faced."
+    - "Describing generically that 'we used Kafka for communication between microservices', with no concrete technical detail about the system."
+    - "Naming only the tools and technologies in the stack, without explaining the architecture decisions made on the project."
+    - "Reciting Kafka's theoretical definition from memory, without connecting it to any specific system you actually operated."
+  correctIndex: 0
+---
+
+## Question
+
+"Tell me about a real project where you used Apache Kafka."
+
+## What the interviewer wants to assess
+
+Whether you applied the concepts in practice, not just studied them. There's no scripted answer to
+memorize here — the interviewer wants to hear about *your* project, with specific details only someone who
+worked on it would know.
+
+<Atencao title="This question has no generic answer">
+Unlike the rest of this book's questions, this one can't be answered with a standard script — it requires
+you to talk about a real system you built or operated. If you haven't worked directly with Kafka in
+production yet, be honest about that and describe a study project or a scenario you'd design, making it
+clear it's hypothetical.
+</Atencao>
+
+## How to structure the answer
+
+A good answer covers, in order, the same elements as this book's [PIX received](/en/kafka/casos/pix-recebido)
+case study — not because you should copy it, but because that structure is what an interviewer expects to
+hear, in the order they can assess depth:
+
+1. **The business context**: what problem the system solved, and why Kafka was chosen (or inherited) to
+   solve it.
+2. **The topology**: which topics existed, how many partitions, which key was used and why.
+3. **The consumers**: how many different systems consumed the same topic, and how they were independent of
+   each other.
+4. **The reliability decisions**: how idempotency, retry, and DLQ were handled — or, if they weren't, what
+   you learned from that.
+5. **A real challenge**: something that didn't go as expected, and how it was resolved (this naturally
+   connects to the next question).
+
+<DicaEntrevista>
+Senior interviewers quickly notice when an answer is too generic ("we used Kafka for communication between
+microservices") versus specific ("the topic had 12 partitions, we used `accountId` as the key because we
+needed per-account ordering, and the biggest challenge was a period where rebalances kept happening
+constantly because of a misconfigured `max.poll.interval.ms`"). Concrete details — even small ones —
+communicate real experience in a way generalities can't.
+</DicaEntrevista>
+
+<Pegadinha title="Making up a generic, rehearsed-sounding project">
+A project described vaguely, with no specific technical detail (number of partitions, key choice,
+observability tools used), tends to sound rehearsed — and is often followed by deeper questions that expose
+the lack of real depth in the described experience.
+</Pegadinha>
+
+<PerguntaDerivada>
+After this answer, be ready for: "why did you choose that number of partitions?", "how did you handle
+duplicate messages?", and this book's next question, about challenges faced.
+</PerguntaDerivada>

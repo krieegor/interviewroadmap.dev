@@ -37,8 +37,7 @@ export default async function OpengraphImage() {
       <div
         style={{ display: "flex", marginTop: 24, fontSize: 28, color: "#94a3b8", maxWidth: 900 }}
       >
-        Guia prático sobre mensageria, arquitetura, reprocessamento, ordenação, idempotência e
-        sistemas distribuídos.
+        {siteConfig.description}
       </div>
     </div>,
     { ...size },

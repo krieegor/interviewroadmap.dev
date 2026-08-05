@@ -6,10 +6,19 @@ import * as Dialog from "@radix-ui/react-dialog";
 import { getTopNav } from "@/config/navigation";
 import type { Locale } from "@/lib/i18n/config";
 import type { Dictionary } from "@/lib/i18n/get-dictionary";
+import type { Tech } from "@/lib/tech/config";
 
-export function MobileNav({ locale, dict }: { locale: Locale; dict: Dictionary }) {
+export function MobileNav({
+  locale,
+  tech,
+  dict,
+}: {
+  locale: Locale;
+  tech: Tech;
+  dict: Dictionary;
+}) {
   const [open, setOpen] = useState(false);
-  const topNav = getTopNav(locale, dict);
+  const topNav = getTopNav(locale, tech, dict);
 
   return (
     <Dialog.Root open={open} onOpenChange={setOpen}>

@@ -1,8 +1,8 @@
 {
-  "name": "kafka-interview-ebook",
+  "name": "trainer-dev",
   "version": "0.1.0",
   "private": true,
-  "description": "Apache Kafka para Entrevistas Java Sênior — e-book interativo, gratuito e open source.",
+  "description": "trainer.dev — plataforma gratuita e open source de preparação para entrevistas técnicas, com trilhas por tecnologia (Kafka, Java, Elastic Search).",
   "license": "MIT",
   "scripts": {
     "dev": "next dev",

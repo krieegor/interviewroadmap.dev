@@ -2,11 +2,14 @@ import fs from "node:fs";
 import path from "node:path";
 import type { MDXModule, QuestionFrontmatter } from "@/types/content";
 import type { Locale } from "@/lib/i18n/config";
+import type { Tech } from "@/lib/tech/config";
 
-const QUESTIONS_DIR = path.join(process.cwd(), "src/content/questions");
+function questionsDir(tech: Tech): string {
+  return path.join(process.cwd(), "src/content", tech, "questions");
+}
 
-function questionFiles(locale: Locale): string[] {
-  const dir = path.join(QUESTIONS_DIR, locale);
+function questionFiles(tech: Tech, locale: Locale): string[] {
+  const dir = path.join(questionsDir(tech), locale);
   if (!fs.existsSync(dir)) return [];
   return fs
     .readdirSync(dir)
@@ -14,33 +17,41 @@ function questionFiles(locale: Locale): string[] {
     .sort();
 }
 
-async function loadQuestion(locale: Locale, file: string): Promise<MDXModule<QuestionFrontmatter>> {
-  return import(`../../content/questions/${locale}/${file}`);
+async function loadQuestion(
+  tech: Tech,
+  locale: Locale,
+  file: string,
+): Promise<MDXModule<QuestionFrontmatter>> {
+  return import(`../../content/${tech}/questions/${locale}/${file}`);
 }
 
 const cache = new Map<
-  Locale,
+  string,
   Promise<Array<{ file: string; module: MDXModule<QuestionFrontmatter> }>>
 >();
 
-function loadAll(locale: Locale) {
-  let entry = cache.get(locale);
+function loadAll(tech: Tech, locale: Locale) {
+  const key = `${tech}:${locale}`;
+  let entry = cache.get(key);
   if (!entry) {
     entry = Promise.all(
-      questionFiles(locale).map(async (file) => ({ file, module: await loadQuestion(locale, file) })),
+      questionFiles(tech, locale).map(async (file) => ({
+        file,
+        module: await loadQuestion(tech, locale, file),
+      })),
     );
-    cache.set(locale, entry);
+    cache.set(key, entry);
   }
   return entry;
 }
 
-export async function getAllQuestions(locale: Locale): Promise<QuestionFrontmatter[]> {
-  const all = await loadAll(locale);
+export async function getAllQuestions(tech: Tech, locale: Locale): Promise<QuestionFrontmatter[]> {
+  const all = await loadAll(tech, locale);
   return all.map(({ module }) => module.frontmatter).sort((a, b) => a.id - b.id);
 }
 
-export async function getQuestionBySlug(slug: string, locale: Locale) {
-  const all = await loadAll(locale);
+export async function getQuestionBySlug(tech: Tech, slug: string, locale: Locale) {
+  const all = await loadAll(tech, locale);
   const entry = all.find(({ module }) => module.frontmatter.slug === slug);
   if (!entry) return null;
   return {
@@ -49,13 +60,21 @@ export async function getQuestionBySlug(slug: string, locale: Locale) {
   };
 }
 
-export async function getQuestionsByTopic(topic: string, locale: Locale): Promise<QuestionFrontmatter[]> {
-  const all = await getAllQuestions(locale);
+export async function getQuestionsByTopic(
+  tech: Tech,
+  topic: string,
+  locale: Locale,
+): Promise<QuestionFrontmatter[]> {
+  const all = await getAllQuestions(tech, locale);
   return all.filter((question) => question.topics.includes(topic));
 }
 
-export async function getQuestionsByLevel(level: string, locale: Locale): Promise<QuestionFrontmatter[]> {
-  const all = await getAllQuestions(locale);
+export async function getQuestionsByLevel(
+  tech: Tech,
+  level: string,
+  locale: Locale,
+): Promise<QuestionFrontmatter[]> {
+  const all = await getAllQuestions(tech, locale);
   return all.filter((question) =>
     question.level.includes(level as QuestionFrontmatter["level"][number]),
   );

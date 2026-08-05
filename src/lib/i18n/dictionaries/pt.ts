@@ -220,6 +220,38 @@ export const pt = {
     chaptersCompleted: "{completed} de {total} capítulos concluídos ({percent}%)",
     continueReading: "Continuar de onde parou →",
   },
+  trackSelector: {
+    badge: "Gratuito & open source",
+    heroTitle: "trainer.dev",
+    heroIntro:
+      "Uma plataforma gratuita e open source de preparação para entrevistas técnicas. Cada trilha de tecnologia segue o mesmo formato: um livro navegável, perguntas de entrevista reais, glossário e um simulador — sem curso pago, sem cadastro, sem anúncio.",
+    howItWorksTitle: "O mesmo formato em toda trilha",
+    featureBookTitle: "Livro",
+    featureBookDescription:
+      "Capítulos organizados em partes progressivas, cobrindo os conceitos que realmente caem em entrevista.",
+    featureQuestionsTitle: "Perguntas de entrevista",
+    featureQuestionsDescription:
+      "Cada pergunta com resposta rápida, resposta nível sênior, explicação aprofundada e pegadinhas comuns.",
+    featureGlossaryTitle: "Glossário",
+    featureGlossaryDescription:
+      "Termos essenciais com definição curta e detalhada, linkados aos capítulos onde aparecem.",
+    featureSimulatorTitle: "Simulador",
+    featureSimulatorDescription:
+      "Pratique no seu ritmo — modo aberto (explique em voz alta) ou múltipla escolha, tudo salvo só no seu navegador.",
+    title: "Escolha sua trilha",
+    intro: "trainer.dev é uma plataforma gratuita e open source de preparação para entrevistas técnicas, organizada por tecnologia.",
+    comingSoonBadge: "Em breve",
+    openSourceText: "Esse projeto é gratuito e open source. Contribuições são bem-vindas.",
+    githubCta: "Ver no GitHub",
+  },
+  comingSoon: {
+    title: "Em construção",
+    message: "Essa trilha ainda não tem conteúdo publicado. Volte em breve.",
+    backToSelector: "← Escolher outra trilha",
+  },
+  trackSwitcher: {
+    backToSelector: "← Trocar trilha",
+  },
 };
 
 export type Dictionary = typeof pt;

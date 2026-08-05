@@ -2,11 +2,14 @@ import fs from "node:fs";
 import path from "node:path";
 import type { CaseStudyFrontmatter, MDXModule } from "@/types/content";
 import type { Locale } from "@/lib/i18n/config";
+import type { Tech } from "@/lib/tech/config";
 
-const CASE_STUDIES_DIR = path.join(process.cwd(), "src/content/case-studies");
+function caseStudiesDir(tech: Tech): string {
+  return path.join(process.cwd(), "src/content", tech, "case-studies");
+}
 
-function caseStudyFiles(locale: Locale): string[] {
-  const dir = path.join(CASE_STUDIES_DIR, locale);
+function caseStudyFiles(tech: Tech, locale: Locale): string[] {
+  const dir = path.join(caseStudiesDir(tech), locale);
   if (!fs.existsSync(dir)) return [];
   return fs
     .readdirSync(dir)
@@ -14,33 +17,41 @@ function caseStudyFiles(locale: Locale): string[] {
     .sort();
 }
 
-async function loadCaseStudy(locale: Locale, file: string): Promise<MDXModule<CaseStudyFrontmatter>> {
-  return import(`../../content/case-studies/${locale}/${file}`);
+async function loadCaseStudy(
+  tech: Tech,
+  locale: Locale,
+  file: string,
+): Promise<MDXModule<CaseStudyFrontmatter>> {
+  return import(`../../content/${tech}/case-studies/${locale}/${file}`);
 }
 
 const cache = new Map<
-  Locale,
+  string,
   Promise<Array<{ file: string; module: MDXModule<CaseStudyFrontmatter> }>>
 >();
 
-function loadAll(locale: Locale) {
-  let entry = cache.get(locale);
+function loadAll(tech: Tech, locale: Locale) {
+  const key = `${tech}:${locale}`;
+  let entry = cache.get(key);
   if (!entry) {
     entry = Promise.all(
-      caseStudyFiles(locale).map(async (file) => ({ file, module: await loadCaseStudy(locale, file) })),
+      caseStudyFiles(tech, locale).map(async (file) => ({
+        file,
+        module: await loadCaseStudy(tech, locale, file),
+      })),
     );
-    cache.set(locale, entry);
+    cache.set(key, entry);
   }
   return entry;
 }
 
-export async function getAllCaseStudies(locale: Locale): Promise<CaseStudyFrontmatter[]> {
-  const all = await loadAll(locale);
+export async function getAllCaseStudies(tech: Tech, locale: Locale): Promise<CaseStudyFrontmatter[]> {
+  const all = await loadAll(tech, locale);
   return all.map(({ module }) => module.frontmatter).sort((a, b) => a.order - b.order);
 }
 
-export async function getCaseStudyBySlug(slug: string, locale: Locale) {
-  const all = await loadAll(locale);
+export async function getCaseStudyBySlug(tech: Tech, slug: string, locale: Locale) {
+  const all = await loadAll(tech, locale);
   const entry = all.find(({ module }) => module.frontmatter.slug === slug);
   if (!entry) return null;
   return {

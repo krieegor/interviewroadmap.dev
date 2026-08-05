@@ -1,0 +1,61 @@
+---
+id: 13
+title: "What is a Topic?"
+slug: "o-que-e-um-topic"
+level: ["pleno", "senior"]
+topics: ["arquitetura"]
+relatedChapters: ["arquitetura-interna"]
+shortAnswer: "Topic is the logical name under which related events are published and consumed; physically, it's split into one or more partitions, which are the actual logs."
+quiz:
+  options:
+    - "Topic is the logical name under which related events are published and consumed, physically split into one or more partitions."
+    - "A topic is equivalent to a database table, with guaranteed order across all of its rows."
+    - "A topic is the single, ordered physical log where records are stored sequentially."
+    - "The schema of data published to a topic is enforced and validated directly by Kafka itself."
+  correctIndex: 0
+---
+
+## Question
+
+"What is a Topic in Kafka?"
+
+## What the interviewer wants to assess
+
+Whether you distinguish the logical abstraction (topic) from the actual physical structure (partitions) —
+a common mistake is treating "topic" as if it were the log itself, when it's actually split into
+independent partitions.
+
+<RespostaCurta>
+Topic is the logical name under which related events are published and consumed — for example,
+`pagamentos.aprovados`. Physically, a topic is split into one or more partitions, which are the ordered
+logs where the data actually lives.
+</RespostaCurta>
+
+<RespostaSenior>
+A topic has no schema imposed by Kafka itself — the schema, when it exists, is the responsibility of a
+layer like the Schema Registry. What Kafka guarantees about a topic is the split into partitions and
+delivery order within each one — not across different partitions of the same topic. When creating a topic,
+the relevant decisions are the number of partitions (parallelism, Chapter 4), the replication factor
+(availability, Chapter 5), and the retention policy (Chapter 8) — the topic itself is just the name that
+ties those decisions together.
+</RespostaSenior>
+
+## In-depth explanation
+
+See "Topic" in [Chapter 3](/en/kafka/livro/arquitetura-interna).
+
+<ExemploFinanceiro>
+The `boletos.emitidos` topic might have 8 partitions, replication factor 3, and 30 days of retention —
+three independent design decisions, all tied to the same logical topic name that producers and consumers
+reference in code.
+</ExemploFinanceiro>
+
+<Pegadinha title='"A Kafka topic is like a database table"'>
+The analogy helps convey that a topic groups related data, but it breaks down around ordering: a table
+normally has no notion of "order guaranteed only for a subset of rows" — a Kafka topic has exactly that
+characteristic, because of partitions.
+</Pegadinha>
+
+<PerguntaDerivada>
+Likely follow-ups: "what is a Partition?" and "why do Partitions exist?".
+</PerguntaDerivada>

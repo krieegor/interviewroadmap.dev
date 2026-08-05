@@ -16,7 +16,10 @@ export default function Icon() {
         borderRadius: 6,
       }}
     >
-      <div style={{ display: "flex", color: "#fb923c", fontSize: 20, fontWeight: 700 }}>K</div>
+      <svg width="32" height="32" viewBox="0 0 32 32">
+        <path d="M16 6 9 26" stroke="#fb923c" strokeWidth="4" />
+        <path d="M13 16 21 26" stroke="#fb923c" strokeWidth="4" />
+      </svg>
     </div>,
     { ...size },
   );

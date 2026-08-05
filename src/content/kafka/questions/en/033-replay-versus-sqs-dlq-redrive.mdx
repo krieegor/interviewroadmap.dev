@@ -1,0 +1,61 @@
+---
+id: 33
+title: "What's the difference between Replay and SQS DLQ Redrive?"
+slug: "replay-versus-sqs-dlq-redrive"
+level: ["senior", "tech-lead"]
+topics: ["consumo", "comparacoes"]
+relatedChapters: ["retention-e-replay", "retry-e-dlq"]
+shortAnswer: "Replay (Kafka) reprocesses any range of retained events, processed or not. DLQ Redrive (SQS) only reroutes messages that had already failed and been isolated in the DLQ."
+quiz:
+  options:
+    - "Replay reprocesses any range of events still retained on the topic, processed or not; redrive only reroutes messages that had already failed and landed in the DLQ."
+    - "They're the same operation with different names, since both solve the same message-reprocessing problem."
+    - "Replay only works for messages that failed, just like SQS redrive, with the only difference being the resource's name across platforms."
+    - "SQS redrive can resend any message already processed successfully, something Kafka's replay doesn't allow."
+  correctIndex: 0
+---
+
+## Question
+
+"What's the difference between Kafka's Replay and SQS's DLQ Redrive?"
+
+## What the interviewer wants to assess
+
+Comparative knowledge across ecosystems — common at companies with AWS infrastructure that also use Kafka.
+Tests whether you understand these are reprocessing mechanisms with different scopes, not synonyms.
+
+<RespostaCurta>
+Replay in Kafka reprocesses any range of events still retained on the topic, processed or not — just
+reset the Consumer Group's offset. DLQ Redrive in SQS only reroutes messages that had already failed and
+been moved to the DLQ, sending them back to the original queue.
+</RespostaCurta>
+
+<RespostaSenior>
+The scope difference is key: replay operates on the topic's full history, within the retention window —
+it even includes messages that were processed successfully, if you want to reprocess them (for example, to
+rebuild derived state). SQS redrive only solves the subset of messages that were already isolated by
+failure — it has no way to reroute a message that was processed "successfully," but incorrectly, because
+SQS doesn't retain history for already-acknowledged messages. This reflects the model difference: Kafka is
+a retained log; SQS is a queue that removes the message once processing is confirmed.
+</RespostaSenior>
+
+## In-depth explanation
+
+See the "Replay vs. DLQ Redrive" comparison in [Chapter 9](/en/kafka/livro/retry-e-dlq) and the tool comparison
+in [Chapter 2](/en/kafka/livro/kafka-versus-outras-ferramentas).
+
+<ExemploFinanceiro>
+If a calculation bug affected the cashback amount on purchases already successfully processed over the
+last 2 days, Kafka lets you replay that entire range to recalculate. On SQS, that wouldn't be possible via
+redrive — only the messages that were already in the DLQ (i.e., that had already failed) could be
+rerouted.
+</ExemploFinanceiro>
+
+<Pegadinha title='"They are the same thing with different names"'>
+Treating the two as equivalent ignores that redrive only solves messages that already failed, while replay
+solves reprocessing any part of the retained history — correctly processed or not.
+</Pegadinha>
+
+<PerguntaDerivada>
+Likely follow-ups: "what is Retry?" and "does Kafka have native DLQ?".
+</PerguntaDerivada>

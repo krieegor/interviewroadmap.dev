@@ -1,0 +1,61 @@
+---
+id: 24
+title: "What happens when there are more Partitions than consumers?"
+slug: "mais-partitions-que-consumidores"
+level: ["pleno", "senior"]
+topics: ["arquitetura"]
+relatedChapters: ["consumer-groups-e-rebalance"]
+shortAnswer: "Some consumers process more than one partition — processing stays parallel, but unbalanced, since each consumer with multiple partitions absorbs more load than the others."
+quiz:
+  options:
+    - "Some consumers receive more than one partition — processing stays parallel, but becomes unbalanced across the group's instances."
+    - "That imbalance is always a problem that needs immediate fixing, regardless of the message volume being processed."
+    - "The extra partitions are left with no consumer assigned until a new instance is added to the group."
+    - "Kafka distributes exactly one partition per consumer and discards the messages from partitions beyond that number."
+  correctIndex: 0
+---
+
+## Question
+
+"What happens if a Consumer Group has fewer consumer instances than the topic has Partitions?"
+
+## What the interviewer wants to assess
+
+The counterpoint to the previous question — tests whether the candidate understands the opposite scenario
+and its load-balancing implications, not just the "ideal" 1:1 case.
+
+<RespostaCurta>
+Some consumers receive more than one partition. Processing stays parallel — every partition still has
+exactly one consumer assigned — but becomes unbalanced, since consumers with multiple partitions process
+more load than the others.
+</RespostaCurta>
+
+<RespostaSenior>
+Kafka distributes the remaining partitions among the available consumers as evenly as possible (depending
+on the configured assignor strategy), but if the number of partitions isn't a multiple of the number of
+consumers, the distribution is never perfectly equal — one consumer might get 3 partitions and another 2,
+for example. That's not a problem by itself, but it means the consumer with more partitions assigned tends
+to accumulate more consumer lag (Chapter 15) if volume per partition is similar across them, because it
+has to process twice or three times as many messages in the same time window.
+</RespostaSenior>
+
+## In-depth explanation
+
+See "What happens with different numbers of consumers" in
+[Chapter 6](/en/kafka/livro/consumer-groups-e-rebalance).
+
+<ExemploFinanceiro>
+A topic with 5 partitions and a Consumer Group with 2 replicas results in one replica processing 3
+partitions and the other processing 2 — still parallel, but with one replica absorbing 50% more load than
+the other.
+</ExemploFinanceiro>
+
+<Pegadinha title='"This is a problem I need to fix immediately"'>
+Not always. It's a valid, functional distribution — the real warning sign is when that imbalance turns
+into disproportionate, sustained consumer lag on one of the instances, a sign that the group's total
+parallelism is insufficient for the volume, not just poorly distributed.
+</Pegadinha>
+
+<PerguntaDerivada>
+Likely follow-ups: "what is Rebalance?" and "what happens when a Consumer goes down?".
+</PerguntaDerivada>

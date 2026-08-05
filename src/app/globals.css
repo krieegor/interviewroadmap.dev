@@ -202,6 +202,13 @@ body.pdf-render-content-only .pdf-cover {
   break-inside: avoid;
 }
 
+/* Empurra o par heading+primeiro parágrafo inteiro pra próxima página quando não cabem
+   juntos, em vez de deixar o título perto do fim da página com o parágrafo cortado logo
+   depois — ver src/lib/mdx/rehype-keep-heading-with-next.mjs */
+.pdf-book .pdf-keep-with-heading {
+  break-inside: avoid-page;
+}
+
 @media print {
   .site-chrome {
     display: none !important;

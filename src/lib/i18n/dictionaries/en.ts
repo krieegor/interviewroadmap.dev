@@ -221,4 +221,36 @@ export const en: Dictionary = {
     chaptersCompleted: "{completed} of {total} chapters completed ({percent}%)",
     continueReading: "Continue where you left off →",
   },
+  trackSelector: {
+    badge: "Free & open source",
+    heroTitle: "trainer.dev",
+    heroIntro:
+      "A free, open-source technical interview prep platform. Every technology track follows the same format: a navigable book, real interview questions, a glossary, and a practice simulator — no paid course, no sign-up, no ads.",
+    howItWorksTitle: "The same format, every track",
+    featureBookTitle: "Book",
+    featureBookDescription:
+      "Chapters organized into progressive parts, covering what actually comes up in interviews.",
+    featureQuestionsTitle: "Interview questions",
+    featureQuestionsDescription:
+      "Each question with a quick answer, a senior-level answer, an in-depth explanation, and common pitfalls.",
+    featureGlossaryTitle: "Glossary",
+    featureGlossaryDescription:
+      "Essential terms with short and detailed definitions, linked back to the chapters where they appear.",
+    featureSimulatorTitle: "Simulator",
+    featureSimulatorDescription:
+      "Practice at your own pace — open-ended mode (explain out loud) or multiple choice, everything saved only in your browser.",
+    title: "Choose your track",
+    intro: "trainer.dev is a free, open-source technical interview prep platform, organized by technology.",
+    comingSoonBadge: "Coming soon",
+    openSourceText: "This project is free and open source. Contributions are welcome.",
+    githubCta: "View on GitHub",
+  },
+  comingSoon: {
+    title: "Under construction",
+    message: "This track doesn't have published content yet. Check back soon.",
+    backToSelector: "← Choose another track",
+  },
+  trackSwitcher: {
+    backToSelector: "← Switch track",
+  },
 };

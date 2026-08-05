@@ -39,7 +39,7 @@ describe("Simulator", () => {
   });
 
   it("percorre o simulado até o resultado final", () => {
-    render(<Simulator questions={questions} locale="pt" dict={pt} />);
+    render(<Simulator questions={questions} locale="pt" tech="kafka" dict={pt} />);
 
     fireEvent.click(screen.getByRole("button", { name: "Iniciar simulado" }));
 
@@ -53,7 +53,7 @@ describe("Simulator", () => {
   });
 
   it("permite reiniciar o simulado após o resultado", () => {
-    render(<Simulator questions={questions} locale="pt" dict={pt} />);
+    render(<Simulator questions={questions} locale="pt" tech="kafka" dict={pt} />);
 
     fireEvent.click(screen.getByRole("button", { name: "Iniciar simulado" }));
     for (let i = 0; i < questions.length; i++) {
@@ -66,7 +66,7 @@ describe("Simulator", () => {
   });
 
   it("percorre o simulado no modo múltipla escolha até o resultado final", () => {
-    render(<Simulator questions={questions} locale="pt" dict={pt} />);
+    render(<Simulator questions={questions} locale="pt" tech="kafka" dict={pt} />);
 
     fireEvent.click(screen.getByText("Múltipla escolha"));
     fireEvent.click(screen.getByRole("button", { name: "Iniciar simulado" }));

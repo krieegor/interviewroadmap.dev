@@ -1,0 +1,65 @@
+---
+id: 4
+title: "Quando escolher Kafka?"
+slug: "quando-escolher-kafka"
+level: ["senior", "tech-lead"]
+topics: ["fundamentos"]
+relatedChapters: ["o-que-e-apache-kafka"]
+shortAnswer: "Escolha Kafka quando múltiplos sistemas independentes precisam reagir ao mesmo fato de negócio, quando há necessidade de replay/reprocessamento histórico, ou quando o volume de eventos exige desacoplamento para não comprometer disponibilidade."
+quiz:
+  options:
+    - "Quando múltiplos sistemas independentes precisam reagir ao mesmo fato de negócio, há necessidade de replay, ou o volume exige desacoplamento para preservar disponibilidade."
+    - "Sempre que a comunicação entre serviços for assíncrona, independentemente de quantos consumidores existem ou da necessidade de histórico."
+    - "Quando os serviços envolvidos precisam de consistência transacional forte entre suas escritas, como em um commit distribuído."
+    - "Quando é preciso garantir uma resposta síncrona de baixa latência entre dois serviços específicos."
+  correctIndex: 0
+---
+
+## Pergunta
+
+"Em que situação você optaria por usar Kafka em um novo projeto?"
+
+## O que o entrevistador quer avaliar
+
+Julgamento arquitetural — não "Kafka resolve tudo", mas critérios concretos que levam à decisão. É uma
+pergunta para diferenciar quem aplica tecnologia por hype de quem escolhe por necessidade real.
+
+<RespostaCurta>
+  Escolho Kafka quando múltiplos sistemas independentes precisam reagir ao mesmo evento de negócio,
+  quando preciso de replay para reprocessar histórico, ou quando o volume de eventos é alto o
+  suficiente para que acoplamento síncrono vire risco de disponibilidade.
+</RespostaCurta>
+
+<RespostaSenior>
+  Considero três sinais principais. Primeiro, múltiplos consumidores independentes do mesmo fato —
+  se hoje só notificação reage a "pagamento aprovado", mas amanhã antifraude, contabilidade e
+  analytics também vão precisar, Kafka evita reescrever o produtor a cada novo consumidor. Segundo,
+  necessidade de replay — se o negócio pode pedir para reprocessar os últimos 30 dias de transações
+  por causa de uma regra corrigida, uma fila tradicional não guarda esse histórico, o Kafka sim.
+  Terceiro, volume e criticidade de disponibilidade — quando não posso deixar uma falha em um
+  consumidor lento derrubar o produtor, o desacoplamento assíncrono do Kafka isola essa falha. Se
+  nenhum desses três sinais está presente, geralmente há uma solução mais simples (fila, chamada
+  síncrona) que resolve com menos complexidade operacional.
+</RespostaSenior>
+
+## Explicação aprofundada
+
+Veja "Quando utilizar" no [Capítulo 1](/pt/kafka/livro/o-que-e-apache-kafka).
+
+<ExemploFinanceiro>
+  Um sistema de concessão de crédito que precisa: (1) notificar o cliente, (2) atualizar o score
+  interno, (3) alimentar um data lake para modelos de risco, e (4) permitir reprocessar decisões
+  históricas quando o modelo de score muda — é um caso claro para Kafka, porque reúne múltiplos
+  consumidores independentes e necessidade de replay ao mesmo tempo.
+</ExemploFinanceiro>
+
+<Pegadinha title='"Uso Kafka sempre que preciso de mensageria assíncrona"'>
+  Isso ignora que mensageria assíncrona simples (uma tarefa, um worker, sem necessidade de replay) é
+  resolvida com menos custo operacional por uma fila. Escolher Kafka "por padrão" é tão problemático
+  quanto nunca escolhê-lo.
+</Pegadinha>
+
+<PerguntaDerivada>
+  Espere a pergunta complementar: "e quando você não escolheria Kafka?" — praticamente sempre feita
+  em sequência.
+</PerguntaDerivada>

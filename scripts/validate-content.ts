@@ -6,6 +6,8 @@ import { z } from "zod";
 const ROOT = process.cwd();
 const LOCALES = ["pt", "en"] as const;
 type ContentLocale = (typeof LOCALES)[number];
+const TECHS = ["kafka", "java", "elastic"] as const;
+type ContentTech = (typeof TECHS)[number];
 
 const chapterSchema = z.object({
   title: z.string().min(1),
@@ -52,24 +54,38 @@ const caseStudySchema = z.object({
 
 type ContentDefinition = {
   label: string;
-  dir: string;
+  dirName: string;
   schema: z.ZodTypeAny;
 };
 
 const contentTypes: ContentDefinition[] = [
-  { label: "capítulos", dir: "src/content/chapters", schema: chapterSchema },
-  { label: "perguntas", dir: "src/content/questions", schema: questionSchema },
-  { label: "glossário", dir: "src/content/glossary", schema: glossarySchema },
-  { label: "estudos de caso", dir: "src/content/case-studies", schema: caseStudySchema },
+  { label: "capítulos", dirName: "chapters", schema: chapterSchema },
+  { label: "perguntas", dirName: "questions", schema: questionSchema },
+  { label: "glossário", dirName: "glossary", schema: glossarySchema },
+  { label: "estudos de caso", dirName: "case-studies", schema: caseStudySchema },
 ];
 
 let hasErrors = false;
-const knownChapterSlugs: Record<ContentLocale, Set<string>> = { pt: new Set(), en: new Set() };
-const knownGlossarySlugs: Record<ContentLocale, Set<string>> = { pt: new Set(), en: new Set() };
 
-function collectSlugs(dir: string, locale: ContentLocale, key: string): Set<string> {
+function emptySlugsByTechLocale(): Record<ContentTech, Record<ContentLocale, Set<string>>> {
+  return {
+    kafka: { pt: new Set(), en: new Set() },
+    java: { pt: new Set(), en: new Set() },
+    elastic: { pt: new Set(), en: new Set() },
+  };
+}
+
+const knownChapterSlugs = emptySlugsByTechLocale();
+const knownGlossarySlugs = emptySlugsByTechLocale();
+
+function collectSlugs(
+  tech: ContentTech,
+  dirName: string,
+  locale: ContentLocale,
+  key: string,
+): Set<string> {
   const slugs = new Set<string>();
-  const fullDir = path.join(ROOT, dir, locale);
+  const fullDir = path.join(ROOT, "src/content", tech, dirName, locale);
   if (!fs.existsSync(fullDir)) return slugs;
   for (const file of fs.readdirSync(fullDir)) {
     if (!file.endsWith(".mdx")) continue;
@@ -80,11 +96,12 @@ function collectSlugs(dir: string, locale: ContentLocale, key: string): Set<stri
   return slugs;
 }
 
-function validateContentType({ label, dir, schema }: ContentDefinition) {
+function validateContentType(tech: ContentTech, { label, dirName, schema }: ContentDefinition) {
   for (const locale of LOCALES) {
-    const fullDir = path.join(ROOT, dir, locale);
+    const relDir = `src/content/${tech}/${dirName}`;
+    const fullDir = path.join(ROOT, relDir, locale);
     if (!fs.existsSync(fullDir)) {
-      console.log(`- ${label} (${locale}): diretório não encontrado (${dir}/${locale}), pulando.`);
+      console.log(`- ${label} (${tech}/${locale}): diretório não encontrado (${relDir}/${locale}), pulando.`);
       continue;
     }
 
@@ -99,7 +116,7 @@ function validateContentType({ label, dir, schema }: ContentDefinition) {
       const result = schema.safeParse(data);
       if (!result.success) {
         hasErrors = true;
-        console.error(`\n[FRONTMATTER INVÁLIDO] ${dir}/${locale}/${file}`);
+        console.error(`\n[FRONTMATTER INVÁLIDO] ${relDir}/${locale}/${file}`);
         for (const issue of result.error.issues) {
           console.error(`  - ${issue.path.join(".")}: ${issue.message}`);
         }
@@ -110,51 +127,56 @@ function validateContentType({ label, dir, schema }: ContentDefinition) {
       if (slugsSeen.has(slug)) {
         hasErrors = true;
         console.error(
-          `\n[SLUG DUPLICADO] ${dir}/${locale}/${file} — slug "${slug}" já usado por outro arquivo.`,
+          `\n[SLUG DUPLICADO] ${relDir}/${locale}/${file} — slug "${slug}" já usado por outro arquivo.`,
         );
       }
       slugsSeen.add(slug);
 
       const relatedChapters = (result.data as { relatedChapters?: string[] }).relatedChapters ?? [];
       for (const chapterSlug of relatedChapters) {
-        if (!knownChapterSlugs[locale].has(chapterSlug)) {
+        if (!knownChapterSlugs[tech][locale].has(chapterSlug)) {
           hasErrors = true;
           console.error(
-            `\n[LINK QUEBRADO] ${dir}/${locale}/${file} — relatedChapters aponta para capítulo inexistente: "${chapterSlug}"`,
+            `\n[LINK QUEBRADO] ${relDir}/${locale}/${file} — relatedChapters aponta para capítulo inexistente: "${chapterSlug}"`,
           );
         }
       }
 
-      const internalLinkPattern = /\]\(\/(pt|en)\/(livro|perguntas|glossario|casos)\/([a-z0-9-]+)/g;
+      const internalLinkPattern =
+        /\]\(\/(pt|en)\/(kafka|java|elastic)\/(livro|perguntas|glossario|casos)\/([a-z0-9-]+)/g;
       let match: RegExpExecArray | null;
       while ((match = internalLinkPattern.exec(content))) {
-        const [, linkLocale, section, targetSlug] = match;
+        const [, linkLocale, linkTech, section, targetSlug] = match;
         const locSlugs =
           section === "glossario"
-            ? knownGlossarySlugs[linkLocale as ContentLocale]
-            : knownChapterSlugs[linkLocale as ContentLocale];
+            ? knownGlossarySlugs[linkTech as ContentTech][linkLocale as ContentLocale]
+            : knownChapterSlugs[linkTech as ContentTech][linkLocale as ContentLocale];
         if ((section === "livro" || section === "glossario") && !locSlugs.has(targetSlug!)) {
           hasErrors = true;
           console.error(
-            `\n[LINK QUEBRADO] ${dir}/${locale}/${file} — link para "${section}" inexistente: "/${linkLocale}/${section}/${targetSlug}"`,
+            `\n[LINK QUEBRADO] ${relDir}/${locale}/${file} — link para "${section}" inexistente: "/${linkLocale}/${linkTech}/${section}/${targetSlug}"`,
           );
         }
       }
     }
 
-    console.log(`- ${label} (${locale}): ${files.length} arquivo(s) validado(s).`);
+    console.log(`- ${label} (${tech}/${locale}): ${files.length} arquivo(s) validado(s).`);
   }
 }
 
 // Primeira passada: capítulos e glossário, para conhecermos os slugs válidos antes de checar links.
-for (const locale of LOCALES) {
-  knownChapterSlugs[locale] = collectSlugs("src/content/chapters", locale, "slug");
-  knownGlossarySlugs[locale] = collectSlugs("src/content/glossary", locale, "slug");
+for (const tech of TECHS) {
+  for (const locale of LOCALES) {
+    knownChapterSlugs[tech][locale] = collectSlugs(tech, "chapters", locale, "slug");
+    knownGlossarySlugs[tech][locale] = collectSlugs(tech, "glossary", locale, "slug");
+  }
 }
 
 console.log("Validando conteúdo...\n");
-for (const contentType of contentTypes) {
-  validateContentType(contentType);
+for (const tech of TECHS) {
+  for (const contentType of contentTypes) {
+    validateContentType(tech, contentType);
+  }
 }
 
 if (hasErrors) {

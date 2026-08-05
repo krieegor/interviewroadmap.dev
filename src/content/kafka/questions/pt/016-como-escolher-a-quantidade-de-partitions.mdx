@@ -1,0 +1,65 @@
+---
+id: 16
+title: "Como escolher a quantidade de Partitions?"
+slug: "como-escolher-a-quantidade-de-partitions"
+level: ["senior", "tech-lead"]
+topics: ["arquitetura"]
+relatedChapters: ["partitions-e-ordenacao", "consumer-groups-e-rebalance"]
+shortAnswer: "Dimensione pelo throughput-alvo dividido pelo throughput por partition, e pelo número máximo de consumers que o Consumer Group pretende escalar — nunca por um valor arbitrário 'redondo'."
+quiz:
+  options:
+    - "Dimensione pelo throughput-alvo dividido pelo throughput por partition e pelo número máximo de consumers planejado para o Consumer Group."
+    - "Um número fixo e redondo, como 12 partitions, é uma escolha segura independente de throughput ou paralelismo de consumo."
+    - "Aumentar o número de partitions de um tópico em produção não afeta a distribuição das keys já existentes."
+    - "O número de partitions deve ser sempre igual ao número de brokers do cluster, nada mais."
+  correctIndex: 0
+---
+
+## Pergunta
+
+"Como você decidiria quantas Partitions um tópico deveria ter?"
+
+## O que o entrevistador quer avaliar
+
+Julgamento de dimensionamento — não uma resposta genérica como "depende", mas critérios concretos e as
+consequências de errar para mais ou para menos.
+
+<RespostaCurta>
+Duas variáveis principais: o throughput-alvo do tópico dividido pelo throughput sustentável de uma única
+partition, e o número máximo de consumers que o Consumer Group pretende escalar no futuro — já que o número
+de partitions é o teto real de paralelismo de consumo.
+</RespostaCurta>
+
+<RespostaSenior>
+Eu começo pelo throughput esperado: se uma partition sustenta, digamos, alguns MB/s de escrita e o tópico
+precisa de throughput bem maior que isso, preciso de partitions suficientes para dividir essa carga entre
+brokers. Em seguida, considero o paralelismo de consumo desejado — se o time planeja escalar o consumer
+até 20 réplicas em pico, o tópico precisa de pelo menos 20 partitions, ou 15 delas ficarão ociosas
+(Capítulo 6). Prefiro errar um pouco para mais do que para menos, porque aumentar partitions depois muda o
+resultado do hash de particionamento para novas mensagens (Capítulo 4), quebrando a suposição de que o
+histórico de uma key inteira está em uma única partition — em geral prefiro migrar para um tópico novo a
+aumentar partitions de um tópico já em produção com histórico relevante.
+</RespostaSenior>
+
+## Explicação aprofundada
+
+Veja "Aumentar o número de partitions: o que muda" e "Impactos arquiteturais" no
+[Capítulo 4](/pt/kafka/livro/partitions-e-ordenacao), e o teto de paralelismo no
+[Capítulo 6](/pt/kafka/livro/consumer-groups-e-rebalance).
+
+<ExemploFinanceiro>
+Um tópico de transações de cartão que hoje processa 500 transações/segundo, com plano de crescer para 5.000
+em dois anos, é dimensionado já considerando esse teto — evitando um aumento de partitions no meio do
+caminho, que quebraria a ordenação histórica por `cartaoId`.
+</ExemploFinanceiro>
+
+<Pegadinha title='"Eu sempre uso 12 partitions, é um bom número redondo"'>
+Um número fixo sem relação com throughput-alvo ou paralelismo de consumo planejado é uma escolha arbitrária,
+não uma decisão de dimensionamento. Pode estar certo por acidente, mas não é uma resposta defensável em
+entrevista nem em produção.
+</Pegadinha>
+
+<PerguntaDerivada>
+Prováveis follow-ups: "o que acontece se você errar essa estimativa?" e "como o Kafka escolhe uma Partition
+para cada mensagem?".
+</PerguntaDerivada>

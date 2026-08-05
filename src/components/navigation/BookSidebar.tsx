@@ -2,17 +2,20 @@ import Link from "next/link";
 import type { ChapterPart } from "@/lib/content/chapters";
 import type { Locale } from "@/lib/i18n/config";
 import type { Dictionary } from "@/lib/i18n/get-dictionary";
+import type { Tech } from "@/lib/tech/config";
 
 export function BookSidebar({
   parts,
   currentSlug,
   locale,
+  tech,
   dict,
   className = "",
 }: {
   parts: ChapterPart[];
   currentSlug?: string;
   locale: Locale;
+  tech: Tech;
   dict: Dictionary;
   className?: string;
 }) {
@@ -30,7 +33,7 @@ export function BookSidebar({
                 return (
                   <li key={chapter.slug}>
                     <Link
-                      href={`/${locale}/livro/${chapter.slug}`}
+                      href={`/${locale}/${tech}/livro/${chapter.slug}`}
                       aria-current={isActive ? "page" : undefined}
                       className={`-ml-px block border-l-2 py-1.5 pl-3 text-sm transition-colors ${
                         isActive

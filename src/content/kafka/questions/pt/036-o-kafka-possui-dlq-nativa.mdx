@@ -1,0 +1,61 @@
+---
+id: 36
+title: "O Kafka possui DLQ nativa?"
+slug: "o-kafka-possui-dlq-nativa"
+level: ["senior", "tech-lead"]
+topics: ["consumo"]
+relatedChapters: ["retry-e-dlq"]
+shortAnswer: "Não. Diferente do SQS, o Kafka não tem um recurso nativo de dead-lettering — uma DLQ é apenas um tópico comum, populado por convenção da aplicação ou de um framework como o Spring Kafka."
+quiz:
+  options:
+    - "Não. Diferente do SQS, o Kafka não tem recurso nativo de dead-lettering — a DLQ é um tópico comum, populado por convenção da aplicação ou de um framework."
+    - "Sim, todo tópico Kafka pode ter uma DLQ ativada por configuração, de forma equivalente à RedrivePolicy do SQS."
+    - "Sim, mas apenas quando o cluster é gerenciado por um provedor cloud, que adiciona esse recurso como extensão do broker."
+    - "Não, e por isso o Kafka não oferece nenhuma forma prática de isolar mensagens problemáticas do restante do fluxo."
+  correctIndex: 0
+---
+
+## Pergunta
+
+"O Kafka tem um mecanismo nativo de DLQ, como o SQS tem?"
+
+## O que o entrevistador quer avaliar
+
+Essa é uma pegadinha frequente e reveladora — testa se o candidato assume, por analogia com SQS, que Kafka
+tem DLQ "de fábrica".
+
+<RespostaCurta>
+Não. Diferente do SQS, que tem DLQ integrada nativamente à fila, o Kafka não tem nenhum recurso nativo de
+dead-lettering. Uma "DLQ" no Kafka é, na prática, apenas um tópico comum — a lógica de publicar mensagens
+problemáticas nele é responsabilidade da aplicação ou de um framework.
+</RespostaCurta>
+
+<RespostaSenior>
+O SQS tem um atributo de configuração nativo (`RedrivePolicy`) que a AWS gerencia internamente. O Kafka não
+tem equivalente — o "tópico de DLQ" é uma convenção arquitetural, não um recurso da plataforma: você cria um
+tópico normal (por exemplo, `<topico>.DLT`) e implementa a lógica de publicar nele quando as tentativas de
+retry se esgotam. O Spring Kafka facilita isso com o `DeadLetterPublishingRecoverer`, que integra ao
+`DefaultErrorHandler` e publica automaticamente no tópico de DLQ configurado — mas isso é uma abstração de
+framework sobre o Kafka, não uma capacidade nativa do broker em si.
+</RespostaSenior>
+
+## Explicação aprofundada
+
+Veja "DLQ no Kafka: não é nativa" no [Capítulo 9](/pt/kafka/livro/retry-e-dlq) e a implementação prática no
+[Capítulo 14](/pt/kafka/livro/consumer-com-spring-kafka).
+
+<ExemploFinanceiro>
+Um time migrando de SQS para Kafka precisa implementar explicitamente a lógica de DLQ (via
+`DeadLetterPublishingRecoverer` ou equivalente) — não existe um parâmetro de configuração do tópico Kafka
+que ative isso automaticamente, como existe no SQS.
+</ExemploFinanceiro>
+
+<Pegadinha title='"Claro, todo tópico Kafka pode ter uma DLQ configurada nele mesmo"'>
+Não existe configuração de tópico que ative DLQ automaticamente. A DLQ é sempre um tópico separado,
+criado e alimentado por lógica explícita da aplicação ou do framework — nunca um atributo do tópico
+original.
+</Pegadinha>
+
+<PerguntaDerivada>
+Prováveis follow-ups: "como você implementaria uma DLQ no Kafka?" e "o que é uma Poison Pill?".
+</PerguntaDerivada>

@@ -2,16 +2,19 @@ import Link from "next/link";
 import type { ChapterFrontmatter } from "@/types/content";
 import type { Locale } from "@/lib/i18n/config";
 import type { Dictionary } from "@/lib/i18n/get-dictionary";
+import type { Tech } from "@/lib/tech/config";
 
 export function ChapterPager({
   previous,
   next,
   locale,
+  tech,
   dict,
 }: {
   previous: ChapterFrontmatter | null;
   next: ChapterFrontmatter | null;
   locale: Locale;
+  tech: Tech;
   dict: Dictionary;
 }) {
   if (!previous && !next) return null;
@@ -24,7 +27,7 @@ export function ChapterPager({
       <div>
         {previous ? (
           <Link
-            href={`/${locale}/livro/${previous.slug}`}
+            href={`/${locale}/${tech}/livro/${previous.slug}`}
             className="group flex flex-col rounded-md border border-[var(--color-border)] p-4 transition-colors hover:border-[var(--color-accent)]"
           >
             <span className="text-xs text-[var(--color-text-muted)]">{dict.chapterPager.previous}</span>
@@ -37,7 +40,7 @@ export function ChapterPager({
       <div>
         {next ? (
           <Link
-            href={`/${locale}/livro/${next.slug}`}
+            href={`/${locale}/${tech}/livro/${next.slug}`}
             className="group flex flex-col rounded-md border border-[var(--color-border)] p-4 text-right transition-colors hover:border-[var(--color-accent)]"
           >
             <span className="text-xs text-[var(--color-text-muted)]">{dict.chapterPager.next}</span>

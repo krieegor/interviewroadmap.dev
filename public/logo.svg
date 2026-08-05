@@ -1,4 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" width="40" height="40" role="img" aria-label="Logo do projeto">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" width="40" height="40" role="img" aria-label="trainer.dev">
   <rect width="40" height="40" rx="8" fill="#0a0e14" />
-  <text x="20" y="27" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="18" font-weight="700" fill="#fb923c">K</text>
+  <path d="M20 8 11.5 32" fill="none" stroke="#fb923c" stroke-width="5" stroke-linecap="square" />
+  <path d="M16 20 26 32" fill="none" stroke="#fb923c" stroke-width="5" stroke-linecap="square" />
 </svg>

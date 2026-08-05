@@ -1,0 +1,61 @@
+---
+id: 15
+title: "Por que existem Partitions?"
+slug: "por-que-existem-partitions"
+level: ["pleno", "senior"]
+topics: ["arquitetura"]
+relatedChapters: ["partitions-e-ordenacao"]
+shortAnswer: "Partitions existem para paralelizar consumo (cada uma é lida por um consumer diferente dentro de um Consumer Group) e para escalar escrita (partitions de um tópico podem residir em brokers diferentes)."
+quiz:
+  options:
+    - "Partitions existem para paralelizar consumo dentro de um Consumer Group e para escalar escrita distribuindo partitions entre brokers."
+    - "Partitions existem exclusivamente para melhorar a performance de escrita, sem relação com paralelismo de consumo."
+    - "Partitions existem para garantir ordenação global entre todas as mensagens publicadas em um tópico."
+    - "Adicionar mais consumers a um Consumer Group sempre aumenta o throughput, independente do número de partitions do tópico."
+  correctIndex: 0
+---
+
+## Pergunta
+
+"Por que o Kafka divide um tópico em Partitions? Qual problema isso resolve?"
+
+## O que o entrevistador quer avaliar
+
+Se você entende a motivação por trás das partitions, não só a definição — essa pergunta costuma vir logo
+depois de "o que é uma partition", testando se o candidato entende o "porquê", não decorou o "o quê".
+
+<RespostaCurta>
+Partitions existem para resolver dois problemas ao mesmo tempo: paralelismo de consumo (mais partitions
+significa mais consumers processando em paralelo dentro de um Consumer Group) e escalabilidade de escrita
+(partitions de um mesmo tópico podem residir em brokers diferentes, distribuindo a carga).
+</RespostaCurta>
+
+<RespostaSenior>
+Um tópico poderia, em princípio, ser um único log gigante — mas isso limitaria o paralelismo de consumo a
+um único fluxo sequencial, não importa quantos consumers fossem adicionados ao grupo. Partitions resolvem
+isso dividindo o tópico em unidades independentes: dentro de um Consumer Group, cada partition é atribuída a
+exatamente um consumer por vez, então o paralelismo de consumo escala com o número de partitions. Do lado da
+escrita, partitions de um mesmo tópico podem ser distribuídas entre múltiplos brokers, multiplicando a
+capacidade de escrita simultânea do tópico.
+</RespostaSenior>
+
+## Explicação aprofundada
+
+Veja "Por que partitions existem" no [Capítulo 4](/pt/kafka/livro/partitions-e-ordenacao).
+
+<ExemploFinanceiro>
+Um tópico de transações de cartão com 1 única partition limitaria o processamento a um único consumer por
+vez, mesmo que o time escalasse o serviço para 10 réplicas — 9 delas ficariam ociosas. Com 10 partitions, as
+10 réplicas processam em paralelo de verdade.
+</ExemploFinanceiro>
+
+<Pegadinha title='"Partitions existem só para performance de escrita"'>
+Performance de escrita é metade da resposta. A outra metade — igualmente importante e frequentemente
+esquecida — é paralelismo de consumo: sem partitions, adicionar mais consumers a um Consumer Group não
+aumentaria throughput de processamento algum.
+</Pegadinha>
+
+<PerguntaDerivada>
+Prováveis follow-ups: "como você escolheria a quantidade de Partitions?" e "o que acontece se eu tiver mais
+consumers que Partitions?".
+</PerguntaDerivada>

@@ -2,8 +2,17 @@ import Link from "next/link";
 import { getSiteConfig } from "@/config/site";
 import type { Locale } from "@/lib/i18n/config";
 import type { Dictionary } from "@/lib/i18n/get-dictionary";
+import type { Tech } from "@/lib/tech/config";
 
-export function Footer({ locale, dict }: { locale: Locale; dict: Dictionary }) {
+export function Footer({
+  locale,
+  tech,
+  dict,
+}: {
+  locale: Locale;
+  tech: Tech;
+  dict: Dictionary;
+}) {
   const siteConfig = getSiteConfig(locale);
 
   return (
@@ -13,7 +22,7 @@ export function Footer({ locale, dict }: { locale: Locale; dict: Dictionary }) {
           {siteConfig.name} {dict.footer.disclaimer}
         </p>
         <div className="flex items-center gap-4">
-          <Link href={`/${locale}/sobre`} className="hover:text-[var(--color-accent)]">
+          <Link href={`/${locale}/${tech}/sobre`} className="hover:text-[var(--color-accent)]">
             {dict.footer.sobre}
           </Link>
           <a

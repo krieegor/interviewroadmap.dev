@@ -1,0 +1,66 @@
+---
+id: 8
+title: "Kafka versus Google Pub/Sub"
+slug: "kafka-versus-google-pubsub"
+level: ["senior", "tech-lead"]
+topics: ["comparacoes"]
+relatedChapters: ["kafka-versus-outras-ferramentas"]
+shortAnswer: "Google Pub/Sub é pub/sub totalmente gerenciado, com retenção configurável e replay via seek, mas sem o conceito de partition/offset do Kafka; ordenação exige uma ordering key opcional, com custo de throughput."
+quiz:
+  options:
+    - "Pub/Sub é totalmente gerenciado, com retenção configurável e replay via seek, mas sem partition/offset; ordenação exige uma ordering key opcional, com custo de throughput."
+    - "Pub/Sub e Kafka são intercambiáveis, bastando trocar o client, já que resolvem exatamente o mesmo problema da mesma forma."
+    - "Pub/Sub usa o mesmo modelo de partition/offset do Kafka, apenas com um nome diferente para as partitions."
+    - "Pub/Sub garante ordenação estrita de todas as mensagens por padrão, sem necessidade de configuração adicional."
+  correctIndex: 0
+---
+
+## Pergunta
+
+"Você conhece o Google Pub/Sub? Como ele se compara ao Kafka?"
+
+## O que o entrevistador quer avaliar
+
+Menos comum que RabbitMQ/SQS, mas aparece em empresas com stack GCP. Avalia se você entende que "gerenciado"
+não é sinônimo de "idêntico ao Kafka" e se sabe onde a semântica diverge.
+
+<RespostaCurta>
+  Google Pub/Sub é um serviço de pub/sub totalmente gerenciado, com retenção configurável (até 31
+  dias) e suporte a replay via *seek*. A diferença central é que ele não tem o conceito de
+  partition/offset do Kafka — ordenação é opcional, via *ordering key*, e tem custo de throughput
+  quando ativada. É operacionalmente o mais próximo de "Kafka sem operar cluster", mas com semântica
+  diferente.
+</RespostaCurta>
+
+<RespostaSenior>
+  Pub/Sub resolve boa parte do que o Kafka resolve — múltiplos assinantes independentes do mesmo
+  tópico, retenção configurável, capacidade de reler mensagens — mas com um modelo de dados
+  diferente. Não existe partition como unidade de paralelismo e ordenação; em vez disso, há uma
+  *ordering key* opcional que garante ordem para mensagens com a mesma chave, às custas de
+  throughput menor nesse fluxo. A operação é zero para o time — não há cluster para gerenciar,
+  diferente do Kafka auto-hospedado. Na prática, para times já comprometidos com Java/Spring e o
+  ecossistema de client do Kafka (Spring Kafka, Kafka Streams), migrar para Pub/Sub tem custo de
+  reescrita; para times GCP-native, sem investimento prévio em Kafka, Pub/Sub remove a complexidade
+  operacional de cluster, ao custo de menor controle sobre paralelismo/ordenação.
+</RespostaSenior>
+
+## Explicação aprofundada
+
+Veja a comparação completa no [Capítulo 2](/pt/kafka/livro/kafka-versus-outras-ferramentas).
+
+<ExemploFinanceiro>
+  Um sistema de conciliação bancária que precisa garantir ordem estrita de eventos por conta pagaria
+  o custo de uma *ordering key* por `contaId` no Pub/Sub — equivalente conceitualmente a particionar
+  por key no Kafka, mas com uma penalidade de throughput diferente e explícita no Pub/Sub.
+</ExemploFinanceiro>
+
+<Pegadinha title='"Pub/Sub e Kafka são intercambiáveis, é só trocar o client"'>
+  A ausência do conceito de partition/offset muda a semântica de ordenação e de paralelismo de
+  consumo. Migrar entre eles não é uma troca trivial de biblioteca — exige redesenhar a estratégia
+  de particionamento/ordenação.
+</Pegadinha>
+
+<PerguntaDerivada>
+  Pode vir a seguir: "como funciona ordenação sem partition?" e "você usaria Pub/Sub para um sistema
+  já maduro em Kafka?".
+</PerguntaDerivada>

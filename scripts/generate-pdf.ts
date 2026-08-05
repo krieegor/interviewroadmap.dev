@@ -7,7 +7,7 @@ import { PDFDocument } from "pdf-lib";
 
 const ROOT = process.cwd();
 const OUTPUT_PATH = path.join(ROOT, "public", "livro.pdf");
-const PRINT_ROUTE = "/pt/livro/impressao";
+const PRINT_ROUTE = "/pt/kafka/livro/impressao";
 const SERVER_READY_TIMEOUT_MS = 60_000;
 const MERMAID_TIMEOUT_MS = 30_000;
 

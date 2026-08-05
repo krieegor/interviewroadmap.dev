@@ -1,33 +1,55 @@
 import Link from "next/link";
 import { getTopNav } from "@/config/navigation";
 import { getSiteConfig } from "@/config/site";
+import { getTechConfig } from "@/config/tech";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { MobileNav } from "@/components/layout/MobileNav";
 import { SearchDialog } from "@/components/ui/SearchDialog";
 import { LocaleSwitcher } from "@/components/layout/LocaleSwitcher";
+import { Logo } from "@/components/icons/Logo";
 import { buildSearchIndex } from "@/lib/search/build-index";
 import { getEnAvailability } from "@/lib/i18n/en-availability";
 import type { Locale } from "@/lib/i18n/config";
 import type { Dictionary } from "@/lib/i18n/get-dictionary";
+import type { Tech } from "@/lib/tech/config";
 
-export async function Header({ locale, dict }: { locale: Locale; dict: Dictionary }) {
+export async function Header({
+  locale,
+  tech,
+  dict,
+}: {
+  locale: Locale;
+  tech: Tech;
+  dict: Dictionary;
+}) {
   const [searchIndex, enAvailable] = await Promise.all([
-    buildSearchIndex(locale, dict),
-    getEnAvailability(),
+    buildSearchIndex(tech, locale, dict),
+    getEnAvailability(tech),
   ]);
   const siteConfig = getSiteConfig(locale);
-  const topNav = getTopNav(locale, dict);
+  const techConfig = getTechConfig(tech, locale);
+  const topNav = getTopNav(locale, tech, dict);
 
   return (
     <header className="sticky top-0 z-40 border-b border-[var(--color-border)] bg-[var(--color-bg)]/95 backdrop-blur">
       <div className="mx-auto flex h-14 max-w-6xl items-center gap-4 px-4">
-        <MobileNav locale={locale} dict={dict} />
-        <Link
-          href={`/${locale}`}
-          className="shrink-0 truncate text-sm font-semibold text-[var(--color-text)] sm:text-base"
-        >
-          {siteConfig.shortName}
-        </Link>
+        <MobileNav locale={locale} tech={tech} dict={dict} />
+        <div className="flex shrink-0 items-center gap-2">
+          <Link
+            href={`/${locale}`}
+            className="flex items-center gap-1.5 truncate text-sm font-semibold text-[var(--color-text)] sm:text-base"
+          >
+            <Logo className="text-[var(--color-accent)]" />
+            {siteConfig.shortName}
+          </Link>
+          <Link
+            href={`/${locale}`}
+            aria-label={dict.trackSwitcher.backToSelector}
+            className="rounded-full border border-[var(--color-border)] px-2 py-0.5 text-xs text-[var(--color-text-muted)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]"
+          >
+            {techConfig.shortName}
+          </Link>
+        </div>
         <nav aria-label={dict.header.mainNavLabel} className="hidden flex-1 lg:block">
           <ul className="flex items-center gap-1 text-sm">
             {topNav.map((item) => (
@@ -44,7 +66,7 @@ export async function Header({ locale, dict }: { locale: Locale; dict: Dictionar
         </nav>
         <div className="ml-auto flex items-center gap-2">
           <SearchDialog index={searchIndex} dict={dict} />
-          <LocaleSwitcher locale={locale} dict={dict} enAvailable={enAvailable} />
+          <LocaleSwitcher locale={locale} tech={tech} dict={dict} enAvailable={enAvailable} />
           <a
             href={siteConfig.githubUrl}
             target="_blank"

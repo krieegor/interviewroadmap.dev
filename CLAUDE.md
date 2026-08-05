@@ -4,9 +4,11 @@ Guia para execuções futuras do Claude Code neste repositório.
 
 ## Objetivo do projeto
 
-E-book interativo, gratuito e open source: **Apache Kafka para Entrevistas Java Sênior**. Ensina Kafka a
-desenvolvedores Java/Spring Boot (Pleno → Sênior → Tech Lead) se preparando para entrevistas técnicas. Não é
-landing page, não é documentação de referência, não é curso pago. Especificação completa em `specs/`.
+**trainer.dev**: plataforma interativa, gratuita e open source de preparação para entrevistas técnicas,
+organizada por trilhas de tecnologia (`Tech` — `kafka` | `java` | `elastic`). A trilha **Kafka** está
+completa (e-book, 50 perguntas, glossário, estudos de caso, simulador); **Java** e **Elastic Search** estão
+"em construção" (página própria, sem conteúdo ainda). Não é landing page, não é documentação de referência,
+não é curso pago. Especificação completa em `specs/`.
 
 Leia `specs/product.md`, `specs/architecture.md`, `specs/content-guidelines.md` e `specs/design-system.md`
 antes de qualquer mudança estrutural. Eles são a fonte da verdade — este arquivo resume o essencial para o
@@ -20,10 +22,14 @@ de dados, sem autenticação, sem serviços pagos. Estado do usuário (tema, pro
 
 ## Regras de ouro
 
-- `src/app/**` é só roteamento e composição de componentes. **Nunca** escreva texto do livro ali.
-- Todo conteúdo (capítulo, pergunta, termo, estudo de caso) é um arquivo `.mdx` em `src/content/**` com
-  frontmatter tipado. Ver seção "Como criar conteúdo" abaixo.
+- `src/app/**` é só roteamento e composição de componentes. **Nunca** escreva texto do livro ali. Rotas de
+  conteúdo vivem sob `/[locale]/[tech]/**` (ex.: `/pt/kafka/livro/...`) — `/[locale]` sozinho é o seletor de
+  trilha.
+- Todo conteúdo (capítulo, pergunta, termo, estudo de caso) é um arquivo `.mdx` em
+  `src/content/<tech>/<tipo>/<locale>/*.mdx` com frontmatter tipado. Ver seção "Como criar conteúdo" abaixo.
 - `src/lib/content/**` é a única camada que lê o filesystem. Componentes não importam `fs`/`gray-matter`.
+  Toda função de loader recebe `tech` como primeiro parâmetro (`getAllChapters(tech, locale)` etc.) —
+  `src/lib/tech/config.ts` define `Tech`/`techs`/`techsWithContent`.
 - Não adicione dependência de backend, banco de dados, autenticação ou serviço pago. Se uma funcionalidade
   parece exigir isso, redesenhe para rodar client-side/estático antes de aceitar a dependência.
 - Não copie conteúdo de livros, cursos ou da documentação oficial. Todo texto é original. Não invente
@@ -34,19 +40,20 @@ de dados, sem autenticação, sem serviços pagos. Estado do usuário (tema, pro
 
 ## Como criar um novo capítulo
 
-1. Arquivo em `src/content/chapters/NN-slug.mdx` (NN = ordem de exibição).
+1. Arquivo em `src/content/<tech>/chapters/<locale>/NN-slug.mdx` (NN = ordem de exibição; `<tech>` hoje é
+   praticamente sempre `kafka`, o único com conteúdo real).
 2. Frontmatter: `title`, `part`, `partOrder`, `chapterOrder`, `slug`, `description`.
 3. Estrutura de texto: abertura contextual → desenvolvimento cobrindo os 10 pontos de
    `content-guidelines.md` seção 2 → pelo menos um `<Diagrama>` → pelo menos um `<ExemploFinanceiro>` →
    `<Resumo>`.
 4. Não é preciso editar nenhum arquivo de configuração de navegação — `src/lib/content/chapters.ts` deriva o
    índice do livro (partes → capítulos, em ordem) diretamente do frontmatter (`partOrder`/`chapterOrder`) de
-   todos os arquivos em `src/content/chapters`.
+   todos os arquivos em `src/content/<tech>/chapters`.
 5. Rode `npm run validate-content` antes de commitar.
 
 ## Como criar uma nova pergunta de entrevista
 
-1. Arquivo em `src/content/questions/NNN-slug.mdx` (NNN = número da pergunta, 1–50).
+1. Arquivo em `src/content/<tech>/questions/<locale>/NNN-slug.mdx` (NNN = número da pergunta, 1–50).
 2. Frontmatter: `id`, `title`, `slug`, `level` (`pleno`/`senior`/`tech-lead`), `topics`, `relatedChapters`.
 3. Seções obrigatórias, nesta ordem (ver `content-guidelines.md` seção 5): Pergunta → O que o entrevistador
    quer avaliar → `<RespostaCurta>` → `<RespostaSenior>` → Explicação aprofundada → `<ExemploFinanceiro>` →

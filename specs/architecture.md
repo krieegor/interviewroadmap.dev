@@ -27,23 +27,26 @@
 
 ## 3. Modelo de conteúdo
 
-Conteúdo vive em `src/content/**` como arquivos `.mdx` com frontmatter tipado. O código de app (`src/app`)
-apenas roteia e renderiza; nunca contém texto do livro hardcoded.
+Conteúdo vive em `src/content/<tech>/**` como arquivos `.mdx` com frontmatter tipado — `tech` é a
+plataforma trainer.dev particionada por trilha (`kafka`, `java`, `elastic`; ver seção 14). O código de app
+(`src/app`) apenas roteia e renderiza; nunca contém texto do livro hardcoded.
 
 ```
 src/content/
-├── chapters/
-│   └── 01-o-que-e-apache-kafka.mdx
-│   └── 02-kafka-versus-outras-ferramentas.mdx
-│   └── ...
-├── questions/
-│   └── 001-o-que-e-apache-kafka.mdx
-│   └── ...
-├── glossary/
-│   └── broker.mdx
-│   └── ...
-└── case-studies/
-    └── 01-pix-recebido.mdx
+└── kafka/
+    ├── chapters/
+    │   └── pt/01-o-que-e-apache-kafka.mdx
+    │   └── en/01-o-que-e-apache-kafka.mdx
+    │   └── ...
+    ├── questions/
+    │   └── pt/001-o-que-e-apache-kafka.mdx
+    │   └── ...
+    ├── glossary/
+    │   └── pt/broker.mdx
+    │   └── ...
+    └── case-studies/
+        └── pt/01-pix-recebido.mdx
+# src/content/java/**, src/content/elastic/** ainda não existem — trilhas "em breve", sem arquivos.
 ```
 
 Cada tipo de conteúdo tem um schema de frontmatter validado por um script (`scripts/validate-content.ts`),
@@ -92,13 +95,16 @@ src/
 │   └── ui/          # botões, badges, primitivos genéricos
 ├── content/         # MDX (ver acima)
 ├── lib/
-│   ├── content/     # loaders (getAllChapters, getChapterBySlug, getAllQuestions, ...)
+│   ├── content/     # loaders (getAllChapters, getChapterBySlug, getAllQuestions, ...) — recebem (tech, locale)
+│   ├── tech/        # Tech/techs/defaultTech/isTech/techsWithContent (ver seção 14)
 │   ├── search/      # índice de busca client-side
 │   ├── progress/    # hooks de localStorage (leitura, simulador)
 │   └── seo/         # helpers de metadata/OG/JSON-LD
-├── types/           # tipos compartilhados (Chapter, Question, GlossaryTerm, CaseStudy)
-└── config/          # site config (nome, url, autor) e navegação de topo (não a ordem de capítulos,
-                      # que é derivada do frontmatter em src/lib/content)
+├── types/           # tipos compartilhados (Chapter, Question, GlossaryTerm, CaseStudy) — sem campo tech,
+│                     # é dimensão de path/rota, não de dado
+└── config/          # site.ts (identidade da plataforma trainer.dev) + tech.ts (nome/descrição por
+                      # trilha) + navegação de topo (não a ordem de capítulos, que é derivada do
+                      # frontmatter em src/lib/content)
 ```
 
 **Regra central:** `src/app` é só roteamento e composição; `src/lib/content` é a única camada que lê o
@@ -106,28 +112,35 @@ filesystem (`fs`, `gray-matter`) em build time; `src/components` nunca importa d
 
 ## 5. Roteamento
 
-Todas as rotas de conteúdo vivem sob o segmento dinâmico `/[locale]` (`pt` ou `en` — ver seção 13). `/`
-(raiz, sem locale) é só um `redirect()` estático para `/pt`.
+Todas as rotas de conteúdo vivem sob `/[locale]/[tech]/...` — locale primeiro (`pt`/`en`, ver seção 13),
+tech depois (`kafka`/`java`/`elastic`, ver seção 14). `/` (raiz) é um `redirect()` estático para `/pt`;
+`/[locale]` sozinho (sem tech) é o seletor de trilha, não a home de nenhuma trilha específica.
 
-| Rota                          | Descrição                                                    |
-| ------------------------------ | ------------------------------------------------------------ |
-| `/`                            | Redirect estático para `/pt`                                 |
-| `/[locale]`                    | Home                                                          |
-| `/[locale]/livro`              | Índice do livro (partes + capítulos)                          |
-| `/[locale]/livro/[...slug]`    | Capítulo/seção individual, resolvido por slug do frontmatter |
-| `/[locale]/perguntas`          | Listagem/filtro das 50 perguntas                              |
-| `/[locale]/perguntas/[slug]`   | Página de uma pergunta                                        |
-| `/[locale]/glossario`          | Lista de termos                                                |
-| `/[locale]/glossario/[slug]`   | Página dedicada de um termo, com deep link e prev/next        |
-| `/[locale]/casos`              | Listagem de estudos de caso                                    |
-| `/[locale]/casos/[slug]`       | Estudo de caso individual                                      |
-| `/[locale]/simulador`          | Simulador de entrevista                                        |
-| `/[locale]/sobre`              | Página sobre o projeto/autor                                   |
+| Rota                                  | Descrição                                                       |
+| -------------------------------------- | ----------------------------------------------------------------- |
+| `/`                                    | Redirect estático para `/pt`                                       |
+| `/[locale]`                            | Seletor de trilha (Kafka / Java / Elastic)                          |
+| `/[locale]/[tech]`                     | Home da trilha (conteúdo real se `techsWithContent`, senão "em breve") |
+| `/[locale]/[tech]/livro`               | Índice do livro (partes + capítulos)                                |
+| `/[locale]/[tech]/livro/[...slug]`     | Capítulo/seção individual, resolvido por slug do frontmatter        |
+| `/[locale]/[tech]/perguntas`           | Listagem/filtro das perguntas                                       |
+| `/[locale]/[tech]/perguntas/[slug]`    | Página de uma pergunta                                              |
+| `/[locale]/[tech]/glossario`           | Lista de termos                                                    |
+| `/[locale]/[tech]/glossario/[slug]`    | Página dedicada de um termo, com deep link e prev/next             |
+| `/[locale]/[tech]/casos`               | Listagem de estudos de caso                                        |
+| `/[locale]/[tech]/casos/[slug]`        | Estudo de caso individual                                          |
+| `/[locale]/[tech]/simulador`           | Simulador de entrevista                                            |
+| `/[locale]/[tech]/sobre`               | Página sobre o projeto/autor                                       |
 
-`/[locale]/livro/[...slug]` usa catch-all para suportar futura hierarquia parte/capítulo/seção sem migração
-de rotas. `sitemap.ts`, `robots.ts`, `manifest.ts`, `not-found.tsx`, `icon.tsx` e `opengraph-image.tsx`
-continuam fora de `[locale]` — são rotas globais únicas do App Router; `sitemap.ts` itera os dois locales
-manualmente.
+`/[locale]/[tech]/livro/[...slug]` usa catch-all para suportar futura hierarquia parte/capítulo/seção sem
+migração de rotas. `[locale]/[tech]/layout.tsx` valida a forma de `tech` (`isTech`) e renderiza
+Header/Footer (já cientes da trilha atual); `[locale]/layout.tsx`, acima dele, fica mínimo (`<html>`/
+`<body>`/script de tema) porque não tem acesso ao segmento `[tech]`, que é filho seu. Rotas de conteúdo
+sob `[tech]` (`livro/[...slug]`, `perguntas/[slug]`, etc.) só geram `generateStaticParams` para trilhas em
+`techsWithContent` — `/en/java/livro/qualquer-coisa` dá 404 de build, sem custo extra, já que o site é SSG
+puro. `sitemap.ts`, `robots.ts`, `manifest.ts`, `not-found.tsx`, `icon.tsx` e `opengraph-image.tsx`
+continuam fora de `[locale]` — são rotas globais únicas do App Router, com identidade de plataforma
+(trainer.dev), não de trilha; `sitemap.ts` itera locale × tech.
 
 ## 6. Busca local
 
@@ -207,22 +220,48 @@ Nenhuma dessas opções exige cartão de crédito ou variável secreta.
   inteiro é passado como prop de Server Component para vários Client Components (`SearchDialog`,
   `Simulator`, etc.), e Next não serializa funções através dessa fronteira — um valor função em qualquer
   chave do objeto quebra o build inteiro na primeira página que renderizar aquele client component.
-- **Conteúdo por locale em diretórios irmãos**: `src/content/<tipo>/{pt,en}/*.mdx`, mesmo nome de arquivo
-  nos dois idiomas quando o conteúdo existe nos dois. Todo loader de `src/lib/content/**` recebe `locale`
-  como parâmetro (`getAllChapters(locale)`, `getChapterBySlug(slug, locale)`, etc.) e cacheia por locale
-  (`Map<Locale, Promise<...>>`). **Sem fallback silencioso PT→EN** — se um conteúdo não existe no locale
-  pedido, o loader retorna vazio/`null` para aquele locale; páginas de listagem em EN mostram só o que
-  existe — hoje isso só afeta a versão em inglês do PDF (backlog), já que o resto do conteúdo está completo
-  nos dois idiomas.
-- **Links internos dentro do corpo MDX são locale-prefixados explicitamente** (`/pt/livro/slug` nos
-  arquivos `pt/`, `/en/livro/slug` nos arquivos `en/`). `scripts/validate-content.ts` valida esses links por
-  locale. Se algum conteúdo futuro em inglês referenciar um capítulo ainda não traduzido, o padrão é linkar
-  para a versão em português (`/pt/livro/...`) com uma nota explícita, não inventar tradução nem omitir a
-  referência.
+- **Conteúdo por locale em diretórios irmãos**: `src/content/<tech>/<tipo>/{pt,en}/*.mdx`, mesmo nome de
+  arquivo nos dois idiomas quando o conteúdo existe nos dois. Todo loader de `src/lib/content/**` recebe
+  `tech` e `locale` como parâmetros (`getAllChapters(tech, locale)`, `getChapterBySlug(tech, slug, locale)`,
+  etc.) e cacheia por `` `${tech}:${locale}` ``. **Sem fallback silencioso PT→EN** — se um conteúdo não
+  existe no locale pedido, o loader retorna vazio/`null` para aquele locale; páginas de listagem em EN
+  mostram só o que existe — hoje isso só afeta a versão em inglês do PDF (backlog), já que o resto do
+  conteúdo está completo nos dois idiomas.
+- **Links internos dentro do corpo MDX são locale- e tech-prefixados explicitamente**
+  (`/pt/kafka/livro/slug` nos arquivos `pt/`, `/en/kafka/livro/slug` nos arquivos `en/`).
+  `scripts/validate-content.ts` valida esses links por tech e locale. Se algum conteúdo futuro em inglês
+  referenciar um capítulo ainda não traduzido, o padrão é linkar para a versão em português
+  (`/pt/kafka/livro/...`) com uma nota explícita, não inventar tradução nem omitir a referência.
 - **Conteúdo 100% traduzido para EN**: os 15 capítulos, as 50 perguntas, o glossário completo (24 termos) e
   os 5 estudos de caso existem nos dois idiomas — incluindo uma variante `*En.tsx` de cada diagrama
   SVG/React usado em algum capítulo (padrão em `ProducerConsumerFlowEn.tsx`).
 - `LocaleSwitcher` (`src/components/layout/LocaleSwitcher.tsx`) troca o prefixo de locale preservando o
   caminho quando a página de destino existe (`src/lib/i18n/en-availability.ts` lista os slugs disponíveis
   em `en/`); cai para o índice da seção em vez de gerar um link para uma página inexistente — hoje isso só
-  entra em ação se algum conteúdo novo for adicionado a um único locale no futuro.
+  entra em ação se algum conteúdo novo for adicionado a um único locale no futuro. Recebe `tech` como prop
+  explícita (não tenta re-parsear a URL) — só é renderizado dentro de `[locale]/[tech]/layout.tsx`, onde
+  `tech` sempre existe.
+
+## 14. Trilhas de tecnologia (tech)
+
+- **`Tech = "kafka" | "java" | "elastic"`**, definido em `src/lib/tech/config.ts` — mesmo formato de
+  `src/lib/i18n/config.ts` (`techs`, `defaultTech`, `isTech`). Diferente de locale, tech tem uma lista à
+  parte, `techsWithContent` (hoje só `["kafka"]`), porque nem toda trilha tem conteúdo real — é o único
+  lugar que precisa mudar quando Java/Elastic ganharem conteúdo.
+- **`/[locale]/[tech]/layout.tsx`** valida a forma de `tech` (`isTech`, não `techsWithContent`) e renderiza
+  Header/Footer, já que são os únicos pontos da árvore de rotas com acesso ao segmento `[tech]`.
+  `/[locale]/[tech]/page.tsx` decide, dentro da própria página, entre a home real (kafka) e
+  `<ComingSoon>` (`src/components/content/ComingSoon.tsx`) para trilhas sem conteúdo.
+- **Rotas de conteúdo** (`livro`, `perguntas`, `glossario`, `casos`) checam `techsWithContent` no próprio
+  `generateStaticParams` e no corpo da página (`notFound()` se a trilha não tem conteúdo) — sem layout
+  aninhado extra só para isso, para não fragmentar o guard em mais um lugar.
+- **`src/config/site.ts` (plataforma) vs. `src/config/tech.ts` (trilha)**: `getSiteConfig(locale)` cobre o
+  que é comum a toda a plataforma (autor, contribuidores, URL, GitHub) e é usado por Header/Footer/rotas
+  globais — essas não têm `tech` disponível estruturalmente (Header renderiza de dentro de
+  `[tech]/layout.tsx`, mas rotas fora de `[locale]` como `manifest.ts` não têm `tech` nunca).
+  `getTechConfig(tech, locale)` cobre nome/descrição por trilha (ex.: "Apache Kafka para Entrevistas Java
+  Sênior" vs. "trainer.dev"), usado em `generateMetadata` e no corpo de páginas dentro de `[tech]`.
+- **`scripts/generate-pdf.ts` continua kafka-only** — o script nunca teve loop de locale ou tech (gera um
+  PDF só, a partir de uma rota fixa), então só a constante `PRINT_ROUTE` precisou ganhar o segmento
+  (`/pt/kafka/livro/impressao`); não vale a pena generalizar antes de Java/Elastic terem conteúdo e alguém
+  pedir PDF pra eles.

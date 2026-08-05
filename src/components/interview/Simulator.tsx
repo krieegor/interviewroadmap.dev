@@ -6,6 +6,7 @@ import type { InterviewLevel, QuestionFrontmatter } from "@/types/content";
 import { saveSimulatorResult } from "@/lib/progress/simulator-progress";
 import type { Locale } from "@/lib/i18n/config";
 import type { Dictionary } from "@/lib/i18n/get-dictionary";
+import type { Tech } from "@/lib/tech/config";
 import { formatTemplate } from "@/lib/i18n/format";
 
 type Answer = "acertei" | "parcial" | "nao-sabia";
@@ -26,10 +27,12 @@ function shuffle<T>(items: T[]): T[] {
 export function Simulator({
   questions,
   locale,
+  tech,
   dict,
 }: {
   questions: QuestionFrontmatter[];
   locale: Locale;
+  tech: Tech;
   dict: Dictionary;
 }) {
   const topics = useMemo(
@@ -360,7 +363,7 @@ export function Simulator({
             </div>
             {answerPanelOpen ? (
               <iframe
-                src={`/${locale}/perguntas/${current.slug}`}
+                src={`/${locale}/${tech}/perguntas/${current.slug}`}
                 title={current.title}
                 className="h-full w-full flex-1 border-0"
               />

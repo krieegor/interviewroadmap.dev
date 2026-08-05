@@ -1,0 +1,60 @@
+---
+id: 26
+title: "O que acontece quando um Consumer cai?"
+slug: "o-que-acontece-quando-um-consumer-cai"
+level: ["pleno", "senior"]
+topics: ["arquitetura"]
+relatedChapters: ["consumer-groups-e-rebalance"]
+shortAnswer: "O grupo detecta a ausência via heartbeat/session.timeout.ms, dispara um rebalance, e as partitions do consumer que caiu são redistribuídas entre os consumers restantes do grupo."
+quiz:
+  options:
+    - "O coordenador detecta a ausência de heartbeat dentro do session.timeout.ms, declara o consumer morto e redistribui suas partitions via rebalance."
+    - "Um consumer só é considerado morto se o processo realmente travar ou for encerrado, nunca por demora no processamento de mensagens."
+    - "As partitions do consumer que caiu ficam sem processamento até que ele seja reiniciado manualmente pelo time responsável."
+    - "O broker líder da partition assume temporariamente o papel de consumer até que a instância original volte a ficar disponível."
+  correctIndex: 0
+---
+
+## Pergunta
+
+"O que acontece quando um Consumer de um Consumer Group cai inesperadamente?"
+
+## O que o entrevistador quer avaliar
+
+Praticamente garantida em qualquer entrevista sobre Kafka em produção. Testa se o candidato conhece o
+mecanismo de detecção de falha e redistribuição, não apenas o resultado final ("outro consumer assume").
+
+<RespostaCurta>
+O coordenador do grupo detecta a ausência de heartbeat dentro do `session.timeout.ms` configurado, declara o
+consumer morto, e dispara um rebalance — as partitions que estavam atribuídas a ele são redistribuídas entre
+os consumers restantes do grupo.
+</RespostaCurta>
+
+<RespostaSenior>
+Cada consumer envia heartbeats periódicos ao coordenador do grupo (um dos brokers). Se o coordenador não
+recebe um heartbeat dentro do `session.timeout.ms`, ele considera o consumer morto e inicia um rebalance,
+redistribuindo as partitions órfãs entre os consumers ativos. Um ponto sutil: se o processamento de uma
+mensagem demorar mais que `max.poll.interval.ms`, o consumer é considerado morto mesmo que a thread de
+heartbeat continue respondendo — porque o poll loop, não o heartbeat isoladamente, é o sinal real de que o
+consumer está processando normalmente. Isso é uma causa comum de rebalances "falsos", onde um consumer
+saudável mas lento é expulso do grupo.
+</RespostaSenior>
+
+## Explicação aprofundada
+
+Veja "O que dispara um rebalance" no [Capítulo 6](/pt/kafka/livro/consumer-groups-e-rebalance).
+
+<ExemploFinanceiro>
+Se uma das 4 réplicas do `notificacao-service` cair por falta de memória, suas partitions são redistribuídas
+entre as 3 réplicas restantes em segundos — sem intervenção manual, mas com uma pequena pausa de
+processamento durante a transição.
+</ExemploFinanceiro>
+
+<Pegadinha title='"O consumer só é considerado morto se o processo realmente cair"'>
+Não — um consumer vivo, mas que demora demais para processar uma mensagem (excedendo
+`max.poll.interval.ms`), também é expulso do grupo, mesmo sem nenhuma falha de infraestrutura real.
+</Pegadinha>
+
+<PerguntaDerivada>
+Prováveis follow-ups: "o que é `max.poll.interval.ms` e por que ele causa rebalances?" e "o que é Offset?".
+</PerguntaDerivada>

@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Script from "next/script";
-import { Header } from "@/components/layout/Header";
-import { Footer } from "@/components/layout/Footer";
 import { themeInitScript } from "@/lib/theme-script";
 import { getSiteConfig } from "@/config/site";
 import { locales, isLocale, type Locale } from "@/lib/i18n/config";
@@ -78,15 +76,7 @@ export default async function LocaleLayout({
         >
           {dict.skipToContent}
         </a>
-        <div className="site-chrome">
-          <Header locale={locale} dict={dict} />
-        </div>
-        <main id="conteudo-principal" className="flex-1">
-          {children}
-        </main>
-        <div className="site-chrome">
-          <Footer locale={locale} dict={dict} />
-        </div>
+        {children}
       </body>
     </html>
   );

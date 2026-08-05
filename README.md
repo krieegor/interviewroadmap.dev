@@ -1,19 +1,24 @@
-# Apache Kafka para Entrevistas Java Sênior
+# trainer.dev
 
-E-book interativo, gratuito e open source sobre Apache Kafka, voltado para desenvolvedores Java Backend
-(Pleno, Sênior e Tech Lead) se preparando para entrevistas técnicas.
+Plataforma interativa, gratuita e open source de preparação para entrevistas técnicas, organizada por
+trilhas de tecnologia.
 
-Guia prático sobre mensageria, arquitetura, reprocessamento, ordenação, idempotência e sistemas
-distribuídos — não é uma cópia da documentação oficial, e sim um livro técnico produzido para estudo real.
+- **Kafka** — trilha completa: livro navegável, 50 perguntas de entrevista, glossário, estudos de caso e
+  simulador.
+- **Java** e **Elastic Search** — em construção.
 
-## O que tem aqui
+Cada trilha segue o mesmo formato: guia prático produzido para estudo real (não é cópia da documentação
+oficial), com resposta rápida, resposta nível sênior, explicação aprofundada, exemplo financeiro e
+pegadinhas comuns para cada pergunta de entrevista.
+
+## O que tem aqui (trilha Kafka)
 
 - Livro navegável por capítulos, organizado em partes progressivas.
 - 50 perguntas de entrevista, cada uma com resposta rápida, resposta nível sênior, explicação aprofundada,
   exemplo financeiro e pegadinhas comuns.
 - Glossário com termos essenciais do Kafka.
 - Estudos de caso de sistemas financeiros reais (PIX, cartões, faturas).
-- Simulador de entrevista local, sem backend.
+- Simulador de entrevista local, sem backend (modo aberto e modo múltipla escolha).
 - Busca local, progresso de leitura e tema claro/escuro — tudo salvo no seu navegador.
 
 ## Stack
@@ -28,7 +33,8 @@ npm install
 npm run dev
 ```
 
-Acesse `http://localhost:3000`.
+Acesse `http://localhost:3000` — redireciona pro seletor de trilha (`/pt`), de onde você escolhe Kafka,
+Java ou Elastic Search.
 
 ## Scripts
 

@@ -1,0 +1,62 @@
+---
+id: 18
+title: "O que é Message Key?"
+slug: "o-que-e-message-key"
+level: ["pleno", "senior"]
+topics: ["arquitetura"]
+relatedChapters: ["partitions-e-ordenacao"]
+shortAnswer: "Message key é um valor opcional anexado a cada mensagem que determina, via hash, em qual partition ela será armazenada — a decisão que define quais eventos ficam ordenados entre si."
+quiz:
+  options:
+    - "Message key é um valor opcional que determina, via hash, em qual partition a mensagem é armazenada, fixando quais eventos ficam ordenados entre si."
+    - "Usar um UUID aleatório como key é sempre a melhor escolha, pois maximiza a distribuição entre partitions."
+    - "Message key é um campo obrigatório em toda mensagem Kafka, usado apenas para deduplicação no consumer."
+    - "Mensagens com keys diferentes têm sua ordem relativa garantida desde que sejam publicadas pelo mesmo producer."
+  correctIndex: 0
+---
+
+## Pergunta
+
+"O que é a Message Key e qual sua função?"
+
+## O que o entrevistador quer avaliar
+
+Se você entende a key como uma decisão de modelagem de domínio (quais eventos precisam estar ordenados),
+não apenas como um parâmetro técnico do método `send`.
+
+<RespostaCurta>
+Message key é um valor opcional que o producer anexa a cada mensagem. O Kafka usa essa key (via hash) para
+decidir em qual partition a mensagem cai — mensagens com a mesma key sempre vão para a mesma partition,
+preservando ordem relativa entre elas.
+</RespostaCurta>
+
+<RespostaSenior>
+A pergunta certa ao escolher uma key não é "qual valor distribui melhor entre partitions", mas "quais
+eventos precisam estar ordenados entre si". A key fixa essa relação: eventos com a mesma key ficam na mesma
+partition e são lidos na ordem em que foram escritos; eventos com keys diferentes não têm relação de ordem
+garantida entre si, mesmo que publicados por segundos de diferença. Uma key de alta cardinalidade (como um
+UUID por mensagem) distribui melhor entre partitions, mas elimina qualquer garantia de ordem entre mensagens
+relacionadas — um erro comum de quem otimiza para distribuição sem considerar o requisito real de ordenação
+do domínio.
+</RespostaSenior>
+
+## Explicação aprofundada
+
+Veja "Escolhendo a key: a decisão mais importante ao modelar um tópico" no
+[Capítulo 4](/pt/kafka/livro/partitions-e-ordenacao).
+
+<ExemploFinanceiro>
+No tópico `faturas.eventos`, usar `contaId` como key garante que `FaturaFechada`, `PagamentoRegistrado` e
+`FaturaReaberta` da mesma conta cheguem ao consumer na ordem correta — processá-los fora de ordem levaria a
+uma conclusão errada sobre o saldo devedor.
+</ExemploFinanceiro>
+
+<Pegadinha title='"Sempre uso um UUID aleatório como key para distribuir bem"'>
+Um UUID por mensagem maximiza distribuição, mas garante que mensagens relacionadas (do mesmo pedido, da
+mesma conta) caiam em partitions diferentes — destruindo qualquer garantia de ordem entre elas. Se
+ordenação relativa importa, isso é um bug de modelagem.
+</Pegadinha>
+
+<PerguntaDerivada>
+Prováveis follow-ups: "como funciona a ordenação no Kafka?" e "o Kafka garante ordenação global?".
+</PerguntaDerivada>

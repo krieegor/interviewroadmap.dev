@@ -1,9 +1,16 @@
-# Product Spec — Apache Kafka para Entrevistas Java Sênior
+# Product Spec — trainer.dev
 
 ## 1. O que é
 
-Um e-book interativo, gratuito e open source, publicado como site estático, que ensina Apache Kafka para
-desenvolvedores Java Backend (Pleno, Sênior, Tech Lead) se preparando para entrevistas técnicas.
+**trainer.dev** é uma plataforma interativa, gratuita e open source, publicada como site estático, de
+preparação para entrevistas técnicas — organizada por trilhas de tecnologia. Cada trilha é um e-book
+navegável com a mesma estrutura de estudo (capítulos, perguntas de entrevista, glossário, estudos de caso,
+simulador).
+
+A trilha **Apache Kafka para Entrevistas Java Sênior** está completa hoje, ensinando Kafka para
+desenvolvedores Java Backend (Pleno, Sênior, Tech Lead). **Java** e **Elastic Search** são trilhas futuras,
+hoje "em construção" (página própria, sem conteúdo publicado). O restante deste documento descreve a
+trilha Kafka em detalhe — o mesmo padrão editorial e estrutural se aplica a qualquer trilha nova.
 
 Não é uma landing page, não é um curso pago, não é documentação oficial. É um livro técnico navegável na web,
 com estrutura de estudo (capítulos, perguntas de entrevista, glossário, estudos de caso, simulador).

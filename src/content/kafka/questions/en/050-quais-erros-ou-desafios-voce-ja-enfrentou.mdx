@@ -1,0 +1,67 @@
+---
+id: 50
+title: "What errors or challenges have you faced with Kafka?"
+slug: "quais-erros-ou-desafios-voce-ja-enfrentou"
+level: ["senior", "tech-lead"]
+topics: ["experiencia"]
+relatedChapters: ["consumer-groups-e-rebalance", "retry-e-dlq"]
+shortAnswer: "Pick one real, specific challenge — excessive rebalancing, a duplicate message, a poison pill, poorly sized partitioning — and structure the answer as root cause, diagnosis, and fix, not just 'what went wrong'."
+quiz:
+  options:
+    - "A strong answer follows post-mortem logic — root cause, diagnosis, and fix — ending with what changed in the system or process after the incident."
+    - "Claiming you never faced any problems with Kafka in production, without addressing your real level of experience with the system under load."
+    - "Describing only the symptom of the incident, without explaining the root cause or the fix applied afterward."
+    - "Attributing the problem to a generic limitation of Kafka itself, without investigating the application's configuration or code."
+  correctIndex: 0
+---
+
+## Question
+
+"What errors or challenges have you faced working with Kafka? How did you resolve them?"
+
+## What the interviewer wants to assess
+
+Operational maturity and diagnostic ability — the question that most distinguishes someone who only codes
+against Kafka from someone who has actually operated it under real pressure, during a production incident.
+
+<Atencao title="This question also has no generic answer">
+Just like the previous question, this one requires a real experience of your own. Don't force a made-up
+challenge — if you haven't faced a production incident with Kafka yet, it's honest to say so and talk about
+a study or test-environment challenge, or a scenario you know is common (citing your sources of that
+knowledge, like this book or the documentation).
+</Atencao>
+
+## How to structure the answer
+
+A strong answer follows the logic of a post-mortem, not just a complaint: root cause, diagnosis, and fix.
+Real, common challenges that tend to show up in this kind of answer — described in this book in case you
+need to refresh the technical cause of each one:
+
+- **Excessive rebalances** from a misconfigured `max.poll.interval.ms`, kicking healthy but slow consumers
+  out of the group ([Chapter 6](/en/kafka/livro/consumer-groups-e-rebalance)).
+- **Duplicate messages** in production due to missing idempotency, discovered only when a customer
+  complained about a duplicate charge ([Chapter 11](/en/kafka/livro/idempotencia)).
+- **Poison pill** stalling an entire partition because of an unhandled deserialization bug
+  ([Chapter 9](/en/kafka/livro/retry-e-dlq)).
+- **Poorly sized partitions** from the start, requiring migration to a new topic instead of just increasing
+  the existing one's partition count ([Chapter 4](/en/kafka/livro/partitions-e-ordenacao)).
+- **Growing consumer lag** not detected in time, due to a missing alert
+  ([Chapter 15](/en/kafka/livro/observabilidade)).
+
+<DicaEntrevista>
+Always finish by explaining what changed after the incident — a new alert, a configuration change, a code
+review. That shows you didn't just fix the immediate problem, but improved the system (or the team's
+process) so it doesn't happen again.
+</DicaEntrevista>
+
+<Pegadinha title='"I have never had any problems with Kafka"'>
+That answer, even if true, tends to sound like a lack of real experience with the system in production
+under load — most teams that operate Kafka long enough have faced at least one of the challenges listed
+above. If your experience is limited, it's more honest (and more convincing) to admit that and show you
+understand, in theory, where these problems tend to show up.
+</Pegadinha>
+
+<PerguntaDerivada>
+This is typically the last technical question in a Kafka interview — from here, the conversation usually
+moves on to culture fit or other technologies in the stack.
+</PerguntaDerivada>

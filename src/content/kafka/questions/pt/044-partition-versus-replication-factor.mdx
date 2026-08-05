@@ -1,0 +1,61 @@
+---
+id: 44
+title: "Qual a diferença entre Partition e Replication Factor?"
+slug: "partition-versus-replication-factor"
+level: ["pleno", "senior"]
+topics: ["arquitetura", "comparacoes"]
+relatedChapters: ["partitions-e-ordenacao", "brokers-lideres-e-replicacao"]
+shortAnswer: "Partition define em quantas fatias independentes um tópico é dividido (paralelismo e escala). Replication Factor define quantas cópias existem de cada uma dessas fatias (disponibilidade)."
+quiz:
+  options:
+    - "Partition define quantas fatias independentes um tópico tem (paralelismo e escala); Replication Factor define quantas cópias existem de cada fatia (disponibilidade) — eixos independentes."
+    - "Aumentar o Replication Factor aumenta o paralelismo de consumo, porque réplicas adicionais podem ser lidas simultaneamente por consumers diferentes."
+    - "Partition e Replication Factor são a mesma configuração, apenas nomes diferentes para o número de cópias de um tópico."
+    - "Aumentar o número de partitions de um tópico aumenta diretamente sua tolerância à perda de brokers."
+  correctIndex: 0
+---
+
+## Pergunta
+
+"Qual a diferença entre o número de Partitions e o Replication Factor de um tópico?"
+
+## O que o entrevistador quer avaliar
+
+Uma confusão comum entre iniciantes é tratar os dois como a mesma coisa "de escala". Essa pergunta separa
+quem entende os dois eixos independentes de design de um tópico.
+
+<RespostaCurta>
+Partition define em quantas fatias independentes um tópico é dividido — a base do paralelismo de consumo e
+da distribuição de carga de escrita. Replication Factor define quantas cópias existem de cada uma dessas
+partitions, em brokers diferentes — a base da tolerância a falhas.
+</RespostaCurta>
+
+<RespostaSenior>
+São dois eixos de design completamente independentes. Um tópico com 12 partitions e replication factor 3
+tem, na prática, 36 réplicas físicas distribuídas no cluster (12 partitions × 3 cópias cada). Aumentar
+partitions aumenta paralelismo de consumo e escala de escrita, mas não afeta disponibilidade por si só.
+Aumentar replication factor aumenta tolerância à perda de brokers, mas não afeta paralelismo — mais réplicas
+da mesma partition não permitem mais consumers processando-a simultaneamente, porque leituras e escritas de
+clientes só acontecem através do leader daquela partition.
+</RespostaSenior>
+
+## Explicação aprofundada
+
+Veja o [Capítulo 4](/pt/kafka/livro/partitions-e-ordenacao) (partitions) e o [Capítulo 5](/pt/kafka/livro/brokers-lideres-e-replicacao)
+(replication factor).
+
+<ExemploFinanceiro>
+Um tópico `pix.recebido` com 24 partitions e replication factor 3 tem 24 leaders e 48 réplicas follower
+distribuídas entre os brokers do cluster — 24 é o teto de paralelismo de consumo; 3 é a tolerância a falhas
+de cada uma dessas 24 fatias.
+</ExemploFinanceiro>
+
+<Pegadinha title='"Mais Replication Factor significa mais paralelismo de consumo"'>
+Não — réplicas adicionais de uma partition servem exclusivamente para tolerância a falhas (failover do
+leader). Elas não são lidas por consumers em paralelo com o leader; apenas o leader serve clientes na
+configuração padrão.
+</Pegadinha>
+
+<PerguntaDerivada>
+Prováveis follow-ups: "o que são Leader e Follower?" e "o que acontece quando o Leader cai?".
+</PerguntaDerivada>

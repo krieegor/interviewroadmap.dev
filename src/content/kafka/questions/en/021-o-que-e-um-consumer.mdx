@@ -1,0 +1,59 @@
+---
+id: 21
+title: "What is a Consumer?"
+slug: "o-que-e-um-consumer"
+level: ["pleno", "senior"]
+topics: ["arquitetura"]
+relatedChapters: ["arquitetura-interna", "consumer-com-spring-kafka"]
+shortAnswer: "Consumer is any application that reads events from one or more topics, advancing sequentially from the position (offset) where it last stopped reading."
+quiz:
+  options:
+    - "Consumer is any application that reads events from the partitions assigned to it within its Consumer Group, advancing from the last committed offset."
+    - "Consumer is an application that always reads the entire topic, processing every partition regardless of which Consumer Group it belongs to."
+    - "Consumer is the broker component responsible for storing messages until they're delivered to interested applications."
+    - "Consumer is the application that publishes events to a topic and waits for delivery confirmation before continuing processing."
+  correctIndex: 0
+---
+
+## Question
+
+"What is a Consumer in Kafka?"
+
+## What the interviewer wants to assess
+
+Basic architecture knowledge, usually used as a warm-up before deeper questions about Consumer Group,
+offset, and rebalance.
+
+<RespostaCurta>
+Consumer is any application that reads events from one or more topics, from the position (offset) where it
+previously stopped. Consumers almost always operate within a Consumer Group, which determines how the
+topic's partitions are split among the running instances.
+</RespostaCurta>
+
+<RespostaSenior>
+A consumer is the role played by any application using the Kafka client to read records from partitions.
+It doesn't read the topic as a whole — it reads the partitions specifically assigned to it within its
+Consumer Group, advancing sequentially from the last committed offset. In Spring Boot, this typically shows
+up as a method annotated with `@KafkaListener`, which receives each deserialized record and processes it
+within the application's business logic.
+</RespostaSenior>
+
+## In-depth explanation
+
+See "Consumer" in [Chapter 3](/en/kafka/livro/arquitetura-interna) and the practical implementation in
+[Chapter 14](/en/kafka/livro/consumer-com-spring-kafka).
+
+<ExemploFinanceiro>
+The `notificacao-service` is a consumer of the `pix.recebido` topic: it reads the events assigned to its
+partitions and sends a push notification for each one, advancing its own offset independently of other
+consumers of the same event.
+</ExemploFinanceiro>
+
+<Pegadinha title='"A Consumer reads the entire topic"'>
+An individual consumer only reads the partitions assigned to it within its Consumer Group — not the whole
+topic, unless the topic has only one partition or it's the only consumer in the group.
+</Pegadinha>
+
+<PerguntaDerivada>
+Likely follow-ups: "what is a Consumer Group?" and "what is Offset?".
+</PerguntaDerivada>

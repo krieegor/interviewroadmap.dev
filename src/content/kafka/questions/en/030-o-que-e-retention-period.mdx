@@ -1,0 +1,58 @@
+---
+id: 30
+title: "What is Retention Period?"
+slug: "o-que-e-retention-period"
+level: ["pleno", "senior"]
+topics: ["consumo"]
+relatedChapters: ["retention-e-replay"]
+shortAnswer: "Retention period is the policy, configured per topic, that determines how long (or up to what accumulated size) a partition's records stay available before being discarded."
+quiz:
+  options:
+    - "Retention period is the policy, configured per topic via retention.ms/retention.bytes, that determines how long records stay available before being discarded."
+    - "The message disappears from the topic as soon as every existing Consumer Group has read it, regardless of the configured time."
+    - "Retention period determines how many times a message can be read before it's discarded from the partition."
+    - "Retention period is applied globally across the cluster, with the same value mandatory for every existing topic."
+  correctIndex: 0
+---
+
+## Question
+
+"What is a Kafka topic's Retention Period?"
+
+## What the interviewer wants to assess
+
+Whether you understand retention as independent of consumption — the point that most differentiates Kafka
+from a traditional queue.
+
+<RespostaCurta>
+Retention period is the policy that determines how long (or up to what accumulated size) a partition's
+records stay available, configured via `retention.ms` and/or `retention.bytes` — whichever is hit first
+triggers cleanup of the oldest records.
+</RespostaCurta>
+
+<RespostaSenior>
+The central point is that retention doesn't depend on consumption: a record isn't removed for having been
+read — it stays in the log until it expires under the configured policy, even if every existing Consumer
+Group has already processed it. The reverse also holds: a record never read by any consumer disappears
+from the log as soon as retention expires, regardless of that. It's this characteristic that enables replay
+(Chapter 8): reprocessing old events is only possible while they're still within the retention window.
+</RespostaSenior>
+
+## In-depth explanation
+
+See "Retention Period" in [Chapter 8](/en/kafka/livro/retention-e-replay).
+
+<ExemploFinanceiro>
+A `transacoes.autorizadas` topic with 7 days of retention lets a new analytics service, created today, read
+the full history of the last 7 days as soon as it's deployed — without the authorization service needing to
+resend anything.
+</ExemploFinanceiro>
+
+<Pegadinha title='"The message disappears from the topic as soon as every consumer reads it"'>
+That describes a traditional queue's behavior, not Kafka's. The message stays available until retention
+expires it, regardless of how many consumers (or none) have already read it.
+</Pegadinha>
+
+<PerguntaDerivada>
+Likely follow-ups: "what is Replay?" and "how does Kafka manage to reread already-consumed messages?".
+</PerguntaDerivada>
