@@ -1,5 +1,8 @@
 # trainer.dev
 
+[![CI](https://github.com/krieegor/trainer.dev/actions/workflows/ci.yml/badge.svg)](https://github.com/krieegor/trainer.dev/actions/workflows/ci.yml)
+[![Licença MIT](https://img.shields.io/badge/licença-MIT-blue.svg)](./LICENSE)
+
 Plataforma interativa, gratuita e open source de preparação para entrevistas técnicas, organizada por
 trilhas de tecnologia.
 
@@ -11,20 +14,58 @@ Cada trilha segue o mesmo formato: guia prático produzido para estudo real (nã
 oficial), com resposta rápida, resposta nível sênior, explicação aprofundada, exemplo financeiro e
 pegadinhas comuns para cada pergunta de entrevista.
 
-## O que tem aqui (trilha Kafka)
+## Sumário
+
+- [Trilhas](#trilhas)
+- [Funcionalidades](#funcionalidades)
+- [Stack](#stack)
+- [Estrutura do projeto](#estrutura-do-projeto)
+- [Rodando localmente](#rodando-localmente)
+- [Scripts](#scripts)
+- [Documentação do projeto](#documentação-do-projeto)
+- [Contribuindo](#contribuindo)
+- [Aviso](#aviso)
+- [Licença](#licença)
+
+## Trilhas
+
+| Trilha             | Status           | Conteúdo hoje                                                 |
+| ------------------ | ---------------- | -------------------------------------------------------------- |
+| **Kafka**          | ✅ Completa       | 15 capítulos, 50 perguntas, 24 termos de glossário, 5 estudos de caso |
+| **Java**           | 🚧 Em construção |  —                                                              |
+| **Elastic Search** | 🚧 Em construção |  —                                                              |
+
+## Funcionalidades
 
 - Livro navegável por capítulos, organizado em partes progressivas.
-- 50 perguntas de entrevista, cada uma com resposta rápida, resposta nível sênior, explicação aprofundada,
-  exemplo financeiro e pegadinhas comuns.
-- Glossário com termos essenciais do Kafka.
+- Perguntas de entrevista com resposta rápida, resposta nível sênior, explicação aprofundada, exemplo
+  financeiro e pegadinhas comuns.
+- Glossário com termos essenciais, cada um com página própria e deep link.
 - Estudos de caso de sistemas financeiros reais (PIX, cartões, faturas).
-- Simulador de entrevista local, sem backend (modo aberto e modo múltipla escolha).
-- Busca local, progresso de leitura e tema claro/escuro — tudo salvo no seu navegador.
+- Simulador de entrevista local, sem backend — modo aberto (você explica em voz alta) e modo múltipla
+  escolha (estilo Enem), com painel lateral para ver a resposta completa sem sair da sessão.
+- Exportação do livro em PDF (capa com contribuidores da versão e data).
+- Busca local (`Ctrl+K`), progresso de leitura e tema claro/escuro — tudo salvo só no seu navegador.
+- Internacionalização completa em português e inglês.
 
 ## Stack
 
 Next.js (App Router) + TypeScript + Tailwind CSS + MDX. 100% estático, sem banco de dados, sem
-autenticação, sem serviços pagos.
+autenticação, sem serviços pagos. Estado do usuário (tema, progresso, simulador) vive só em `localStorage`.
+
+## Estrutura do projeto
+
+```
+src/
+├── app/            # rotas (App Router) — /[locale]/[tech]/...
+├── components/      # UI, layout, navegação, blocos de conteúdo MDX, diagramas, ícones
+├── content/          # conteúdo (.mdx) por trilha/tipo/idioma
+├── lib/                # loaders de conteúdo, i18n, trilhas, busca, progresso
+├── config/              # identidade da plataforma (site.ts) e das trilhas (tech.ts)
+└── types/                # tipos compartilhados
+```
+
+Detalhes completos da arquitetura em [`specs/architecture.md`](./specs/architecture.md).
 
 ## Rodando localmente
 
@@ -55,6 +96,16 @@ npm run validate-content            # valida frontmatter e links internos do con
 - [`docs/contributing.md`](./docs/contributing.md) — como contribuir.
 - [`docs/content-authoring.md`](./docs/content-authoring.md) — como escrever capítulos, perguntas, glossário e estudos de caso.
 - [`docs/deployment.md`](./docs/deployment.md) — como publicar em Vercel, Cloudflare Pages ou Netlify.
+
+## Contribuindo
+
+Contribuições são bem-vindas: correções técnicas, novos capítulos/perguntas, conteúdo para as trilhas Java
+e Elastic Search, ou melhorias de acessibilidade e design. Veja
+[`docs/contributing.md`](./docs/contributing.md) antes de abrir um Pull Request.
+
+### Contribuidores
+
+- [João Paulo Rodrigues de Araújo](https://github.com/jprodriguesdev)
 
 ## Aviso
 

@@ -6,24 +6,27 @@ Para as regras editoriais completas (tom, os 10 pontos obrigatórios por conceit
 
 ## Estrutura de arquivos
 
-Todo conteúdo é um arquivo `.mdx` com frontmatter YAML, em uma das quatro pastas — cada uma com uma
-subpasta por locale (`pt/`, `en/`). Hoje o conteúdo está completo nos dois idiomas; ao adicionar conteúdo
-novo, escreva primeiro em `pt/` e traduza para `en/` seguindo "Traduzindo conteúdo para inglês" abaixo.
+trainer.dev tem uma dimensão de **trilha** (`tech`) além de idioma — hoje só `kafka` tem conteúdo real
+(`java` e `elastic` são trilhas "em breve", sem arquivos ainda). Todo conteúdo é um arquivo `.mdx` com
+frontmatter YAML, em `src/content/<tech>/<tipo>/<locale>/`. Ao contribuir para a trilha Kafka, `<tech>` é
+sempre `kafka`. Hoje o conteúdo do Kafka está completo nos dois idiomas; ao adicionar conteúdo novo, escreva
+primeiro em `pt/` e traduza para `en/` seguindo "Traduzindo conteúdo para inglês" abaixo.
 
 ```
 src/content/
-├── chapters/
-│   ├── pt/
-│   └── en/
-├── questions/
-│   ├── pt/
-│   └── en/
-├── glossary/
-│   ├── pt/
-│   └── en/
-└── case-studies/
-    ├── pt/
-    └── en/
+└── kafka/
+    ├── chapters/
+    │   ├── pt/
+    │   └── en/
+    ├── questions/
+    │   ├── pt/
+    │   └── en/
+    ├── glossary/
+    │   ├── pt/
+    │   └── en/
+    └── case-studies/
+        ├── pt/
+        └── en/
 ```
 
 Um arquivo de conteúdo pertence a exatamente um locale — `mesmo nome de arquivo` nos dois idiomas quando o
@@ -32,7 +35,7 @@ conceitual nos dois locales (não traduza o slug).
 
 ## Criando um capítulo
 
-1. Crie `src/content/chapters/pt/NN-slug.mdx`, onde `NN` é a ordem de exibição (ex.:
+1. Crie `src/content/kafka/chapters/pt/NN-slug.mdx`, onde `NN` é a ordem de exibição (ex.:
    `04-partitions-e-ordenacao.mdx`).
 2. Frontmatter obrigatório:
 
@@ -56,7 +59,7 @@ conceitual nos dois locales (não traduza o slug).
 
 ## Criando uma pergunta de entrevista
 
-1. Crie `src/content/questions/pt/NNN-slug.mdx`, onde `NNN` é o número da pergunta (001 a 050).
+1. Crie `src/content/kafka/questions/pt/NNN-slug.mdx`, onde `NNN` é o número da pergunta (001 a 050).
 2. Frontmatter obrigatório:
 
    ```yaml
@@ -68,9 +71,20 @@ conceitual nos dois locales (não traduza o slug).
    topics: ["arquitetura"]
    relatedChapters: ["slug-do-capitulo-relacionado"]
    shortAnswer: "Versão em texto puro da resposta rápida, usada em SEO e JSON-LD."
+   quiz:
+     options:
+       - "Alternativa correta, mesma extensão/registro das erradas."
+       - "Distrator 1 — idealmente adaptado de uma <Pegadinha> desta mesma pergunta."
+       - "Distrator 2 — confusão com conceito adjacente."
+       - "Distrator 3 — generalização ou escopo errado."
+     correctIndex: 0
    ---
    ```
 
+   `quiz` é obrigatório — alimenta o modo "múltipla escolha" do simulador. Sempre escreva a alternativa
+   correta na posição 0 (`correctIndex: 0`); o simulador embaralha as opções em runtime, então a ordem no
+   arquivo não importa para o usuário, só para você não se perder. `npm run validate-content` rejeita
+   frontmatter sem `quiz`, com menos de 4 opções, ou com opções duplicadas.
 3. Estrutura obrigatória do corpo, nesta ordem: `## Pergunta`, `## O que o entrevistador quer avaliar`,
    `<RespostaCurta>`, `<RespostaSenior>`, `## Explicação aprofundada`, `<ExemploFinanceiro>`,
    `<Pegadinha>`, `<PerguntaDerivada>`.
@@ -79,7 +93,7 @@ conceitual nos dois locales (não traduza o slug).
 
 ## Criando um termo de glossário
 
-1. Crie `src/content/glossary/pt/slug.mdx`.
+1. Crie `src/content/kafka/glossary/pt/slug.mdx`.
 2. Frontmatter:
 
    ```yaml
@@ -97,7 +111,7 @@ conceitual nos dois locales (não traduza o slug).
 
 ## Criando um estudo de caso
 
-1. Crie `src/content/case-studies/pt/NN-slug.mdx`.
+1. Crie `src/content/kafka/case-studies/pt/NN-slug.mdx`.
 2. Frontmatter:
 
    ```yaml
@@ -133,10 +147,10 @@ dois idiomas sincronizados é o que evita o site regredir para tradução parcia
 5. **`relatedChapters` só pode apontar para capítulos que já existem em `en/`.** Se o capítulo relacionado
    ainda não foi traduzido, remova o slug de `relatedChapters` (deixe `[]` se nenhum existir) — não invente
    uma referência que o validador não consegue checar.
-6. **Links internos no corpo do texto são locale-prefixados**: `/pt/livro/slug` em arquivos `pt/`,
-   `/en/livro/slug` em arquivos `en/`. Se o texto em inglês precisa citar um capítulo que ainda não foi
-   traduzido, linke explicitamente para a versão em `/pt/...` e deixe claro no texto que a referência está
-   em português.
+6. **Links internos no corpo do texto são locale- e trilha-prefixados**: `/pt/kafka/livro/slug` em arquivos
+   `pt/`, `/en/kafka/livro/slug` em arquivos `en/`. Se o texto em inglês precisa citar um capítulo que ainda
+   não foi traduzido, linke explicitamente para a versão em `/pt/kafka/...` e deixe claro no texto que a
+   referência está em português.
 7. Se o capítulo usa um `<Diagrama>` com texto embutido (a maioria dos diagramas SVG/React em
    `src/components/diagrams/`), o texto do diagrama também está em português — para uma versão em inglês
    ficar consistente, crie uma variante do componente (ex.: `NomeDoDiagramaEn.tsx`, mesmo SVG, só o texto
@@ -169,9 +183,10 @@ Sempre rode antes de commitar:
 npm run validate-content
 ```
 
-O script verifica: frontmatter obrigatório por tipo de conteúdo, slugs duplicados e links internos
-(`relatedChapters` e links `[texto](/pt/livro/slug)` ou `[texto](/en/livro/slug)` no corpo) apontando para
-capítulos/termos inexistentes — checado separadamente por locale.
+O script verifica: frontmatter obrigatório por tipo de conteúdo (incluindo `quiz` em perguntas), slugs
+duplicados e links internos (`relatedChapters` e links `[texto](/pt/kafka/livro/slug)` ou
+`[texto](/en/kafka/livro/slug)` no corpo) apontando para capítulos/termos inexistentes — checado
+separadamente por trilha e por locale.
 
 **Não rode `npm run format` (Prettier) sobre arquivos `.mdx` de conteúdo.** `src/content/**/*.mdx` já está
 no `.prettierignore` por isso: o plugin MDX do Prettier reflui texto dentro de componentes JSX (como

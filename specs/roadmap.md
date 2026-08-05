@@ -1,4 +1,4 @@
-# Roadmap — Apache Kafka para Entrevistas Java Sênior
+# Roadmap — trainer.dev
 
 ## Fase 1 — Análise (concluída)
 
@@ -64,18 +64,44 @@
 
 ## Pós-lançamento (backlog, fora do escopo inicial)
 
-- [x] Página dedicada por termo de glossário com deep link — `/[locale]/glossario/[slug]`, listagem em
-      `/glossario` linkando para cada página, sitemap e `validate-content` cobrindo a rota nova.
+- [x] Página dedicada por termo de glossário com deep link — `/[locale]/[tech]/glossario/[slug]`, listagem
+      em `/glossario` linkando para cada página, sitemap e `validate-content` cobrindo a rota nova.
 - [x] Sumário "nesta página" (coluna direita) nos capítulos — `rehype-slug` + `github-slugger` geram/replicam
       ids de heading, `TableOfContents` renderiza `##`/`###` com âncora, `<details>` equivalente em mobile.
 - [x] Exportação do e-book (capítulos) em PDF — gerado em build-time (`postbuild`) via Playwright a
-      partir da rota `/pt/livro/impressao`, publicado em `public/livro.pdf` e disponível para download na
-      página `/livro`. Só em português; export de PDF em inglês e EPUB continuam no backlog.
+      partir da rota `/pt/kafka/livro/impressao`, publicado em `public/livro.pdf` e disponível para
+      download na página `/livro`. Só em português; export de PDF em inglês e EPUB continuam no backlog.
 - [x] Internacionalização (EN) — infraestrutura completa: rotas `/pt/[...]` e `/en/[...]` simétricas,
       dicionários de UI tipados, loaders de conteúdo por locale, busca e sitemap por locale,
       `LocaleSwitcher` com fallback seguro. **Conteúdo 100% traduzido**: 15/15 capítulos, 50/50 perguntas,
       glossário completo (24 termos) e os 5 estudos de caso. Cada capítulo com diagrama próprio (SVG/React)
       ganhou a variante `*En.tsx` correspondente (padrão em `ProducerConsumerFlowEn.tsx`). Ver
       `specs/architecture.md` seção 13.
-- Testes E2E (Playwright) se o projeto crescer em complexidade de interação
-- Export de PDF do livro em inglês (hoje `scripts/generate-pdf.ts` gera só a versão `/pt/livro/impressao`)
+
+## Fase 6 — trainer.dev: plataforma multi-trilha (concluída)
+
+- [x] Modo "múltipla escolha" no simulador (além do modo aberto) — campo `quiz` obrigatório no frontmatter
+      de pergunta, alternativas embaralhadas em runtime, feedback visual certo/errado.
+- [x] Painel lateral para "ver resposta completa" no simulador (iframe da própria página da pergunta,
+      via `@radix-ui/react-dialog`) — não navega para fora nem perde o progresso da sessão.
+- [x] Correção de paginação do PDF — título não fica mais sozinho no fim de página (agrupamento
+      heading+parágrafo via plugin rehype próprio, `src/lib/mdx/rehype-keep-heading-with-next.mjs`).
+- [x] Capa do PDF com caixa de contribuidores e versão datada (dia/mês/ano).
+- [x] Restruturação completa da plataforma para multi-trilha: `/[locale]/[tech]/...`, trilha Kafka
+      completa, Java e Elastic Search como trilhas "em construção" com página própria. Ver
+      `specs/architecture.md` seção 14 (inclui o bug do Next.js 16 com `generateStaticParams` aninhado que
+      foi descoberto e contornado nessa migração).
+- [x] Landing page do seletor de trilha (`/[locale]`), com hero, seção "como funciona" e ícones por
+      trilha (`src/components/icons/TechIcon.tsx`).
+- [x] Logo próprio (`src/components/icons/Logo.tsx`, lambda estilizada) aplicado a favicon, `/icon`,
+      Header e landing.
+- [x] Repositório GitHub renomeado para `trainer.dev`.
+
+## Backlog (trilhas futuras e itens ainda em aberto)
+
+- Conteúdo real para a trilha **Java** (hoje só "em construção").
+- Conteúdo real para a trilha **Elastic Search** (hoje só "em construção").
+- Testes E2E (Playwright) se o projeto crescer em complexidade de interação.
+- Export de PDF do livro em inglês (hoje `scripts/generate-pdf.ts` gera só a versão `/pt/kafka/livro/impressao`).
+- Exportar/importar progresso do simulador e leitura em JSON (hoje só `localStorage`, perdido ao trocar de
+  navegador/dispositivo).

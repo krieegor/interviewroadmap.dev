@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTechConfig } from "@/config/tech";
@@ -38,7 +39,7 @@ export default async function LocaleHome({
   return (
     <div className="flex min-h-screen flex-col">
       <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-4">
-        <span className="flex items-center gap-1.5 text-sm font-semibold text-[var(--color-text)]">
+        <span className="flex items-center gap-1.5 text-sm font-semibold text-[var(--color-text)] sm:text-base">
           <Logo className="text-[var(--color-accent)]" />
           {siteConfig.shortName}
         </span>
@@ -65,7 +66,7 @@ export default async function LocaleHome({
 
       <main id="conteudo-principal" className="mx-auto w-full max-w-4xl flex-1 px-4 py-16">
         <div className="flex flex-col items-center text-center">
-          <Logo className="h-12 w-12 text-[var(--color-accent)]" />
+          <Logo className="h-20 w-20 text-[var(--color-accent)]" />
           <p className="mt-4 text-sm font-medium uppercase tracking-wide text-[var(--color-accent)]">
             {dict.trackSelector.badge}
           </p>
@@ -140,6 +141,59 @@ export default async function LocaleHome({
           </a>
         </section>
       </main>
+
+      <footer className="border-t border-[var(--color-border)] py-10">
+        <div className="mx-auto max-w-4xl px-4">
+          <p className="text-sm font-semibold text-[var(--color-text)]">{dict.sobre.authorTitle}</p>
+          <div className="mt-3 flex flex-col gap-4 text-sm text-[var(--color-text-muted)] sm:flex-row sm:items-center">
+            {siteConfig.author.avatar ? (
+              <Image
+                src={siteConfig.author.avatar}
+                alt={siteConfig.author.name}
+                width={64}
+                height={64}
+                className="h-16 w-16 shrink-0 rounded-full border border-[var(--color-border)] object-cover"
+              />
+            ) : null}
+            <div>
+              <p className="font-medium text-[var(--color-text)]">{siteConfig.author.name}</p>
+              {siteConfig.author.bio ? <p className="mt-1">{siteConfig.author.bio}</p> : null}
+              <div className="mt-2 flex flex-wrap gap-4">
+                {siteConfig.author.linkedin ? (
+                  <a
+                    href={siteConfig.author.linkedin}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-[var(--color-accent)] hover:underline"
+                  >
+                    {dict.sobre.linkedin}
+                  </a>
+                ) : null}
+                {siteConfig.author.github ? (
+                  <a
+                    href={siteConfig.author.github}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-[var(--color-accent)] hover:underline"
+                  >
+                    {dict.sobre.github}
+                  </a>
+                ) : null}
+                {siteConfig.author.website ? (
+                  <a
+                    href={siteConfig.author.website}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-[var(--color-accent)] hover:underline"
+                  >
+                    {dict.sobre.personalSite}
+                  </a>
+                ) : null}
+              </div>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
