@@ -8,9 +8,10 @@ navegável com a mesma estrutura de estudo (capítulos, perguntas de entrevista,
 simulador).
 
 A trilha **Apache Kafka para Entrevistas Java Sênior** está completa hoje, ensinando Kafka para
-desenvolvedores Java Backend (Pleno, Sênior, Tech Lead). **Java** e **Elastic Search** são trilhas futuras,
-hoje "em construção" (página própria, sem conteúdo publicado). O restante deste documento descreve a
-trilha Kafka em detalhe — o mesmo padrão editorial e estrutural se aplica a qualquer trilha nova.
+desenvolvedores Java Backend (Pleno, Sênior, Tech Lead). **Java**, **Elastic Search**, **SQL**, **AWS** e
+**GCP** são trilhas futuras, hoje "em construção" (página própria, sem conteúdo publicado). O restante deste
+documento descreve a trilha Kafka em detalhe — o mesmo padrão editorial e estrutural se aplica a qualquer
+trilha nova.
 
 Não é uma landing page, não é um curso pago, não é documentação oficial. É um livro técnico navegável na web,
 com estrutura de estudo (capítulos, perguntas de entrevista, glossário, estudos de caso, simulador).

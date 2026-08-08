@@ -2,12 +2,13 @@ import fs from "node:fs";
 import path from "node:path";
 import matter from "gray-matter";
 import { z } from "zod";
+import { techs, type Tech } from "../src/lib/tech/config";
 
 const ROOT = process.cwd();
 const LOCALES = ["pt", "en"] as const;
 type ContentLocale = (typeof LOCALES)[number];
-const TECHS = ["kafka", "java", "elastic"] as const;
-type ContentTech = (typeof TECHS)[number];
+const TECHS = techs;
+type ContentTech = Tech;
 
 const chapterSchema = z.object({
   title: z.string().min(1),
@@ -68,11 +69,11 @@ const contentTypes: ContentDefinition[] = [
 let hasErrors = false;
 
 function emptySlugsByTechLocale(): Record<ContentTech, Record<ContentLocale, Set<string>>> {
-  return {
-    kafka: { pt: new Set(), en: new Set() },
-    java: { pt: new Set(), en: new Set() },
-    elastic: { pt: new Set(), en: new Set() },
-  };
+  const result = {} as Record<ContentTech, Record<ContentLocale, Set<string>>>;
+  for (const tech of TECHS) {
+    result[tech] = { pt: new Set(), en: new Set() };
+  }
+  return result;
 }
 
 const knownChapterSlugs = emptySlugsByTechLocale();
@@ -142,8 +143,10 @@ function validateContentType(tech: ContentTech, { label, dirName, schema }: Cont
         }
       }
 
-      const internalLinkPattern =
-        /\]\(\/(pt|en)\/(kafka|java|elastic)\/(livro|perguntas|glossario|casos)\/([a-z0-9-]+)/g;
+      const internalLinkPattern = new RegExp(
+        `\\]\\(/(pt|en)/(${TECHS.join("|")})/(livro|perguntas|glossario|casos)/([a-z0-9-]+)`,
+        "g",
+      );
       let match: RegExpExecArray | null;
       while ((match = internalLinkPattern.exec(content))) {
         const [, linkLocale, linkTech, section, targetSlug] = match;

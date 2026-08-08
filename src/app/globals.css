@@ -26,6 +26,55 @@
   --color-accent-subtle: #1c1206;
 }
 
+/* Cor de destaque por trilha (`data-tech` em src/app/[locale]/[tech]/layout.tsx e nos cards do
+   seletor em src/app/[locale]/page.tsx) — Kafka mantém o laranja acima como default; as demais
+   trilhas usam uma cor que remete à identidade visual de cada tecnologia, sempre validada para
+   contraste AA (4.5:1) contra --color-bg. */
+[data-tech="java"] {
+  --color-accent: #dc2626;
+  --color-accent-subtle: #fef2f2;
+}
+.dark [data-tech="java"] {
+  --color-accent: #f87171;
+  --color-accent-subtle: #2a1113;
+}
+
+[data-tech="elastic"] {
+  --color-accent: #0f766e;
+  --color-accent-subtle: #f0fdfa;
+}
+.dark [data-tech="elastic"] {
+  --color-accent: #2dd4bf;
+  --color-accent-subtle: #0b2624;
+}
+
+[data-tech="sql"] {
+  --color-accent: #2563eb;
+  --color-accent-subtle: #eff6ff;
+}
+.dark [data-tech="sql"] {
+  --color-accent: #60a5fa;
+  --color-accent-subtle: #0e1a2e;
+}
+
+[data-tech="aws"] {
+  --color-accent: #b45309;
+  --color-accent-subtle: #fffbeb;
+}
+.dark [data-tech="aws"] {
+  --color-accent: #fbbf24;
+  --color-accent-subtle: #241a06;
+}
+
+[data-tech="gcp"] {
+  --color-accent: #1a73e8;
+  --color-accent-subtle: #e8f0fe;
+}
+.dark [data-tech="gcp"] {
+  --color-accent: #669df6;
+  --color-accent-subtle: #0d1b2e;
+}
+
 html {
   color-scheme: light;
 }

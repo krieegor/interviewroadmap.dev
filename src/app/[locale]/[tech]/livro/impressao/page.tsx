@@ -85,16 +85,24 @@ export default async function LivroImpressaoPage({
           {locale === "pt" ? (
             <>
               Este material não possui vínculo oficial com a Apache Software Foundation, com o Apache
-              Kafka ou com a Confluent. &ldquo;Apache Kafka&rdquo; e &ldquo;Kafka&rdquo; são marcas da
-              Apache Software Foundation. Versão completa e atualizada sempre disponível em{" "}
+              Kafka, com a Confluent, com a Elastic NV, com a Oracle, com a Amazon Web Services ou com o
+              Google Cloud. &ldquo;Apache Kafka&rdquo; e &ldquo;Kafka&rdquo; são marcas da Apache Software
+              Foundation; &ldquo;Elasticsearch&rdquo; é marca da Elastic NV; &ldquo;Java&rdquo; e
+              &ldquo;Oracle&rdquo; são marcas da Oracle Corporation; &ldquo;AWS&rdquo; e &ldquo;Amazon Web
+              Services&rdquo; são marcas da Amazon.com, Inc.; &ldquo;Google Cloud&rdquo; e &ldquo;GCP&rdquo;
+              são marcas do Google LLC. Versão completa e atualizada sempre disponível em{" "}
               {siteConfig.url}.
             </>
           ) : (
             <>
               This material has no official affiliation with the Apache Software Foundation, Apache
-              Kafka, or Confluent. &ldquo;Apache Kafka&rdquo; and &ldquo;Kafka&rdquo; are trademarks of
-              the Apache Software Foundation. The full, up-to-date version is always available at{" "}
-              {siteConfig.url}.
+              Kafka, Confluent, Elastic NV, Oracle, Amazon Web Services, or Google Cloud. &ldquo;Apache
+              Kafka&rdquo; and &ldquo;Kafka&rdquo; are trademarks of the Apache Software Foundation;
+              &ldquo;Elasticsearch&rdquo; is a trademark of Elastic NV; &ldquo;Java&rdquo; and
+              &ldquo;Oracle&rdquo; are trademarks of Oracle Corporation; &ldquo;AWS&rdquo; and &ldquo;Amazon
+              Web Services&rdquo; are trademarks of Amazon.com, Inc.; &ldquo;Google Cloud&rdquo; and
+              &ldquo;GCP&rdquo; are trademarks of Google LLC. The full, up-to-date version is always
+              available at {siteConfig.url}.
             </>
           )}
         </p>

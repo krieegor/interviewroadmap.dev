@@ -46,6 +46,42 @@ const localizedTechConfig: Record<Tech, Record<Locale, TechConfig>> = {
       description: "Elastic Search interview prep track — coming soon.",
     },
   },
+  sql: {
+    pt: {
+      name: "SQL",
+      shortName: "SQL",
+      description: "Trilha de preparação para entrevistas de SQL e bancos relacionais — em construção.",
+    },
+    en: {
+      name: "SQL",
+      shortName: "SQL",
+      description: "SQL and relational database interview prep track — coming soon.",
+    },
+  },
+  aws: {
+    pt: {
+      name: "Amazon Web Services (AWS)",
+      shortName: "AWS",
+      description: "Trilha de preparação para entrevistas de AWS — em construção.",
+    },
+    en: {
+      name: "Amazon Web Services (AWS)",
+      shortName: "AWS",
+      description: "AWS interview prep track — coming soon.",
+    },
+  },
+  gcp: {
+    pt: {
+      name: "Google Cloud Platform (GCP)",
+      shortName: "GCP",
+      description: "Trilha de preparação para entrevistas de GCP — em construção.",
+    },
+    en: {
+      name: "Google Cloud Platform (GCP)",
+      shortName: "GCP",
+      description: "GCP interview prep track — coming soon.",
+    },
+  },
 };
 
 export function getTechConfig(tech: Tech, locale: Locale): TechConfig {

@@ -58,7 +58,7 @@ async function TechChrome({
   const dict = getDictionary(locale);
 
   return (
-    <>
+    <div data-tech={tech} className="contents">
       <div className="site-chrome">
         <Header locale={locale} tech={tech} dict={dict} />
       </div>
@@ -68,6 +68,6 @@ async function TechChrome({
       <div className="site-chrome">
         <Footer locale={locale} tech={tech} dict={dict} />
       </div>
-    </>
+    </div>
   );
 }

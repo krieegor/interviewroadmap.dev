@@ -97,10 +97,24 @@
       Header e landing.
 - [x] Repositório GitHub renomeado para `trainer.dev`.
 
+## Fase 7 — quatro novas trilhas "em construção" (concluída)
+
+- [x] Trilhas **SQL**, **Amazon Web Services (AWS)** e **Google Cloud Platform (GCP)** adicionadas ao
+      seletor (`src/lib/tech/config.ts`, `src/config/tech.ts`), com página própria "em construção"
+      (mesmo padrão de Java/Elastic) e ícone próprio em `TechIcon.tsx`.
+- [x] Cor de destaque (`--color-accent`/`--color-accent-subtle`) passou a variar por trilha via atributo
+      `data-tech` (`src/app/[locale]/[tech]/layout.tsx` e nos cards do seletor), em vez de um único laranja
+      global — cada trilha usa uma cor que remete à sua identidade (Java vermelho, Elastic teal, SQL azul
+      genérico, AWS laranja-queimado, GCP azul Google), sempre validada para contraste AA. Kafka continua
+      laranja (default herdado de `:root`/`.dark`).
+- [x] Aviso de marca (`footer.disclaimer`, `sobre.trademarkDisclaimer`, PDF de impressão, README) atualizado
+      para citar também Amazon Web Services e Google Cloud.
+
 ## Backlog (trilhas futuras e itens ainda em aberto)
 
 - Conteúdo real para a trilha **Java** (hoje só "em construção").
 - Conteúdo real para a trilha **Elastic Search** (hoje só "em construção").
+- Conteúdo real para as trilhas **SQL**, **AWS** e **GCP** (hoje só "em construção").
 - Testes E2E (Playwright) se o projeto crescer em complexidade de interação.
 - Export de PDF do livro em inglês (hoje `scripts/generate-pdf.ts` gera só a versão `/pt/kafka/livro/impressao`).
 - Exportar/importar progresso do simulador e leitura em JSON (hoje só `localStorage`, perdido ao trocar de

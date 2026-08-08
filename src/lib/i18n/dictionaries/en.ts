@@ -37,7 +37,7 @@ export const en: Dictionary = {
   },
   footer: {
     disclaimer:
-      "is free, open source material. It has no official affiliation with Apache Kafka, Confluent, or the Apache Software Foundation.",
+      "is free, open source material. It has no official affiliation with Apache Kafka, Confluent, the Apache Software Foundation, Elastic NV, Oracle, Amazon Web Services (AWS), or Google Cloud.",
     sobre: "About",
     github: "GitHub",
   },
@@ -208,7 +208,7 @@ export const en: Dictionary = {
     intro3:
       "Contributions are welcome: technical corrections, new chapters, new interview questions, or accessibility and design improvements can be proposed directly in the project's repository.",
     trademarkDisclaimer:
-      'This project has no official affiliation with the Apache Software Foundation, Apache Kafka, or Confluent. "Apache Kafka" and "Kafka" are trademarks of the Apache Software Foundation.',
+      'This project has no official affiliation with the Apache Software Foundation, Apache Kafka, Confluent, Elastic NV, Oracle, Amazon Web Services, or Google Cloud. "Apache Kafka" and "Kafka" are trademarks of the Apache Software Foundation; "Elasticsearch" is a trademark of Elastic NV; "Java" and "Oracle" are trademarks of Oracle Corporation; "AWS" and "Amazon Web Services" are trademarks of Amazon.com, Inc.; "Google Cloud" and "GCP" are trademarks of Google LLC.',
     authorTitle: "Author",
     authorPlaceholder:
       "Placeholder for the author to add name, LinkedIn, GitHub, personal site and a short professional bio in src/config/site.ts.",
@@ -227,7 +227,7 @@ export const en: Dictionary = {
     heroIntro:
       "A free, open-source technical interview prep platform. Every technology track follows the same format: a navigable book, real interview questions, a glossary, and a practice simulator — no paid course, no sign-up, no ads.",
     howItWorksTitle: "The same format, every track",
-    featureBookTitle: "Book",
+    featureBookTitle: "Like a real book",
     featureBookDescription:
       "Chapters organized into progressive parts, covering what actually comes up in interviews.",
     featureQuestionsTitle: "Interview questions",

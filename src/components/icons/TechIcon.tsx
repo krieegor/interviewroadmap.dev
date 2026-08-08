@@ -61,5 +61,60 @@ export function TechIcon({ tech, className }: { tech: Tech; className?: string }
           <path d="M15.5 15.5 21 21" />
         </svg>
       );
+    case "sql":
+      return (
+        <svg
+          viewBox="0 0 24 24"
+          width="24"
+          height="24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+          className={className}
+        >
+          <ellipse cx="12" cy="6" rx="7" ry="3" />
+          <path d="M5 6v6c0 1.66 3.13 3 7 3s7-1.34 7-3V6" />
+          <path d="M5 12v6c0 1.66 3.13 3 7 3s7-1.34 7-3v-6" />
+        </svg>
+      );
+    case "aws":
+      return (
+        <svg
+          viewBox="0 0 24 24"
+          width="24"
+          height="24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+          className={className}
+        >
+          <path d="M7 16h10a3.5 3.5 0 0 0 .5-6.96A5 5 0 0 0 8 7.1 4 4 0 0 0 7 16Z" />
+          <path d="M8 19.5c2 1.2 6 1.2 8 0" />
+        </svg>
+      );
+    case "gcp":
+      return (
+        <svg
+          viewBox="0 0 24 24"
+          width="24"
+          height="24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+          className={className}
+        >
+          <path d="M7 16h9a3.5 3.5 0 0 0 .5-6.96A5 5 0 0 0 8 7.1 4 4 0 0 0 7 16Z" />
+          <path d="M9.5 16v4l2.5-1.5 2.5 1.5v-4" />
+        </svg>
+      );
   }
 }

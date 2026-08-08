@@ -109,6 +109,7 @@ export default async function LocaleHome({
                 <Link
                   key={tech}
                   href={`/${locale}/${tech}`}
+                  data-tech={tech}
                   className="flex flex-col gap-2 rounded-md border border-[var(--color-border)] p-6 text-left transition-colors hover:border-[var(--color-accent)]"
                 >
                   <TechIcon tech={tech} className="text-[var(--color-accent)]" />

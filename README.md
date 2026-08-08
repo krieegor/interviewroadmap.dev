@@ -105,13 +105,13 @@ e Elastic Search, ou melhorias de acessibilidade e design. Veja
 
 ### Contribuidores
 
-- [João Paulo Rodrigues de Araújo](https://github.com/jprodriguesdev)
+- [João Paulo Rodrigues de Araújo](https://github.com/krieegor)
 
 ## Aviso
 
-Este projeto não possui vínculo oficial com a Apache Software Foundation, com o Apache Kafka ou com a
-Confluent. O conteúdo é original e não substitui a documentação oficial nem a experiência prática de operar
-o sistema em produção.
+Este projeto não possui vínculo oficial com a Apache Software Foundation, com o Apache Kafka, com a
+Confluent, com a Elastic NV, com a Oracle, com a Amazon Web Services ou com o Google Cloud. O conteúdo é
+original e não substitui a documentação oficial nem a experiência prática de operar o sistema em produção.
 
 ## Licença
 

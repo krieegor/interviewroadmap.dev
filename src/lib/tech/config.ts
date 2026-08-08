@@ -1,6 +1,6 @@
-export type Tech = "kafka" | "java" | "elastic";
+export type Tech = "kafka" | "java" | "elastic" | "sql" | "aws" | "gcp";
 
-export const techs: Tech[] = ["kafka", "java", "elastic"];
+export const techs: Tech[] = ["kafka", "java", "elastic", "sql", "aws", "gcp"];
 
 export const defaultTech: Tech = "kafka";
 

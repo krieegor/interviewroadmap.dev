@@ -12,8 +12,12 @@
 ## 2. Identidade visual
 
 - **Base neutra**: cinzas com temperatura levemente fria (slate), tanto no claro quanto no escuro.
-- **Cor de destaque**: laranja (referência ao ecossistema Kafka), usada com moderação — links ativos, ícones
-  de destaque, bordas de callout, item de sidebar ativo. Nunca como cor de fundo de blocos grandes de texto.
+- **Cor de destaque**: varia por trilha (`--color-accent`/`--color-accent-subtle`, escopados via atributo
+  `data-tech` — ver `src/app/globals.css`), usada com moderação — links ativos, ícones de destaque, bordas de
+  callout, item de sidebar ativo. Nunca como cor de fundo de blocos grandes de texto. Kafka (o default de
+  `:root`/`.dark`, sem override) usa laranja, referência ao ecossistema; as demais trilhas usam uma cor que
+  remete à identidade visual da própria tecnologia (Java vermelho, Elastic teal, SQL azul, AWS laranja
+  queimado, GCP azul Google), sempre validada para contraste AA (4.5:1) contra `--color-bg`.
 - **Modo escuro**: fundo quase preto (não cinza médio) para reduzir fadiga em leitura longa; laranja levemente
   dessaturado para não estourar em telas OLED.
 

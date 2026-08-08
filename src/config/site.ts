@@ -4,7 +4,7 @@ const author = {
   name: "João Paulo Rodrigues de Araújo",
   avatar: "/autor/joao-paulo.webp",
   linkedin: "https://linkedin.com/in/jprodriguesdev",
-  github: "https://github.com/jprodriguesdev",
+  github: "https://github.com/krieegor",
   website: "https://jprodrigues.dev",
   bio: "Engenheiro de Software com mais de 10 anos de experiência em tecnologia e mais de 6 anos de atuação com Java, arquitetura de sistemas distribuídos e soluções em cloud. Atua como Tech Lead e Arquiteto de Software no setor financeiro (cartões, crédito, contas e PIX), com experiência prática em arquiteturas orientadas a eventos usando Apache Kafka.",
 };

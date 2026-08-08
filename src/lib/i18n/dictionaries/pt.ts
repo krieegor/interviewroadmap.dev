@@ -35,7 +35,7 @@ export const pt = {
   },
   footer: {
     disclaimer:
-      "é um material gratuito e open source. Não possui vínculo oficial com Apache Kafka, Confluent ou Apache Software Foundation.",
+      "é um material gratuito e open source. Não possui vínculo oficial com Apache Kafka, Confluent, Apache Software Foundation, Elastic NV, Oracle, Amazon Web Services (AWS) ou Google Cloud.",
     sobre: "Sobre",
     github: "GitHub",
   },
@@ -207,7 +207,7 @@ export const pt = {
     intro3:
       "Contribuições são bem-vindas: correções técnicas, novos capítulos, novas perguntas de entrevista ou melhorias de acessibilidade e design podem ser propostas diretamente no repositório do projeto.",
     trademarkDisclaimer:
-      'Este projeto não possui vínculo oficial com a Apache Software Foundation, com o Apache Kafka ou com a Confluent. "Apache Kafka" e "Kafka" são marcas da Apache Software Foundation.',
+      'Este projeto não possui vínculo oficial com a Apache Software Foundation, com o Apache Kafka, com a Confluent, com a Elastic NV, com a Oracle, com a Amazon Web Services ou com o Google Cloud. "Apache Kafka" e "Kafka" são marcas da Apache Software Foundation; "Elasticsearch" é marca da Elastic NV; "Java" e "Oracle" são marcas da Oracle Corporation; "AWS" e "Amazon Web Services" são marcas da Amazon.com, Inc.; "Google Cloud" e "GCP" são marcas do Google LLC.',
     authorTitle: "Autor",
     authorPlaceholder:
       "Espaço reservado para o autor adicionar nome, LinkedIn, GitHub, site pessoal e uma breve apresentação profissional em src/config/site.ts.",
@@ -226,7 +226,7 @@ export const pt = {
     heroIntro:
       "Uma plataforma gratuita e open source de preparação para entrevistas técnicas. Cada trilha de tecnologia segue o mesmo formato: um livro navegável, perguntas de entrevista reais, glossário e um simulador — sem curso pago, sem cadastro, sem anúncio.",
     howItWorksTitle: "O mesmo formato em toda trilha",
-    featureBookTitle: "Livro",
+    featureBookTitle: "Como se fosse um livro",
     featureBookDescription:
       "Capítulos organizados em partes progressivas, cobrindo os conceitos que realmente caem em entrevista.",
     featureQuestionsTitle: "Perguntas de entrevista",
