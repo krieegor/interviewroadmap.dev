@@ -8,7 +8,7 @@ trilhas de tecnologia.
 
 - **Kafka** — trilha completa: livro navegável, 50 perguntas de entrevista, glossário, estudos de caso e
   simulador.
-- **Java** e **Elastic Search** — em construção.
+- **Java**, **Elastic Search**, **SQL**, **AWS** e **GCP** — em construção.
 
 Cada trilha segue o mesmo formato: guia prático produzido para estudo real (não é cópia da documentação
 oficial), com resposta rápida, resposta nível sênior, explicação aprofundada, exemplo financeiro e
@@ -34,6 +34,9 @@ pegadinhas comuns para cada pergunta de entrevista.
 | **Kafka**          | ✅ Completa       | 15 capítulos, 50 perguntas, 24 termos de glossário, 5 estudos de caso |
 | **Java**           | 🚧 Em construção |  —                                                              |
 | **Elastic Search** | 🚧 Em construção |  —                                                              |
+| **SQL**            | 🚧 Em construção |  —                                                              |
+| **AWS**            | 🚧 Em construção |  —                                                              |
+| **GCP**            | 🚧 Em construção |  —                                                              |
 
 ## Funcionalidades
 
@@ -47,6 +50,8 @@ pegadinhas comuns para cada pergunta de entrevista.
 - Exportação do livro em PDF (capa com contribuidores da versão e data).
 - Busca local (`Ctrl+K`), progresso de leitura e tema claro/escuro — tudo salvo só no seu navegador.
 - Internacionalização completa em português e inglês.
+- Identidade visual própria por trilha: a cor de destaque muda conforme a tecnologia (Kafka laranja, Java
+  vermelho, Elastic teal, SQL azul, AWS laranja queimado, GCP azul Google).
 
 ## Stack
 
@@ -75,7 +80,7 @@ npm run dev
 ```
 
 Acesse `http://localhost:3000` — redireciona pro seletor de trilha (`/pt`), de onde você escolhe Kafka,
-Java ou Elastic Search.
+Java, Elastic Search, SQL, AWS ou GCP.
 
 ## Scripts
 
@@ -99,8 +104,8 @@ npm run validate-content            # valida frontmatter e links internos do con
 
 ## Contribuindo
 
-Contribuições são bem-vindas: correções técnicas, novos capítulos/perguntas, conteúdo para as trilhas Java
-e Elastic Search, ou melhorias de acessibilidade e design. Veja
+Contribuições são bem-vindas: correções técnicas, novos capítulos/perguntas, conteúdo para as trilhas Java,
+Elastic Search, SQL, AWS e GCP, ou melhorias de acessibilidade e design. Veja
 [`docs/contributing.md`](./docs/contributing.md) antes de abrir um Pull Request.
 
 ### Contribuidores
