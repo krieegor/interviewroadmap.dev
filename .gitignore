@@ -30,6 +30,9 @@
 # vercel
 .vercel
 
+# cloudflare (wrangler, deploy de assets estáticos via out/)
+/.wrangler/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
