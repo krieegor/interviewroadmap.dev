@@ -140,10 +140,19 @@
       `export const dynamicParams = false` nas rotas com `generateStaticParams` (adicionado durante a
       tentativa com Cloudflare Workers, ver commit anterior) continua correto/necessário aqui — export
       estático exige que todo parâmetro de rota dinâmica seja conhecido em build time.
-- [x] Removida toda a infra da tentativa com Workers: `@opennextjs/cloudflare`, `wrangler`, `wrangler.jsonc`,
-      `open-next.config.ts`, scripts `preview`/`deploy` do `package.json`. `docs/deployment.md` atualizado —
-      Cloudflare volta a ser **Pages** clássico (build output `out/`, sem adapter), e GitHub Pages passou de
-      "não recomendado" para viável (site agora é estático puro).
+- [x] Removida a infra pesada da tentativa com Workers (`@opennextjs/cloudflare`, R2, cache incremental).
+      `wrangler.jsonc` voltou, mas minimalista — só `assets.directory: "./out"`, sem `main`/Worker script:
+      o Worker existente na Cloudflare (`trainer-dev.workers.dev`, criado no fluxo de git integration)
+      continuou funcionando sem precisar recriar o projeto como Pages, porque Workers suporta "só assets
+      estáticos" como modo nativo. `docs/deployment.md` atualizado; GitHub Pages passou de "não recomendado"
+      para viável (site agora é estático puro).
+- [x] `public/livro.pdf` passou a ser **committado no git** em vez de gerado do zero em todo build — o
+      Cloudflare Workers Builds não tem as libs gráficas do Chromium (mesmo problema de antes), então nesse
+      provedor o `postbuild` sempre pulava a geração e o deploy ficava sem PDF (`/livro.pdf` 404). Como
+      `next build` copia `public/**` pra `out/` antes do `postbuild` rodar, ter o PDF committado garante que
+      todo deploy — mesmo sem Chromium — publica pelo menos a última versão gerada. Regenerar continua
+      automático em ambientes com Chromium (local, GitHub Actions, Vercel, Netlify); o autor comita o
+      `public/livro.pdf` atualizado quando muda conteúdo do livro (ver `docs/contributing.md`).
 
 ## Backlog (trilhas futuras e itens ainda em aberto)
 

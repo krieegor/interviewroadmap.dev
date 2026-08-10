@@ -18,7 +18,6 @@
 
 # production
 /build
-/public/livro.pdf
 
 # env
 .env

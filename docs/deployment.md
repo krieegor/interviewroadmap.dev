@@ -22,14 +22,19 @@ Configure-a com a URL final do deploy (ex.: `https://kafka-entrevistas.vercel.ap
 3. Defina `NEXT_PUBLIC_SITE_URL` nas variáveis de ambiente do projeto.
 4. Deploy automático a cada push na branch principal.
 
-## Cloudflare Pages
+## Cloudflare Workers (assets estáticos, sem adapter)
 
-1. Crie um projeto **Pages** (não "Worker" — o app não precisa de servidor, então não usa
-   `@opennextjs/cloudflare`/Workers/R2; já tentamos esse caminho e foi revertido, ver
-   `specs/roadmap.md`).
-2. Build command: `npm run build`.
-3. Build output directory: `out`.
-4. Defina `NEXT_PUBLIC_SITE_URL` nas variáveis de ambiente do projeto Pages.
+O app não precisa de servidor, então **não** usa `@opennextjs/cloudflare`/R2 — já tentamos esse caminho e foi
+revertido (ver `specs/roadmap.md`). Em vez disso, `wrangler.jsonc` na raiz configura um Worker "só assets":
+sem `main`/Worker script, só `assets.directory: "./out"`. Funciona tanto num projeto criado como **Pages**
+quanto como **Worker** com git integration — o repositório atual (`trainer-dev.workers.dev`) usa o segundo.
+
+1. Build command: `npm run build`.
+2. Deploy command: `npx wrangler deploy` (detecta o `assets.directory` do `wrangler.jsonc` e sobe os arquivos
+   de `out/` — não precisa de bucket R2, não precisa de bundle de servidor).
+3. Non-production branch deploy command: `npx wrangler versions upload`.
+4. Root directory: `/`.
+5. Defina `NEXT_PUBLIC_SITE_URL` em "Build variables and secrets" com a URL final.
 
 ## Netlify
 
@@ -54,15 +59,19 @@ npm run build   # gera out/
 npm run start   # serve out/ com `serve` (mesmo servidor usado por scripts/generate-pdf.ts)
 ```
 
-## Limitação conhecida: PDF do livro
+## PDF do livro é committado no repo
 
-`scripts/generate-pdf.ts` (chamado via `postbuild`, depois que `out/` já existe) sobe um Chromium via
-Playwright para renderizar `/pt/kafka/livro/impressao` e gerar `public/livro.pdf` **e** `out/livro.pdf` (o
-export já foi copiado antes do postbuild rodar, então os dois precisam ser escritos). Em ambientes de build
-sem as bibliotecas gráficas do Chromium (containers Linux mínimos, ex.: Cloudflare Workers Builds), o script
-detecta a falha de lançamento do navegador e **pula a geração do PDF sem derrubar o build** — só loga um
-aviso. Vercel, Netlify e GitHub Actions normalmente têm essas libs; se o seu provedor não tiver, o PDF
-publicado será o da última build que conseguiu gerá-lo.
+`scripts/generate-pdf.ts` (chamado via `postbuild`) sobe um Chromium via Playwright para renderizar
+`/pt/kafka/livro/impressao` e gerar `public/livro.pdf`. Como alguns ambientes de build (containers Linux
+mínimos, ex.: Cloudflare Workers Builds) não têm as bibliotecas gráficas que o Chromium exige
+(`libatk-1.0.so.0` e outras), o script detecta essa falha de lançamento do navegador especificamente e
+**pula a geração sem derrubar o build** — só loga um aviso.
+
+Por isso `public/livro.pdf` **é committado no git** (não é mais gerado do zero em todo build/deploy): o
+`next build` copia `public/**` pra `out/` antes do `postbuild` rodar, então mesmo num provedor sem Chromium
+o `out/livro.pdf` publicado é a última versão committada. Pra atualizar o PDF depois de mudar conteúdo do
+livro, rode `npm run build` localmente (ou deixe o GitHub Actions gerar) e commite o `public/livro.pdf`
+resultante — Vercel, Netlify e GitHub Actions têm as libs necessárias e sempre regeneram um novo.
 
 ## Build local (verificação antes do deploy)
 

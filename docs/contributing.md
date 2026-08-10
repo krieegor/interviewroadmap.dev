@@ -39,6 +39,10 @@ npm run build
 
 Um Pull Request só deve ser aberto depois que todos esses comandos passarem sem erro.
 
+`npm run build` regenera `public/livro.pdf` automaticamente (via `postbuild`) sempre que roda num ambiente
+com Chromium completo — se a mudança alterou algum capítulo do livro, inclua o `public/livro.pdf`
+atualizado no commit (ver `docs/deployment.md` § "PDF do livro é committado no repo").
+
 ## Estilo de código
 
 - TypeScript estrito, sem `any` não justificado.
