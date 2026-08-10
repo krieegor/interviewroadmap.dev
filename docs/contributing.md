@@ -46,6 +46,31 @@ Um Pull Request só deve ser aberto depois que todos esses comandos passarem sem
 - Sem dependências novas sem justificativa — avalie o custo de bundle antes de propor uma biblioteca.
 - Prettier formata automaticamente (`npm run format`); não brigue com o formatter.
 
+## Vídeo de demonstração (README + landing page)
+
+O GIF do topo do `README.md` (`docs/media/demo.gif`) e o vídeo da landing page (`public/videos/demo.mp4`)
+são renderizados a partir do subprojeto isolado `remotion/` (Remotion), que **não** é dependência do app
+Next.js — tem `package.json` próprio e nunca é importado por `src/`. Para regenerar depois de alterar a
+animação:
+
+```bash
+cd remotion
+npm install
+npm run render:mp4   # gera remotion/out/demo.mp4
+npm run render:gif   # gera remotion/out/demo.gif
+```
+
+Depois, copie manualmente os arquivos gerados para os destinos finais:
+
+```bash
+cp remotion/out/demo.mp4 public/videos/demo.mp4
+cp remotion/out/demo.gif docs/media/demo.gif
+```
+
+Não há passo automático no `npm run build` raiz nem no CI para isso — renderizar vídeo é lento e exige
+Chromium, o que o pipeline estático do site não tem hoje. Os dois arquivos finais (`.mp4`/`.gif`) são
+commitados manualmente como qualquer outro asset estático.
+
 ## Estilo editorial
 
 Todo conteúdo deve seguir `specs/content-guidelines.md`: os 10 pontos obrigatórios por conceito, a estrutura

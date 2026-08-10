@@ -3,6 +3,8 @@
 [![CI](https://github.com/krieegor/trainer.dev/actions/workflows/ci.yml/badge.svg)](https://github.com/krieegor/trainer.dev/actions/workflows/ci.yml)
 [![Licença MIT](https://img.shields.io/badge/licença-MIT-blue.svg)](./LICENSE)
 
+![Demonstração do trainer.dev](./docs/media/demo.gif)
+
 Plataforma interativa, gratuita e open source de preparação para entrevistas técnicas, organizada por
 trilhas de tecnologia.
 

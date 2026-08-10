@@ -110,6 +110,19 @@
 - [x] Aviso de marca (`footer.disclaimer`, `sobre.trademarkDisclaimer`, PDF de impressão, README) atualizado
       para citar também Amazon Web Services e Google Cloud.
 
+## Pós-lançamento — vídeo de demonstração (concluído)
+
+- [x] Vídeo de demonstração curto (recriação estilizada do hero + do simulador em modo múltipla escolha,
+      paleta dark do design system) usado no topo do `README.md` (GIF) e num bloco discreto perto do CTA de
+      GitHub na landing page (MP4, mudo, loop, oculto sob `prefers-reduced-motion`). Gerado por um
+      subprojeto isolado `remotion/` (Remotion), com `package.json` próprio — **não** é dependência do app
+      Next.js, nunca é importado por `src/`, e o render não roda no `npm run build`/CI (é manual, ver
+      `docs/contributing.md`). Segue o mesmo espírito de `scripts/generate-pdf.ts` (ferramenta de build-time
+      isolada), mas sem hook automático por ser lento e exigir Chromium. Justificativa do desvio: a landing
+      page hoje segue `specs/design-system.md` §1 ("sem seções hero com CTA gigante"), então o vídeo
+      deliberadamente **não** entra no hero acima da dobra — fica como preview pequeno e opcional perto do
+      link do GitHub existente.
+
 ## Backlog (trilhas futuras e itens ainda em aberto)
 
 - Conteúdo real para a trilha **Java** (hoje só "em construção").

@@ -3,6 +3,8 @@ node_modules
 out
 coverage
 public
+.agents
+remotion
 
 # Conteúdo MDX é formatado manualmente pelo autor. O plugin MDX do Prettier reflui texto JSX para o
 # printWidth, o que corrompe tabelas GFM (`| a | b |`) dentro de componentes como <Comparacao>.
