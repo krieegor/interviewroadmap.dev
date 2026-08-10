@@ -111,3 +111,8 @@ formatar um `.mdx` manualmente, verifique visualmente qualquer tabela depois.
 - localStorage em vez de backend para progresso/simulador — mantém o projeto 100% gratuito e sem login.
 - Diagramas próprios (SVG/React) + Mermaid pontual em vez de biblioteca de diagramas completa — controle
   visual e bundle enxuto.
+- `output: "export"` em `next.config.ts` (HTML/CSS/JS puro em `out/`) em vez de servidor Next.js — deploy
+  funciona em qualquer host estático (Cloudflare Workers/Pages, Vercel, Netlify, GitHub Pages) sem adapter,
+  sem cache incremental, sem serviço pago extra. Ver `specs/roadmap.md` (seção "export estático puro") pelo
+  porquê — uma tentativa anterior de rodar como servidor num adapter de edge (Cloudflare Workers via
+  `@opennextjs/cloudflare`) esbarrou em limite de tamanho e exigiu R2, e foi revertida.

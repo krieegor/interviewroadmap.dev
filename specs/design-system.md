@@ -84,10 +84,10 @@ Cada bloco especial de conteúdo (seção 6.6 do briefing) tem uma cor de borda 
 ## 5. Componentes de UI (`src/components/ui`)
 
 Conjunto mínimo, sem biblioteca de componentes pesada (sem shadcn completo, sem MUI): Button, Badge, Card,
-Callout (base para os blocos de conteúdo), Tabs (para comparações), CopyLinkButton, ThemeToggle,
-SearchDialog. Todos construídos com Tailwind + Radix primitives apenas onde acessibilidade exige
-(`@radix-ui/react-dialog` para busca/drawer, `@radix-ui/react-tabs` para comparações) — não recriar
-comportamento de foco/teclado na mão quando uma primitiva madura resolve com poucos KB.
+Callout (base para os blocos de conteúdo), CopyLinkButton, ThemeToggle, SearchDialog. Construídos com
+Tailwind + `@radix-ui/react-dialog` só onde acessibilidade de foco/teclado exige (busca, drawer, painel do
+simulador) — não recriar esse comportamento na mão quando uma primitiva madura resolve com poucos KB.
+`Comparacao` (bloco de conteúdo) usa `<table>` HTML semântico, sem lib extra.
 
 ## 6. Diagramas
 

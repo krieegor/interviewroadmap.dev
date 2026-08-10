@@ -144,10 +144,14 @@ continuam fora de `[locale]` — são rotas globais únicas do App Router, com i
 
 ## 6. Busca local
 
-Build-time gera um índice JSON estático (`public/search-index.json` ou embutido via `generateStaticParams`)
-contendo `{ type, title, slug, excerpt }` de capítulos, perguntas e termos do glossário. No client, um
-componente carrega esse índice sob demanda (lazy) e faz filtro simples de substring/score — sem Algolia,
-sem backend, sem custo.
+`scripts/build-search-index.ts` (roda como `prebuild`, antes de `next build`) lê o frontmatter dos `.mdx`
+direto via `gray-matter` (não reaproveita `src/lib/content/**` — esses loaders fazem `import()` dinâmico de
+`.mdx`, só funciona dentro do pipeline de build do Next) e gera um JSON estático por trilha/idioma em
+`public/search-index/<tech>-<locale>.json` — `{ type, title, excerpt, href }` (tipo `SearchEntry` em
+`src/types/content.ts`). O `SearchDialog` (client component) busca
+esse arquivo via `fetch()` sob demanda — no hover/foco do botão de busca ou na abertura do diálogo — e faz
+filtro simples de substring em memória. Deliberadamente **não** vem embutido no HTML da página (evitaria
+duplicar as ~90 entradas em cada uma das centenas de páginas do site); sem Algolia, sem backend, sem custo.
 
 ## 7. Progresso de leitura
 
@@ -185,18 +189,23 @@ Estratégia Tailwind `class` + script inline no `<head>` (evita flash) que lê `
 
 ## 11. Deploy
 
-Estático/SSG, sem servidor Node obrigatório em runtime. Compatível com:
+`next.config.ts` usa `output: "export"` — `npm run build` gera HTML/CSS/JS puro em `out/`, sem servidor Node
+em runtime, sem adapter. Compatível com qualquer host estático:
 
-- **Vercel** (padrão, zero config).
-- **Cloudflare Pages** (via `@cloudflare/next-on-pages` ou export estático, documentado em
-  `docs/deployment.md`).
-- **Netlify** (adapter oficial `@netlify/plugin-nextjs`).
+- **Vercel** (zero config, detecta o export automaticamente).
+- **Cloudflare Workers** (assets estáticos, `wrangler.jsonc` com `assets.directory` apontando pra `out/`,
+  sem `main`/Worker script) ou **Cloudflare Pages** clássico — ambos servem `out/` diretamente.
+- **Netlify** (publish directory `out/`, sem plugin — `@netlify/plugin-nextjs` só é necessário pra
+  SSR/ISR, que este projeto não usa).
+- **GitHub Pages** (também viável desde o export estático; ver `docs/deployment.md`).
 
-Nenhuma dessas opções exige cartão de crédito ou variável secreta.
+Detalhes de cada plataforma, incluindo por que a tentativa inicial de deploy no Cloudflare via
+`@opennextjs/cloudflare`/Workers com cache R2 foi revertida, em `docs/deployment.md` e
+`specs/roadmap.md`. Nenhuma opção exige cartão de crédito ou variável secreta.
 
 ## 12. Testes
 
-- **Vitest** para funções puras (`lib/content`, `lib/progress`, `lib/search`).
+- **Vitest** para funções puras (`lib/content`, `lib/progress`).
 - **Testing Library** para componentes com lógica (busca, simulador, toggle de tema).
 - **Script de validação de conteúdo** (`scripts/validate-content.ts`) roda no CI e localmente
   (`npm run validate-content`), garante frontmatter obrigatório e links internos válidos.

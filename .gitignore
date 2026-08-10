@@ -18,6 +18,9 @@
 
 # production
 /build
+# gerado por scripts/build-search-index.ts (prebuild) — ao contrário de public/livro.pdf, não depende
+# de Chromium, então qualquer ambiente de build regenera sem problema.
+/public/search-index/
 
 # env
 .env
@@ -71,3 +74,4 @@ Desktop.ini
 # docs/contributing.md.
 /.agents/
 /.claude/skills/
+/skills-lock.json

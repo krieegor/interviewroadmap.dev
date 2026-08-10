@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { act, renderHook } from "@testing-library/react";
 import { useReadingProgress } from "@/lib/progress/reading-progress";
+import { STORAGE_KEY, getSnapshot } from "@/lib/progress/reading-progress-store";
 
 describe("useReadingProgress", () => {
   beforeEach(() => {
@@ -52,5 +53,15 @@ describe("useReadingProgress", () => {
 
     const { result: second } = renderHook(() => useReadingProgress());
     expect(second.current.progress.completed).toContain("kafka-versus-outras-ferramentas");
+  });
+
+  it("ignora JSON corrompido no localStorage e volta pro estado vazio", () => {
+    localStorage.setItem(STORAGE_KEY, "{ isso não é json válido");
+    expect(getSnapshot()).toEqual({ visited: [], completed: [] });
+  });
+
+  it("ignora dado com shape errado no localStorage e volta pro estado vazio", () => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ visited: "não é um array" }));
+    expect(getSnapshot()).toEqual({ visited: [], completed: [] });
   });
 });

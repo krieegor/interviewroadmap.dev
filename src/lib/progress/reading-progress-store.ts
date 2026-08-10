@@ -1,6 +1,6 @@
 "use client";
 
-const STORAGE_KEY = "kafka-ebook:progress:v1";
+export const STORAGE_KEY = "kafka-ebook:progress:v1";
 
 export type ReadingProgress = {
   visited: string[];
@@ -14,6 +14,21 @@ const listeners = new Set<() => void>();
 let cachedRaw: string | null = null;
 let cachedSnapshot: ReadingProgress = EMPTY_PROGRESS;
 
+// Confia no shape salvo sem checar poderia consumir um formato de versão antiga (a chave é
+// versionada com :v1, mas só na convenção — nada força o bump) como se fosse válido, produzindo
+// erro silencioso na UI em vez de cair pro estado vazio.
+function isReadingProgress(value: unknown): value is ReadingProgress {
+  if (!value || typeof value !== "object") return false;
+  const v = value as Record<string, unknown>;
+  return (
+    Array.isArray(v.visited) &&
+    v.visited.every((s) => typeof s === "string") &&
+    Array.isArray(v.completed) &&
+    v.completed.every((s) => typeof s === "string") &&
+    (v.lastVisited === undefined || typeof v.lastVisited === "string")
+  );
+}
+
 function readSnapshot(): ReadingProgress {
   let raw: string | null;
   try {
@@ -24,7 +39,8 @@ function readSnapshot(): ReadingProgress {
   if (raw === cachedRaw) return cachedSnapshot;
   cachedRaw = raw;
   try {
-    cachedSnapshot = raw ? (JSON.parse(raw) as ReadingProgress) : EMPTY_PROGRESS;
+    const parsed: unknown = raw ? JSON.parse(raw) : EMPTY_PROGRESS;
+    cachedSnapshot = isReadingProgress(parsed) ? parsed : EMPTY_PROGRESS;
   } catch {
     cachedSnapshot = EMPTY_PROGRESS;
   }

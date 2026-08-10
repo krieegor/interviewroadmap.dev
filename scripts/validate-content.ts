@@ -1,57 +1,20 @@
 import fs from "node:fs";
 import path from "node:path";
 import matter from "gray-matter";
-import { z } from "zod";
+import type { z } from "zod";
 import { techs, type Tech } from "../src/lib/tech/config";
+import {
+  caseStudySchema,
+  chapterSchema,
+  glossarySchema,
+  questionSchema,
+} from "./content-schemas";
 
 const ROOT = process.cwd();
 const LOCALES = ["pt", "en"] as const;
 type ContentLocale = (typeof LOCALES)[number];
 const TECHS = techs;
 type ContentTech = Tech;
-
-const chapterSchema = z.object({
-  title: z.string().min(1),
-  part: z.string().min(1),
-  partOrder: z.number(),
-  chapterOrder: z.number(),
-  slug: z.string().min(1),
-  description: z.string().min(1),
-});
-
-const questionSchema = z.object({
-  id: z.number(),
-  title: z.string().min(1),
-  slug: z.string().min(1),
-  level: z.array(z.enum(["pleno", "senior", "tech-lead"])).min(1),
-  topics: z.array(z.string()).min(1),
-  relatedChapters: z.array(z.string()),
-  shortAnswer: z.string().min(1),
-  quiz: z
-    .object({
-      options: z.array(z.string().min(1)).length(4),
-      correctIndex: z.number().int().min(0).max(3),
-    })
-    .refine((q) => new Set(q.options).size === q.options.length, {
-      message: "quiz.options contém alternativas duplicadas",
-    }),
-});
-
-const glossarySchema = z.object({
-  term: z.string().min(1),
-  slug: z.string().min(1),
-  shortDefinition: z.string().min(1),
-  relatedTerms: z.array(z.string()),
-  relatedChapters: z.array(z.string()),
-});
-
-const caseStudySchema = z.object({
-  title: z.string().min(1),
-  slug: z.string().min(1),
-  order: z.number(),
-  description: z.string().min(1),
-  relatedChapters: z.array(z.string()),
-});
 
 type ContentDefinition = {
   label: string;

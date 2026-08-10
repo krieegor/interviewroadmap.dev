@@ -1,30 +1,56 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import * as Dialog from "@radix-ui/react-dialog";
-import type { SearchEntry } from "@/lib/search/build-index";
+import type { SearchEntry } from "@/types/content";
+import type { Locale } from "@/lib/i18n/config";
 import type { Dictionary } from "@/lib/i18n/get-dictionary";
+import type { Tech } from "@/lib/tech/config";
 import { formatTemplate } from "@/lib/i18n/format";
 
-export function SearchDialog({ index, dict }: { index: SearchEntry[]; dict: Dictionary }) {
+export function SearchDialog({
+  tech,
+  locale,
+  dict,
+}: {
+  tech: Tech;
+  locale: Locale;
+  dict: Dictionary;
+}) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
+  const [index, setIndex] = useState<SearchEntry[] | null>(null);
+  const fetchStarted = useRef(false);
+
+  // Índice gerado em build-time (scripts/build-search-index.ts) como JSON estático — não vem embutido
+  // no HTML da página (evita duplicar ~90 entradas em toda uma das 294 páginas do site). Buscado sob
+  // demanda (no hover/foco do botão, ou na abertura do diálogo, o que vier primeiro).
+  function loadIndex() {
+    if (fetchStarted.current) return;
+    fetchStarted.current = true;
+    fetch(`/search-index/${tech}-${locale}.json`)
+      .then((response) => (response.ok ? response.json() : []))
+      .then((data: SearchEntry[]) => setIndex(data))
+      .catch(() => setIndex([]));
+  }
 
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
         e.preventDefault();
+        loadIndex();
         setOpen(true);
       }
     }
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- loadIndex é estável (só depende de refs)
   }, []);
 
   const results = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return [];
+    if (!q || !index) return [];
     return index
       .filter(
         (entry) => entry.title.toLowerCase().includes(q) || entry.excerpt.toLowerCase().includes(q),
@@ -36,6 +62,7 @@ export function SearchDialog({ index, dict }: { index: SearchEntry[]; dict: Dict
     <Dialog.Root
       open={open}
       onOpenChange={(next) => {
+        if (next) loadIndex();
         setOpen(next);
         if (!next) setQuery("");
       }}
@@ -43,6 +70,8 @@ export function SearchDialog({ index, dict }: { index: SearchEntry[]; dict: Dict
       <Dialog.Trigger asChild>
         <button
           type="button"
+          onMouseEnter={loadIndex}
+          onFocus={loadIndex}
           className="inline-flex h-9 items-center gap-2 rounded-md border border-[var(--color-border)] px-3 text-sm text-[var(--color-text-muted)] transition-colors hover:text-[var(--color-accent)]"
         >
           <svg

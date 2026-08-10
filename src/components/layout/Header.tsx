@@ -7,7 +7,6 @@ import { MobileNav } from "@/components/layout/MobileNav";
 import { SearchDialog } from "@/components/ui/SearchDialog";
 import { LocaleSwitcher } from "@/components/layout/LocaleSwitcher";
 import { Logo } from "@/components/icons/Logo";
-import { buildSearchIndex } from "@/lib/search/build-index";
 import { getEnAvailability } from "@/lib/i18n/en-availability";
 import type { Locale } from "@/lib/i18n/config";
 import type { Dictionary } from "@/lib/i18n/get-dictionary";
@@ -22,10 +21,7 @@ export async function Header({
   tech: Tech;
   dict: Dictionary;
 }) {
-  const [searchIndex, enAvailable] = await Promise.all([
-    buildSearchIndex(tech, locale, dict),
-    getEnAvailability(tech),
-  ]);
+  const enAvailable = await getEnAvailability(tech);
   const siteConfig = getSiteConfig(locale);
   const techConfig = getTechConfig(tech, locale);
   const topNav = getTopNav(locale, tech, dict);
@@ -65,7 +61,7 @@ export async function Header({
           </ul>
         </nav>
         <div className="ml-auto flex items-center gap-2">
-          <SearchDialog index={searchIndex} dict={dict} />
+          <SearchDialog tech={tech} locale={locale} dict={dict} />
           <LocaleSwitcher locale={locale} tech={tech} dict={dict} enAvailable={enAvailable} />
           <a
             href={siteConfig.githubUrl}

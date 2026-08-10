@@ -45,3 +45,10 @@ export type MDXModule<Frontmatter> = {
   default: React.ComponentType;
   frontmatter: Frontmatter;
 };
+
+export type SearchEntry = {
+  type: string;
+  title: string;
+  excerpt: string;
+  href: string;
+};

@@ -1,4 +1,15 @@
-export function ConsumerLagDiagram() {
+type ConsumerLagLabels = {
+  ariaLabel: string;
+  consumerAt: string;
+  logEnd: string;
+  lag: string;
+};
+
+// Base compartilhada entre PT (`ConsumerLagDiagram`) e EN (`ConsumerLagDiagramEn`, no arquivo
+// irmão) — só o texto muda entre os dois idiomas, a geometria do SVG é idêntica. Ver
+// specs/roadmap.md (spike de consolidação de diagramas) antes de replicar esse padrão pros outros
+// 12 pares PT/EN.
+export function ConsumerLagDiagramBase({ labels }: { labels: ConsumerLagLabels }) {
   const offsets = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
   const consumerOffset = 4;
   const logEndOffset = 9;
@@ -7,7 +18,7 @@ export function ConsumerLagDiagram() {
     <svg
       viewBox="0 0 700 180"
       role="img"
-      aria-label="O producer ja escreveu ate o offset 9 (log end offset). O consumer so processou ate o offset 4. Consumer lag e a diferenca entre os dois: 5 mensagens ainda nao processadas."
+      aria-label={labels.ariaLabel}
       className="mx-auto w-full max-w-2xl"
     >
       {offsets.map((offset, i) => {
@@ -55,7 +66,7 @@ export function ConsumerLagDiagram() {
         textAnchor="middle"
         className="fill-[var(--color-accent)] text-[11px] font-semibold"
       >
-        consumer em 4
+        {labels.consumerAt}
       </text>
 
       <line
@@ -72,12 +83,26 @@ export function ConsumerLagDiagram() {
         textAnchor="middle"
         className="fill-[var(--color-text-muted)] text-[11px] font-semibold"
       >
-        log end: 9
+        {labels.logEnd}
       </text>
 
       <text x="350" y="150" textAnchor="middle" className="fill-red-500 text-[12px] font-semibold">
-        consumer lag = 9 − 4 = 5 mensagens pendentes
+        {labels.lag}
       </text>
     </svg>
+  );
+}
+
+export function ConsumerLagDiagram() {
+  return (
+    <ConsumerLagDiagramBase
+      labels={{
+        ariaLabel:
+          "O producer ja escreveu ate o offset 9 (log end offset). O consumer so processou ate o offset 4. Consumer lag e a diferenca entre os dois: 5 mensagens ainda nao processadas.",
+        consumerAt: "consumer em 4",
+        logEnd: "log end: 9",
+        lag: "consumer lag = 9 − 4 = 5 mensagens pendentes",
+      }}
+    />
   );
 }

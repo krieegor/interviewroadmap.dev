@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { getTechConfig } from "@/config/tech";
 import { siteConfig } from "@/config/site";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
+import { LazyAutoplayVideo } from "@/components/ui/LazyAutoplayVideo";
 import { TechIcon } from "@/components/icons/TechIcon";
 import { Logo } from "@/components/icons/Logo";
 import { isLocale, locales, type Locale } from "@/lib/i18n/config";
@@ -131,14 +132,10 @@ export default async function LocaleHome({
         </section>
 
         <section className="mt-16 rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] p-6 text-center">
-          <video
+          <LazyAutoplayVideo
             src="/videos/demo.mp4"
-            autoPlay
-            muted
-            loop
-            playsInline
-            aria-hidden="true"
-            className="motion-reduce:hidden mx-auto mb-6 max-h-64 w-full max-w-lg rounded-md border border-[var(--color-border)]"
+            poster="/videos/demo-poster.jpg"
+            className="mx-auto mb-6 max-h-64 w-full max-w-lg rounded-md border border-[var(--color-border)]"
           />
           <p className="text-sm text-[var(--color-text-muted)]">{dict.trackSelector.openSourceText}</p>
           <a

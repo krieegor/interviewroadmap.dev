@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { readSimulatorHistory, saveSimulatorResult } from "@/lib/progress/simulator-progress";
+import { STORAGE_KEY, readSimulatorHistory, saveSimulatorResult } from "@/lib/progress/simulator-progress";
 
 function makeResult(overrides: Partial<Parameters<typeof saveSimulatorResult>[0]> = {}) {
   return {
@@ -40,5 +40,15 @@ describe("simulator-progress", () => {
     const history = readSimulatorHistory();
     expect(history).toHaveLength(10);
     expect(history[0]?.topic).toBe("topico-14");
+  });
+
+  it("ignora JSON corrompido no localStorage e volta pro histórico vazio", () => {
+    localStorage.setItem(STORAGE_KEY, "{ isso não é json válido");
+    expect(readSimulatorHistory()).toEqual([]);
+  });
+
+  it("ignora dado com shape errado no localStorage e volta pro histórico vazio", () => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify([{ date: "hoje" }]));
+    expect(readSimulatorHistory()).toEqual([]);
   });
 });

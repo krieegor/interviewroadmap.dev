@@ -2,8 +2,6 @@ export type Tech = "kafka" | "java" | "elastic" | "sql" | "aws" | "gcp";
 
 export const techs: Tech[] = ["kafka", "java", "elastic", "sql", "aws", "gcp"];
 
-export const defaultTech: Tech = "kafka";
-
 export function isTech(value: string): value is Tech {
   return techs.includes(value as Tech);
 }

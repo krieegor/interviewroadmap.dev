@@ -2,7 +2,7 @@
 
 import { useSyncExternalStore } from "react";
 
-const STORAGE_KEY = "kafka-ebook:simulator:v1";
+export const STORAGE_KEY = "kafka-ebook:simulator:v1";
 const MAX_HISTORY = 10;
 
 export type SimulatorResult = {
@@ -21,6 +21,24 @@ const listeners = new Set<() => void>();
 let cachedRaw: string | null = null;
 let cachedHistory: SimulatorResult[] = EMPTY_HISTORY;
 
+function isSimulatorResult(value: unknown): value is SimulatorResult {
+  if (!value || typeof value !== "object") return false;
+  const v = value as Record<string, unknown>;
+  return (
+    typeof v.date === "string" &&
+    typeof v.level === "string" &&
+    typeof v.topic === "string" &&
+    typeof v.total === "number" &&
+    typeof v.correct === "number" &&
+    typeof v.partial === "number" &&
+    typeof v.unknown === "number"
+  );
+}
+
+function isSimulatorHistory(value: unknown): value is SimulatorResult[] {
+  return Array.isArray(value) && value.every(isSimulatorResult);
+}
+
 function readSnapshot(): SimulatorResult[] {
   let raw: string | null;
   try {
@@ -31,7 +49,8 @@ function readSnapshot(): SimulatorResult[] {
   if (raw === cachedRaw) return cachedHistory;
   cachedRaw = raw;
   try {
-    cachedHistory = raw ? (JSON.parse(raw) as SimulatorResult[]) : EMPTY_HISTORY;
+    const parsed: unknown = raw ? JSON.parse(raw) : EMPTY_HISTORY;
+    cachedHistory = isSimulatorHistory(parsed) ? parsed : EMPTY_HISTORY;
   } catch {
     cachedHistory = EMPTY_HISTORY;
   }

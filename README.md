@@ -88,12 +88,13 @@ Java, Elastic Search, SQL, AWS ou GCP.
 
 ```bash
 npm run dev              # ambiente de desenvolvimento
-npm run build              # build de produção (estático)
-npm run lint                 # ESLint
-npm run typecheck              # checagem de tipos
-npm run test                    # Vitest
-npm run format                    # Prettier
-npm run validate-content            # valida frontmatter e links internos do conteúdo
+npm run build              # build de produção (gera out/, estático puro)
+npm run start                # serve out/ localmente, pra conferir o build de produção
+npm run lint                   # ESLint
+npm run typecheck                # checagem de tipos
+npm run test                       # Vitest
+npm run format                       # Prettier
+npm run validate-content                # valida frontmatter e links internos do conteúdo
 ```
 
 ## Documentação do projeto
@@ -102,7 +103,8 @@ npm run validate-content            # valida frontmatter e links internos do con
 - [`specs/`](./specs) — especificações de produto, arquitetura, diretrizes de conteúdo, design system e roadmap.
 - [`docs/contributing.md`](./docs/contributing.md) — como contribuir.
 - [`docs/content-authoring.md`](./docs/content-authoring.md) — como escrever capítulos, perguntas, glossário e estudos de caso.
-- [`docs/deployment.md`](./docs/deployment.md) — como publicar em Vercel, Cloudflare Pages ou Netlify.
+- [`docs/deployment.md`](./docs/deployment.md) — como publicar em Vercel, Cloudflare (Workers ou Pages),
+  Netlify ou GitHub Pages.
 
 ## Contribuindo
 
