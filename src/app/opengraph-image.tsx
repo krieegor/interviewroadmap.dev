@@ -3,6 +3,8 @@ import { siteConfig } from "@/config/site";
 
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
+// Necessário com `output: "export"` — sem isso o build trata a rota como potencialmente dinâmica.
+export const dynamic = "force-static";
 
 export default async function OpengraphImage() {
   return new ImageResponse(

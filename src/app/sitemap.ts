@@ -7,6 +7,9 @@ import { siteConfig } from "@/config/site";
 import { locales } from "@/lib/i18n/config";
 import { techs, techsWithContent } from "@/lib/tech/config";
 
+// Necessário com `output: "export"` — sem isso o build trata a rota como potencialmente dinâmica.
+export const dynamic = "force-static";
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const entries: MetadataRoute.Sitemap = [];
 

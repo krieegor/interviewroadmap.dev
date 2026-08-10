@@ -7,6 +7,9 @@ import { PDFDocument } from "pdf-lib";
 
 const ROOT = process.cwd();
 const OUTPUT_PATH = path.join(ROOT, "public", "livro.pdf");
+// `next build` (output: "export") já copiou public/** para out/ antes do postbuild rodar — escrever
+// só em public/livro.pdf não afeta o export já gerado, então o PDF final também precisa ir pra lá.
+const EXPORT_OUTPUT_PATH = path.join(ROOT, "out", "livro.pdf");
 const PRINT_ROUTE = "/pt/kafka/livro/impressao";
 const SERVER_READY_TIMEOUT_MS = 60_000;
 const MERMAID_TIMEOUT_MS = 30_000;
@@ -29,16 +32,19 @@ function getFreePort(): Promise<number> {
 }
 
 function startServer(port: number): ChildProcess {
-  const nextBin = path.join(
+  // Com `output: "export"` não existe mais `next start` (o build é HTML estático em out/) — serve
+  // esse diretório com o `serve` (mesmo pacote usado no script "start" do package.json).
+  const serveBin = path.join(
     ROOT,
     "node_modules",
     ".bin",
-    process.platform === "win32" ? "next.cmd" : "next",
+    process.platform === "win32" ? "serve.cmd" : "serve",
   );
+  const outDir = path.join(ROOT, "out");
   // .cmd shims on Windows only run through a shell; the command is built as a
   // single string (rather than shell:true + args array) to sidestep Node's
   // shell-argument-escaping deprecation warning (DEP0190).
-  const command = `"${nextBin}" start -p ${port}`;
+  const command = `"${serveBin}" -l ${port} "${outDir}"`;
   return spawn(command, {
     cwd: ROOT,
     shell: true,
@@ -141,13 +147,17 @@ async function main() {
       for (const p of await merged.copyPages(contentDoc, contentDoc.getPageIndices())) {
         merged.addPage(p);
       }
-      fs.writeFileSync(OUTPUT_PATH, await merged.save());
+      const pdfBytes = await merged.save();
+      fs.writeFileSync(OUTPUT_PATH, pdfBytes);
+      if (fs.existsSync(path.dirname(EXPORT_OUTPUT_PATH))) {
+        fs.writeFileSync(EXPORT_OUTPUT_PATH, pdfBytes);
+      }
     } finally {
       await browser.close();
     }
 
     const { size } = fs.statSync(OUTPUT_PATH);
-    console.log(`PDF gerado em public/livro.pdf (${(size / 1024 / 1024).toFixed(1)} MB).`);
+    console.log(`PDF gerado em public/livro.pdf e out/livro.pdf (${(size / 1024 / 1024).toFixed(1)} MB).`);
   } finally {
     stopServer(server);
   }

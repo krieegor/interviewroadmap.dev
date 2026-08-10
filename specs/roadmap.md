@@ -123,6 +123,28 @@
       deliberadamente **não** entra no hero acima da dobra — fica como preview pequeno e opcional perto do
       link do GitHub existente.
 
+## Pós-lançamento — export estático puro (`output: "export"`) (concluído)
+
+- [x] `next.config.ts` passou a usar `output: "export"` (+ `images.unoptimized: true`, já que export
+      estático não tem servidor pra otimizar imagem sob demanda). `npm run build` agora gera `out/` com
+      HTML/CSS/JS puro — sem servidor Node em produção. Motivação: uma tentativa de deploy no Cloudflare
+      como **Worker** (via `@opennextjs/cloudflare`) esbarrou em dois problemas de fundo — o Worker
+      ultrapassava o limite de tamanho (15+ MB, acima até do plano pago) e o cache incremental necessário
+      pra servir páginas SSG corretamente exigia um bucket R2, que por sua vez exige cadastrar cartão/PayPal
+      na conta Cloudflare (mesmo no free tier). Como o site já era 100% estático por design (todo conteúdo
+      via `generateStaticParams`, sem middleware, sem API routes, sem Server Actions), rodá-lo atrás de um
+      Worker nunca foi necessário — a causa raiz era simplesmente não estar usando `output: "export"`.
+- [x] `scripts/generate-pdf.ts` deixou de depender de `next start` (incompatível com `output: "export"`) —
+      agora serve `out/` com `serve` (novo devDependency) e escreve o PDF em `public/livro.pdf` **e**
+      `out/livro.pdf` (o export já foi copiado de `public/` antes do `postbuild` rodar).
+      `export const dynamicParams = false` nas rotas com `generateStaticParams` (adicionado durante a
+      tentativa com Cloudflare Workers, ver commit anterior) continua correto/necessário aqui — export
+      estático exige que todo parâmetro de rota dinâmica seja conhecido em build time.
+- [x] Removida toda a infra da tentativa com Workers: `@opennextjs/cloudflare`, `wrangler`, `wrangler.jsonc`,
+      `open-next.config.ts`, scripts `preview`/`deploy` do `package.json`. `docs/deployment.md` atualizado —
+      Cloudflare volta a ser **Pages** clássico (build output `out/`, sem adapter), e GitHub Pages passou de
+      "não recomendado" para viável (site agora é estático puro).
+
 ## Backlog (trilhas futuras e itens ainda em aberto)
 
 - Conteúdo real para a trilha **Java** (hoje só "em construção").

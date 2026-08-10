@@ -2,6 +2,8 @@ import { ImageResponse } from "next/og";
 
 export const size = { width: 32, height: 32 };
 export const contentType = "image/png";
+// Necessário com `output: "export"` — sem isso o build trata a rota como potencialmente dinâmica.
+export const dynamic = "force-static";
 
 export default function Icon() {
   return new ImageResponse(

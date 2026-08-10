@@ -14,8 +14,6 @@ const eslintConfig = [
       ".agents/**",
       ".claude/skills/**",
       "remotion/**",
-      ".open-next/**",
-      ".wrangler/**",
     ],
   },
 ];
