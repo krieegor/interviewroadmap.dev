@@ -20,14 +20,56 @@ Configure-a com a URL final do deploy (ex.: `https://kafka-entrevistas.vercel.ap
 3. Defina `NEXT_PUBLIC_SITE_URL` nas variáveis de ambiente do projeto.
 4. Deploy automático a cada push na branch principal.
 
-## Cloudflare Pages
+## Cloudflare Workers (via OpenNext)
 
-1. Crie um projeto Pages apontando para o repositório.
-2. Build command: `npm run build`.
-3. Build output directory: use o adapter `@cloudflare/next-on-pages` (`npx @cloudflare/next-on-pages`) como
-   comando de build, já que o projeto usa recursos de Server Components/`generateStaticParams` do App
-   Router — o export estático puro (`next export`) não é usado aqui.
-4. Defina `NEXT_PUBLIC_SITE_URL` nas variáveis de ambiente do projeto Pages.
+`@cloudflare/next-on-pages` (Cloudflare Pages clássico) está em modo manutenção — o caminho atual
+recomendado pela própria Cloudflare para Next.js é deploy como **Worker** via `@opennextjs/cloudflare`.
+Arquivos relevantes no repo: `wrangler.jsonc`, `open-next.config.ts`.
+
+### Por que precisa de R2 (cache incremental)
+
+Mesmo páginas 100% SSG (`generateStaticParams`) no App Router não são servidas como arquivo estático puro
+pelo OpenNext — passam por uma camada de "cache incremental" populada no build. Sem um backend persistente
+configurado para esse cache, toda request cairia no fallback de renderização ao vivo dentro do Worker, que
+falha: os loaders de conteúdo (`src/lib/content/**`) usam `fs.readdirSync`/`import()` dinâmico contra
+`src/content/**/*.mdx`, e o sandbox do Workers não tem acesso a esse filesystem. Por isso o cache incremental
+está configurado para usar um bucket R2 (`open-next.config.ts` → `r2IncrementalCache`), que É populado no
+build e persiste entre requests.
+
+### Setup (uma vez, na conta Cloudflare)
+
+1. Crie o bucket R2 (nome tem que bater com `bucket_name` em `wrangler.jsonc`, hoje `trainer-dev-cache`):
+   ```bash
+   npx wrangler login
+   npx wrangler r2 bucket create trainer-dev-cache
+   ```
+2. Conecte o repositório como **Worker** (não Pages clássico) via git integration da Cloudflare.
+3. Configure os campos do dashboard:
+   - **Build command**: `npx opennextjs-cloudflare build` (roda `next build` + `postbuild` internamente e
+     gera `.open-next/worker.js`; **não** usar `npm run build` sozinho, ele não gera o Worker).
+   - **Deploy command**: `npx wrangler deploy` (detecta projeto OpenNext automaticamente e popula o cache R2
+     como parte do deploy).
+   - **Non-production branch deploy command**: `npx wrangler versions upload`.
+   - **Path**: `/` (app na raiz do repo).
+4. Defina `NEXT_PUBLIC_SITE_URL` em "Build variables and secrets" com a URL final do Worker.
+
+### Limitação conhecida: PDF do livro
+
+`scripts/generate-pdf.ts` (chamado via `postbuild`) precisa de um Chromium completo (Playwright). O
+container de build da Cloudflare Workers Builds é uma imagem Linux mínima sem as bibliotecas gráficas
+necessárias (`libatk-1.0.so.0` e outras) — o script detecta essa falha de lançamento do navegador
+especificamente e **pula a geração do PDF sem derrubar o build** (loga um aviso). `public/livro.pdf` só é
+atualizado por builds em ambientes com essas libs (ex.: GitHub Actions/Vercel/Netlify). Se isso importar para
+o deploy no Cloudflare, o PDF pode ser gerado em outro pipeline e comitado manualmente, ou o Cloudflare pode
+servir a última versão já publicada.
+
+### Testar localmente antes de mudar o dashboard
+
+```bash
+npm install
+npx opennextjs-cloudflare build
+npx opennextjs-cloudflare preview   # sobe o Worker localmente com R2 emulado (Miniflare), popula o cache
+```
 
 ## Netlify
 
