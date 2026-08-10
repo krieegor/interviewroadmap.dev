@@ -4,6 +4,7 @@ out
 coverage
 public
 .agents
+.claude
 remotion
 
 # Conteúdo MDX é formatado manualmente pelo autor. O plugin MDX do Prettier reflui texto JSX para o

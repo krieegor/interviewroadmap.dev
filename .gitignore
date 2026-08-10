@@ -63,3 +63,9 @@ Desktop.ini
 *.pem
 *.tmp
 .tmp-*
+
+# Agent Skills instalados via `npx skills add` (ex.: remotion-dev/skills) — conteúdo de terceiros
+# gerenciado pela ferramenta, regenerável a qualquer momento, não é código do projeto. Ver
+# docs/contributing.md.
+/.agents/
+/.claude/skills/
