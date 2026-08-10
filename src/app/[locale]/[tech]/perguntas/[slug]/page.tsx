@@ -24,6 +24,9 @@ export async function generateStaticParams() {
   return params;
 }
 
+// Conjunto fechado — ver nota em src/app/[locale]/layout.tsx.
+export const dynamicParams = false;
+
 export async function generateMetadata({
   params,
 }: {

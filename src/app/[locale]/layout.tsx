@@ -10,6 +10,11 @@ export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
 }
 
+// `locales` é um conjunto fechado — sem isso, adapters de edge (ex.: OpenNext/Cloudflare Workers)
+// tratam a rota como parcialmente dinâmica e empacotam o server-render de toda a árvore de páginas
+// na function de request, estourando o limite de tamanho do Worker.
+export const dynamicParams = false;
+
 export async function generateMetadata({
   params,
 }: {

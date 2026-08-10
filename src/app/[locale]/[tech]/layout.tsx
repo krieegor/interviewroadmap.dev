@@ -12,6 +12,9 @@ export function generateStaticParams({ params }: { params: { locale: string } })
   return techs.map((tech) => ({ tech }));
 }
 
+// `techs` é um conjunto fechado — ver nota em src/app/[locale]/layout.tsx.
+export const dynamicParams = false;
+
 export async function generateMetadata({
   params,
 }: {

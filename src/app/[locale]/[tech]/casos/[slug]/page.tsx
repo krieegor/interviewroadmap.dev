@@ -24,6 +24,10 @@ export async function generateStaticParams() {
   return params;
 }
 
+// Conjunto fechado (todo slug válido já está em `params` acima) — ver nota em
+// src/app/[locale]/layout.tsx sobre por que isso importa para o deploy em Cloudflare Workers.
+export const dynamicParams = false;
+
 export async function generateMetadata({
   params,
 }: {
