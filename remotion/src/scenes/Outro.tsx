@@ -36,7 +36,7 @@ export function Outro() {
           transform: `translateY(${(1 - titleIn) * 12}px)`,
         }}
       >
-        trainer.dev
+        trainerdev.app
       </div>
       <div
         style={{

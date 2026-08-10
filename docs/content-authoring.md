@@ -6,7 +6,7 @@ Para as regras editoriais completas (tom, os 10 pontos obrigatórios por conceit
 
 ## Estrutura de arquivos
 
-trainer.dev tem uma dimensão de **trilha** (`tech`) além de idioma — hoje só `kafka` tem conteúdo real
+trainerdev.app tem uma dimensão de **trilha** (`tech`) além de idioma — hoje só `kafka` tem conteúdo real
 (`java` e `elastic` são trilhas "em breve", sem arquivos ainda). Todo conteúdo é um arquivo `.mdx` com
 frontmatter YAML, em `src/content/<tech>/<tipo>/<locale>/`. Ao contribuir para a trilha Kafka, `<tech>` é
 sempre `kafka`. Hoje o conteúdo do Kafka está completo nos dois idiomas; ao adicionar conteúdo novo, escreva

@@ -223,7 +223,7 @@ export const en: Dictionary = {
   },
   trackSelector: {
     badge: "Free & open source",
-    heroTitle: "trainer.dev",
+    heroTitle: "trainerdev.app",
     heroIntro:
       "A free, open-source technical interview prep platform. Every technology track follows the same format: a navigable book, real interview questions, a glossary, and a practice simulator — no paid course, no sign-up, no ads.",
     howItWorksTitle: "The same format, every track",
@@ -240,7 +240,7 @@ export const en: Dictionary = {
     featureSimulatorDescription:
       "Practice at your own pace — open-ended mode (explain out loud) or multiple choice, everything saved only in your browser.",
     title: "Choose your track",
-    intro: "trainer.dev is a free, open-source technical interview prep platform, organized by technology.",
+    intro: "trainerdev.app is a free, open-source technical interview prep platform, organized by technology.",
     comingSoonBadge: "Coming soon",
     openSourceText: "This project is free and open source. Contributions are welcome.",
     githubCta: "View on GitHub",

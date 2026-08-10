@@ -1,4 +1,4 @@
-# Roadmap — trainer.dev
+# Roadmap — trainerdev.app
 
 ## Fase 1 — Análise (concluída)
 
@@ -153,6 +153,17 @@
       todo deploy — mesmo sem Chromium — publica pelo menos a última versão gerada. Regenerar continua
       automático em ambientes com Chromium (local, GitHub Actions, Vercel, Netlify); o autor comita o
       `public/livro.pdf` atualizado quando muda conteúdo do livro (ver `docs/contributing.md`).
+
+## Pós-lançamento — rebranding para trainerdev.app (concluído)
+
+- [x] Domínio `trainer.dev` trocado por `trainerdev.app` (o primeiro ficou caro demais pra manter) — marca
+      atualizada em `src/config/site.ts`, dicionários de i18n, README, `CLAUDE.md`, `specs/`,
+      `docs/content-authoring.md`, logo/favicon (`aria-label`) e `package.json`/`remotion/package.json`.
+- [x] Vídeo de demonstração (`remotion/src/scenes/Intro.tsx` e `Outro.tsx`) re-renderizado com o novo nome —
+      `public/videos/demo.mp4`, `public/videos/demo-poster.jpg` e `docs/media/demo.gif` regenerados via
+      `npm run render:mp4`/`render:gif` + `remotion still` (ver `docs/contributing.md`).
+- [x] Repositório GitHub renomeado de `trainer.dev` para `trainerdev.app` — `githubUrl` em
+      `src/config/site.ts` e o badge de CI do README atualizados para a nova URL.
 
 ## Backlog (trilhas futuras e itens ainda em aberto)
 

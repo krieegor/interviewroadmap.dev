@@ -1,8 +1,8 @@
-# Product Spec — trainer.dev
+# Product Spec — trainerdev.app
 
 ## 1. O que é
 
-**trainer.dev** é uma plataforma interativa, gratuita e open source, publicada como site estático, de
+**trainerdev.app** é uma plataforma interativa, gratuita e open source, publicada como site estático, de
 preparação para entrevistas técnicas — organizada por trilhas de tecnologia. Cada trilha é um e-book
 navegável com a mesma estrutura de estudo (capítulos, perguntas de entrevista, glossário, estudos de caso,
 simulador).

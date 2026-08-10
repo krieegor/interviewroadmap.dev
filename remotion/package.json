@@ -1,7 +1,7 @@
 {
   "name": "remotion",
   "version": "1.0.0",
-  "description": "Vídeo de demonstração do trainer.dev (README + landing page) — subprojeto isolado, não é dependência do app Next.js.",
+  "description": "Vídeo de demonstração do trainerdev.app (README + landing page) — subprojeto isolado, não é dependência do app Next.js.",
   "repository": {},
   "license": "UNLICENSED",
   "private": true,

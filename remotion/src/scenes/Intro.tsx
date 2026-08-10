@@ -60,7 +60,7 @@ export function Intro() {
           letterSpacing: -0.5,
         }}
       >
-        trainer.dev
+        trainerdev.app
       </div>
       <div
         style={{

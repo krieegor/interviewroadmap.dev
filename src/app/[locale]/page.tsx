@@ -65,18 +65,39 @@ export default async function LocaleHome({
         </div>
       </div>
 
-      <main id="conteudo-principal" className="mx-auto w-full max-w-4xl flex-1 px-4 py-16">
-        <div className="flex flex-col items-center text-center">
-          <Logo className="h-20 w-20 text-[var(--color-accent)]" />
-          <p className="mt-4 text-sm font-medium uppercase tracking-wide text-[var(--color-accent)]">
-            {dict.trackSelector.badge}
-          </p>
-          <h1 className="mt-3 text-4xl font-semibold text-[var(--color-text)]">
-            {dict.trackSelector.heroTitle}
-          </h1>
-          <p className="mt-4 max-w-2xl text-[var(--color-text-muted)]">
-            {dict.trackSelector.heroIntro}
-          </p>
+      <main id="conteudo-principal" className="mx-auto w-full max-w-5xl flex-1 px-4 py-16">
+        <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-2">
+          <div className="flex flex-col items-center text-center lg:items-start lg:text-left">
+            <Logo className="h-20 w-20 text-[var(--color-accent)]" />
+            <p className="mt-4 text-sm font-medium uppercase tracking-wide text-[var(--color-accent)]">
+              {dict.trackSelector.badge}
+            </p>
+            <h1 className="mt-3 text-4xl font-semibold text-[var(--color-text)]">
+              {dict.trackSelector.heroTitle}
+            </h1>
+            <p className="mt-4 max-w-2xl text-[var(--color-text-muted)]">
+              {dict.trackSelector.heroIntro}
+            </p>
+          </div>
+
+          <div className="flex flex-col items-center text-center">
+            <LazyAutoplayVideo
+              src="/videos/demo.mp4"
+              poster="/videos/demo-poster.jpg"
+              className="w-full max-w-md rounded-md border border-[var(--color-border)]"
+            />
+            <p className="mt-4 text-sm text-[var(--color-text-muted)]">
+              {dict.trackSelector.openSourceText}
+            </p>
+            <a
+              href={siteConfig.githubUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="mt-2 inline-block text-sm font-medium text-[var(--color-accent)] hover:underline"
+            >
+              {dict.trackSelector.githubCta}
+            </a>
+          </div>
         </div>
 
         <section className="mt-16">
@@ -129,23 +150,6 @@ export default async function LocaleHome({
               );
             })}
           </div>
-        </section>
-
-        <section className="mt-16 rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] p-6 text-center">
-          <LazyAutoplayVideo
-            src="/videos/demo.mp4"
-            poster="/videos/demo-poster.jpg"
-            className="mx-auto mb-6 max-h-64 w-full max-w-lg rounded-md border border-[var(--color-border)]"
-          />
-          <p className="text-sm text-[var(--color-text-muted)]">{dict.trackSelector.openSourceText}</p>
-          <a
-            href={siteConfig.githubUrl}
-            target="_blank"
-            rel="noreferrer"
-            className="mt-3 inline-block text-sm font-medium text-[var(--color-accent)] hover:underline"
-          >
-            {dict.trackSelector.githubCta}
-          </a>
         </section>
       </main>
 

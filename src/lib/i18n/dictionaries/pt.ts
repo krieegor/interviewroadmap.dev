@@ -222,7 +222,7 @@ export const pt = {
   },
   trackSelector: {
     badge: "Gratuito & open source",
-    heroTitle: "trainer.dev",
+    heroTitle: "trainerdev.app",
     heroIntro:
       "Uma plataforma gratuita e open source de preparação para entrevistas técnicas. Cada trilha de tecnologia segue o mesmo formato: um livro navegável, perguntas de entrevista reais, glossário e um simulador — sem curso pago, sem cadastro, sem anúncio.",
     howItWorksTitle: "O mesmo formato em toda trilha",
@@ -239,7 +239,7 @@ export const pt = {
     featureSimulatorDescription:
       "Pratique no seu ritmo — modo aberto (explique em voz alta) ou múltipla escolha, tudo salvo só no seu navegador.",
     title: "Escolha sua trilha",
-    intro: "trainer.dev é uma plataforma gratuita e open source de preparação para entrevistas técnicas, organizada por tecnologia.",
+    intro: "trainerdev.app é uma plataforma gratuita e open source de preparação para entrevistas técnicas, organizada por tecnologia.",
     comingSoonBadge: "Em breve",
     openSourceText: "Esse projeto é gratuito e open source. Contribuições são bem-vindas.",
     githubCta: "Ver no GitHub",
