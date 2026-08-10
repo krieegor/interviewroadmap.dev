@@ -81,7 +81,18 @@ async function main() {
     await waitForServer(url);
 
     console.log("Gerando PDF com Playwright/Chromium...");
-    const browser = await chromium.launch();
+    let browser;
+    try {
+      browser = await chromium.launch();
+    } catch (error) {
+      console.warn(
+        "Não foi possível iniciar o Chromium (ambiente sem as bibliotecas gráficas necessárias — " +
+          "ex.: o build container da Cloudflare Workers Builds). Pulando a geração do PDF nesta " +
+          "execução; public/livro.pdf não será atualizado.",
+      );
+      console.warn(String(error));
+      return;
+    }
     try {
       const context = await browser.newContext({ colorScheme: "light" });
       const page = await context.newPage();
