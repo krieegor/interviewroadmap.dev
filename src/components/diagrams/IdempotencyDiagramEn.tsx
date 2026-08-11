@@ -1,4 +1,32 @@
-export function IdempotencyDiagramEn() {
+"use client";
+
+import dynamic from "next/dynamic";
+import { useShouldRender3D } from "@/components/three/webgl-support";
+import { HeroCanvasSkeleton } from "@/components/hero/HeroCanvasSkeleton";
+import { useStepCarousel } from "@/lib/hooks/useStepCarousel";
+import { DiagramStepArrows, DiagramStepDots } from "@/components/hero/ChapterDiagramControls";
+import type { IdempotencyLabels } from "@/components/three/diagrams/IdempotencyScene";
+
+const IdempotencyScene = dynamic(() => import("@/components/three/diagrams/IdempotencyScene"), {
+  ssr: false,
+  loading: () => <HeroCanvasSkeleton />,
+});
+
+const LABELS: IdempotencyLabels = {
+  event: "Event arrives",
+  eventSub: "eventId = X",
+  decision: "Does eventId X already exist?",
+  decisionSub: "processed_events (same transaction)",
+  skip: "Skip",
+  skipSub: "event already processed",
+  insert: "Insert eventId + apply effect",
+  insertSub: "same transaction",
+};
+
+const STEP_LABELS = ["New event", "Duplicate event"];
+const AUTOPLAY_INTERVAL_MS = 4500;
+
+export function IdempotencyDiagramEnSvg() {
   return (
     <svg
       viewBox="0 0 640 220"
@@ -190,5 +218,26 @@ export function IdempotencyDiagramEn() {
         A uniqueness constraint on eventId guarantees atomicity even under concurrency.
       </text>
     </svg>
+  );
+}
+
+export function IdempotencyDiagramEn() {
+  const shouldRender3D = useShouldRender3D();
+  const { step, goTo } = useStepCarousel(STEP_LABELS.length, shouldRender3D, AUTOPLAY_INTERVAL_MS);
+
+  if (!shouldRender3D) {
+    return <IdempotencyDiagramEnSvg />;
+  }
+
+  return (
+    <div>
+      <div className="relative mx-auto aspect-[16/9] w-full max-w-2xl">
+        <div aria-hidden="true" className="h-full w-full">
+          <IdempotencyScene step={step} labels={LABELS} />
+        </div>
+        <DiagramStepArrows step={step} onGoTo={goTo} prevLabel="Previous step" nextLabel="Next step" />
+      </div>
+      <DiagramStepDots step={step} stepLabels={STEP_LABELS} onGoTo={goTo} goToLabel="Go to step" />
+    </div>
   );
 }

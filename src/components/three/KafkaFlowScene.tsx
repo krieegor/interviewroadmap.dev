@@ -1,20 +1,18 @@
 "use client";
 
 import { Canvas } from "@react-three/fiber";
-import type { MotionValue } from "motion/react";
-import { CAMERA_START, LANE_Z } from "./scene-constants";
+import { CAMERA_STEPS, LANE_Z } from "./scene-constants";
 import { useThemeColors } from "./useThemeColors";
 import { ProducerNode } from "./ProducerNode";
 import { PartitionLane } from "./PartitionLane";
 import { ConsumerGroupCluster } from "./ConsumerGroupCluster";
-import { ScrollCameraRig } from "./ScrollCameraRig";
-import { IdleOrbitCamera } from "./IdleOrbitCamera";
+import { StepCameraRig } from "./shared/StepCameraRig";
 
 export default function KafkaFlowScene({
-  scrollProgress,
+  step,
   mobile,
 }: {
-  scrollProgress?: MotionValue<number>;
+  step: number;
   mobile: boolean;
 }) {
   const colors = useThemeColors();
@@ -23,7 +21,7 @@ export default function KafkaFlowScene({
   return (
     <Canvas
       dpr={mobile ? 1 : [1, 2]}
-      camera={{ fov: 50, near: 0.1, far: 100, position: CAMERA_START.toArray() }}
+      camera={{ fov: 50, near: 0.1, far: 100, position: CAMERA_STEPS[0]!.position.toArray() }}
       gl={{ antialias: true }}
       aria-hidden="true"
     >
@@ -38,7 +36,7 @@ export default function KafkaFlowScene({
       ))}
       <ConsumerGroupCluster colors={colors} />
 
-      {mobile || !scrollProgress ? <IdleOrbitCamera /> : <ScrollCameraRig progress={scrollProgress} />}
+      <StepCameraRig step={step} steps={CAMERA_STEPS} />
     </Canvas>
   );
 }

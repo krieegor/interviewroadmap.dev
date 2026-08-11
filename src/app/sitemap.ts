@@ -14,7 +14,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const entries: MetadataRoute.Sitemap = [];
 
   for (const locale of locales) {
-    entries.push({ url: `${siteConfig.url}/${locale}`, lastModified: new Date() });
+    entries.push({ url: `${siteConfig.url}/${locale}/home`, lastModified: new Date() });
 
     for (const tech of techs) {
       entries.push({ url: `${siteConfig.url}/${locale}/${tech}`, lastModified: new Date() });

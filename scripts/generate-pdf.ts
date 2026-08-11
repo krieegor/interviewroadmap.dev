@@ -102,6 +102,9 @@ async function main() {
     try {
       const context = await browser.newContext({ colorScheme: "light" });
       const page = await context.newPage();
+      // Precisa ser emulado antes do goto: os diagramas decidem 3D-vs-SVG (useShouldRender3D)
+      // já na primeira renderização, lendo `window.matchMedia("print")` no mount.
+      await page.emulateMedia({ media: "print" });
       await page.goto(url, { waitUntil: "networkidle" });
       await page.waitForFunction(
         () => document.querySelectorAll('[data-mermaid-status="rendering"]').length === 0,

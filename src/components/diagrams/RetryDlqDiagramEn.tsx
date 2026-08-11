@@ -1,4 +1,31 @@
-export function RetryDlqDiagramEn() {
+"use client";
+
+import dynamic from "next/dynamic";
+import { useShouldRender3D } from "@/components/three/webgl-support";
+import { HeroCanvasSkeleton } from "@/components/hero/HeroCanvasSkeleton";
+import { useStepCarousel } from "@/lib/hooks/useStepCarousel";
+import { DiagramStepArrows, DiagramStepDots } from "@/components/hero/ChapterDiagramControls";
+import type { RetryDlqLabels } from "@/components/three/diagrams/RetryDlqScene";
+
+const RetryDlqScene = dynamic(() => import("@/components/three/diagrams/RetryDlqScene"), {
+  ssr: false,
+  loading: () => <HeroCanvasSkeleton />,
+});
+
+const LABELS: RetryDlqLabels = {
+  topic: "Topic: payments",
+  consumer: "Consumer",
+  consumerFail: "fails to process",
+  retryTopic: "Topic: payments-retry",
+  backoff: "exponential backoff",
+  dlqTopic: "Topic: payments-dlq",
+  dlqSub: "manual investigation",
+};
+
+const STEP_LABELS = ["Tries to process", "Retry with backoff", "Exhausted — goes to DLQ"];
+const AUTOPLAY_INTERVAL_MS = 4500;
+
+export function RetryDlqDiagramEnSvg() {
   return (
     <svg
       viewBox="0 0 700 260"
@@ -188,5 +215,26 @@ export function RetryDlqDiagramEn() {
         the problematic message doesn&apos;t block the partition (no poison pill effect).
       </text>
     </svg>
+  );
+}
+
+export function RetryDlqDiagramEn() {
+  const shouldRender3D = useShouldRender3D();
+  const { step, goTo } = useStepCarousel(STEP_LABELS.length, shouldRender3D, AUTOPLAY_INTERVAL_MS);
+
+  if (!shouldRender3D) {
+    return <RetryDlqDiagramEnSvg />;
+  }
+
+  return (
+    <div>
+      <div className="relative mx-auto aspect-[16/9] w-full max-w-2xl">
+        <div aria-hidden="true" className="h-full w-full">
+          <RetryDlqScene step={step} labels={LABELS} />
+        </div>
+        <DiagramStepArrows step={step} onGoTo={goTo} prevLabel="Previous step" nextLabel="Next step" />
+      </div>
+      <DiagramStepDots step={step} stepLabels={STEP_LABELS} onGoTo={goTo} goToLabel="Go to step" />
+    </div>
   );
 }

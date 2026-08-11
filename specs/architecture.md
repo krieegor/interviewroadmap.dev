@@ -113,13 +113,17 @@ filesystem (`fs`, `gray-matter`) em build time; `src/components` nunca importa d
 ## 5. Roteamento
 
 Todas as rotas de conteúdo vivem sob `/[locale]/[tech]/...` — locale primeiro (`pt`/`en`, ver seção 13),
-tech depois (`kafka`/`java`/`elastic`, ver seção 14). `/` (raiz) é um `redirect()` estático para `/pt`;
-`/[locale]` sozinho (sem tech) é o seletor de trilha, não a home de nenhuma trilha específica.
+tech depois (`kafka`/`java`/`elastic`, ver seção 14). `/` (raiz) é um `redirect()` estático para
+`/[locale]/home`; `/[locale]` sozinho também é só um `redirect()` estático (pro mesmo destino) — nenhum dos
+dois renderiza conteúdo. O seletor de trilha em si vive em `/[locale]/home`, uma rota estática irmã de
+`[tech]` (Next.js resolve o segmento literal `home/` antes de cair no dinâmico `[tech]/`, então não há
+colisão — `home` também não é um valor válido de `Tech`).
 
 | Rota                                  | Descrição                                                       |
 | -------------------------------------- | ----------------------------------------------------------------- |
-| `/`                                    | Redirect estático para `/pt`                                       |
-| `/[locale]`                            | Seletor de trilha (Kafka / Java / Elastic)                          |
+| `/`                                    | Redirect estático para `/[locale]/home` (locale padrão)             |
+| `/[locale]`                            | Redirect estático para `/[locale]/home`                             |
+| `/[locale]/home`                       | Seletor de trilha (Kafka / Java / Elastic / SQL / AWS / GCP)         |
 | `/[locale]/[tech]`                     | Home da trilha (conteúdo real se `techsWithContent`, senão "em breve") |
 | `/[locale]/[tech]/livro`               | Índice do livro (partes + capítulos)                                |
 | `/[locale]/[tech]/livro/[...slug]`     | Capítulo/seção individual, resolvido por slug do frontmatter        |

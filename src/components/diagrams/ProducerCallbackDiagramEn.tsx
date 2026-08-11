@@ -1,4 +1,31 @@
-export function ProducerCallbackDiagramEn() {
+"use client";
+
+import dynamic from "next/dynamic";
+import { useShouldRender3D } from "@/components/three/webgl-support";
+import { HeroCanvasSkeleton } from "@/components/hero/HeroCanvasSkeleton";
+import { useStepCarousel } from "@/lib/hooks/useStepCarousel";
+import { DiagramStepArrows, DiagramStepDots } from "@/components/hero/ChapterDiagramControls";
+import type { ProducerCallbackLabels } from "@/components/three/diagrams/ProducerCallbackScene";
+
+const ProducerCallbackScene = dynamic(
+  () => import("@/components/three/diagrams/ProducerCallbackScene"),
+  { ssr: false, loading: () => <HeroCanvasSkeleton /> },
+);
+
+const LABELS: ProducerCallbackLabels = {
+  template: "KafkaTemplate",
+  templateSub: ".send(topic, key, value)",
+  broker: "Broker",
+  success: "onSuccess(SendResult)",
+  successSub: "ack received",
+  failure: "onFailure(Throwable)",
+  failureSub: "failed to publish",
+};
+
+const STEP_LABELS = ["Success", "Failure"];
+const AUTOPLAY_INTERVAL_MS = 4500;
+
+export function ProducerCallbackDiagramEnSvg() {
   return (
     <svg
       viewBox="0 0 620 200"
@@ -140,5 +167,26 @@ export function ProducerCallbackDiagramEn() {
         failed to publish
       </text>
     </svg>
+  );
+}
+
+export function ProducerCallbackDiagramEn() {
+  const shouldRender3D = useShouldRender3D();
+  const { step, goTo } = useStepCarousel(STEP_LABELS.length, shouldRender3D, AUTOPLAY_INTERVAL_MS);
+
+  if (!shouldRender3D) {
+    return <ProducerCallbackDiagramEnSvg />;
+  }
+
+  return (
+    <div>
+      <div className="relative mx-auto aspect-[16/9] w-full max-w-2xl">
+        <div aria-hidden="true" className="h-full w-full">
+          <ProducerCallbackScene step={step} labels={LABELS} />
+        </div>
+        <DiagramStepArrows step={step} onGoTo={goTo} prevLabel="Previous step" nextLabel="Next step" />
+      </div>
+      <DiagramStepDots step={step} stepLabels={STEP_LABELS} onGoTo={goTo} goToLabel="Go to step" />
+    </div>
   );
 }

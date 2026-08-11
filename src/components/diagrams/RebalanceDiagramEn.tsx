@@ -1,14 +1,31 @@
-function PartitionBox({
-  x,
-  y,
-  label,
-  dashed,
-}: {
-  x: number;
-  y: number;
-  label: string;
-  dashed?: boolean;
-}) {
+"use client";
+
+import dynamic from "next/dynamic";
+import { useShouldRender3D } from "@/components/three/webgl-support";
+import { HeroCanvasSkeleton } from "@/components/hero/HeroCanvasSkeleton";
+import { useStepCarousel } from "@/lib/hooks/useStepCarousel";
+import { DiagramStepArrows, DiagramStepDots } from "@/components/hero/ChapterDiagramControls";
+import type { RebalanceLabels } from "@/components/three/diagrams/RebalanceScene";
+
+const RebalanceScene = dynamic(() => import("@/components/three/diagrams/RebalanceScene"), {
+  ssr: false,
+  loading: () => <HeroCanvasSkeleton />,
+});
+
+const LABELS: RebalanceLabels = {
+  partition0: "Partition 0",
+  partition1: "Partition 1",
+  partition2: "Partition 2",
+  consumer1: "Consumer 1",
+  consumer2: "Consumer 2",
+  consumer3: "Consumer 3",
+  down: "down",
+};
+
+const STEP_LABELS = ["Before the rebalance", "After (Consumer 2 goes down)"];
+const AUTOPLAY_INTERVAL_MS = 4500;
+
+function PartitionBox({ x, y, label }: { x: number; y: number; label: string }) {
   return (
     <g>
       <rect
@@ -17,13 +34,8 @@ function PartitionBox({
         width="90"
         height="30"
         rx="5"
-        className={
-          dashed
-            ? "fill-[var(--color-bg)] stroke-[var(--color-border)]"
-            : "fill-[var(--color-bg)] stroke-[var(--color-border)]"
-        }
+        className="fill-[var(--color-bg)] stroke-[var(--color-border)]"
         strokeWidth="1.5"
-        strokeDasharray={dashed ? "3 3" : undefined}
       />
       <text
         x={x + 45}
@@ -78,7 +90,7 @@ function ConsumerBox({
   );
 }
 
-export function RebalanceDiagramEn() {
+export function RebalanceDiagramEnSvg() {
   return (
     <svg
       viewBox="0 0 640 280"
@@ -152,5 +164,26 @@ export function RebalanceDiagramEn() {
         Partition 1
       </text>
     </svg>
+  );
+}
+
+export function RebalanceDiagramEn() {
+  const shouldRender3D = useShouldRender3D();
+  const { step, goTo } = useStepCarousel(STEP_LABELS.length, shouldRender3D, AUTOPLAY_INTERVAL_MS);
+
+  if (!shouldRender3D) {
+    return <RebalanceDiagramEnSvg />;
+  }
+
+  return (
+    <div>
+      <div className="relative mx-auto aspect-[16/9] w-full max-w-2xl">
+        <div aria-hidden="true" className="h-full w-full">
+          <RebalanceScene step={step} labels={LABELS} />
+        </div>
+        <DiagramStepArrows step={step} onGoTo={goTo} prevLabel="Previous step" nextLabel="Next step" />
+      </div>
+      <DiagramStepDots step={step} stepLabels={STEP_LABELS} onGoTo={goTo} goToLabel="Go to step" />
+    </div>
   );
 }

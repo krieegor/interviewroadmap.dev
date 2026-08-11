@@ -229,6 +229,9 @@ export const en: Dictionary = {
     heroCaptionProducer: "Producer",
     heroCaptionPartitions: "Partitions keep the order",
     heroCaptionConsumerGroup: "Consumer Group distributes the processing",
+    heroPrevStep: "Previous step",
+    heroNextStep: "Next step",
+    heroGoToStep: "Go to step",
     howItWorksTitle: "The same format, every track",
     featureBookTitle: "Like a real book",
     featureBookDescription:

@@ -1,6 +1,6 @@
 # Como adicionar uma trilha (`tech`) nova
 
-Este guia é para quem vai adicionar uma trilha nova ao seletor (`/[locale]`) — seja uma trilha "em
+Este guia é para quem vai adicionar uma trilha nova ao seletor (`/[locale]/home`) — seja uma trilha "em
 construção" (só a página existe, sem conteúdo ainda, como Java/Elastic/SQL/AWS/GCP hoje) ou uma trilha que
 já nasce com conteúdo real. Para escrever capítulos/perguntas/glossário/estudos de caso **dentro** de uma
 trilha que já existe, veja [`docs/content-authoring.md`](./content-authoring.md) — este guia aqui é só sobre

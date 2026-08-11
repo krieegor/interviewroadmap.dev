@@ -24,8 +24,9 @@ de dados, sem autenticação, sem serviços pagos. Estado do usuário (tema, pro
 ## Regras de ouro
 
 - `src/app/**` é só roteamento e composição de componentes. **Nunca** escreva texto do livro ali. Rotas de
-  conteúdo vivem sob `/[locale]/[tech]/**` (ex.: `/pt/kafka/livro/...`) — `/[locale]` sozinho é o seletor de
-  trilha.
+  conteúdo vivem sob `/[locale]/[tech]/**` (ex.: `/pt/kafka/livro/...`) — `/[locale]/home` é o seletor de
+  trilha; `/[locale]` sozinho é só um redirect estático pra `/[locale]/home` (não renderiza nada, ver
+  `src/app/[locale]/page.tsx`).
 - Todo conteúdo (capítulo, pergunta, termo, estudo de caso) é um arquivo `.mdx` em
   `src/content/<tech>/<tipo>/<locale>/*.mdx` com frontmatter tipado. Ver seção "Como criar conteúdo" abaixo.
 - `src/lib/content/**` é a única camada que lê o filesystem. Componentes não importam `fs`/`gray-matter`.
@@ -38,11 +39,17 @@ de dados, sem autenticação, sem serviços pagos. Estado do usuário (tema, pro
 - Não trate Kafka como "só uma fila" em nenhum texto.
 - Siga [`specs/content-guidelines.md`](./specs/content-guidelines.md) à risca: os 10 pontos por conceito, a
   estrutura fixa de pergunta de entrevista, os blocos MDX disponíveis.
-- `/[locale]` (seletor de trilha) tem identidade visual própria, mais expressiva (hero 3D, motion, scroll
-  storytelling) — ver `specs/design-system.md` §1. Qualquer componente 3D/motion pesado adicionado ali
+- `/[locale]/home` (seletor de trilha) e `/[locale]/[tech]` (home de cada trilha) têm identidade visual
+  própria, mais expressiva (motion, scroll reveal, microinterações) — ver `specs/design-system.md` §1.
+  Elemento 3D decorativo/de vitrine é **específico de uma trilha** (ex.: o hero do Kafka em
+  `src/components/hero/KafkaHero.tsx`, condicionado a `tech === "kafka"` em
+  `src/app/[locale]/[tech]/page.tsx`) — nunca entra no seletor genérico `/[locale]/home`, que lista várias
+  tecnologias e não deve favorecer o modelo visual de uma só. Qualquer componente 3D/motion pesado
   **precisa** ter fallback real sob "sem WebGL"/`prefers-reduced-motion` (não é opcional) e ser carregado via
-  `next/dynamic(..., { ssr: false })`. As páginas de leitura do livro continuam com a identidade calma
-  original — não estenda 3D/scroll-drive pra lá sem justificar antes.
+  `next/dynamic(..., { ssr: false })`. As páginas de leitura do livro mantêm a identidade calma (sem
+  scroll-drive, sem hero, sem 3D decorativo solto em prosa) — a única exceção aceita é recriar em 3D um
+  diagrama que já existe em 2D no livro, seguindo o contrato de fallback e o kit compartilhado descritos em
+  `specs/design-system.md` §1. Não estenda 3D pra lá além desse caso sem justificar antes.
 
 ## Como criar um novo capítulo
 
@@ -82,6 +89,14 @@ capítulo"/"pergunta" acima e por [`docs/content-authoring.md`](./docs/content-a
 - Fluxo mais elaborado/único (rebalance, outbox pattern) → `<Mermaid chart="...">` (import dinâmico,
   `ssr: false`), tema customizado para herdar a paleta do projeto.
 - Nunca use imagens externas ou hotlink de diagrama de terceiros.
+- Todo diagrama SVG do livro Kafka hoje também tem uma versão 3D equivalente (ver
+  `specs/design-system.md` §1) — o componente exportado em `src/components/diagrams/XDiagram.tsx`/
+  `XDiagramEn.tsx` decide entre a cena 3D (`src/components/three/diagrams/XScene.tsx`, carregada via
+  `next/dynamic(..., { ssr: false })`) e o SVG original (preservado verbatim como fallback) usando
+  `useHasWebGL()` + `useReducedMotion()`. Um diagrama **novo** não precisa de versão 3D — só recrie em 3D um
+  diagrama já existente se o autor pedir explicitamente; nesse caso reuse os primitives de
+  `src/components/three/shared/` (`Node3D`, `Connector3D`, `FlowParticles3D`, `OffsetLog3D`,
+  `StepCameraRig`) em vez de escrever geometria do zero.
 
 ## Componentes de conteúdo disponíveis (`src/components/content`)
 
@@ -131,11 +146,15 @@ formatar um `.mdx` manualmente, verifique visualmente qualquer tabela depois.
   sem cache incremental, sem serviço pago extra. Ver [`specs/roadmap.md`](./specs/roadmap.md) (seção "export
   estático puro") pelo porquê — uma tentativa anterior de rodar como servidor num adapter de edge (Cloudflare
   Workers via `@opennextjs/cloudflare`) esbarrou em limite de tamanho e exigiu R2, e foi revertida.
-- Motion (`motion`) + Three.js via `@react-three/fiber`/`@react-three/drei` adotados para um hero 3D
-  scroll-driven em `/[locale]` — decisão explícita do autor pra elevar a qualidade visual da vitrine do
-  produto, substituindo a regra anterior de "sem animação de scroll" só nessa página (o resto do site mantém
-  a identidade calma original). Escolhido em vez de canvas/WebGL na mão ou CSS-only porque o grafo de cena
-  declarativo do R3F combina com o padrão de um-componente-por-responsabilidade do projeto, e os
-  `MotionValue`s do Motion cruzam pra dentro do loop `useFrame` do R3F sem causar re-render React a cada
-  frame de scroll. Ver [`specs/roadmap.md`](./specs/roadmap.md) ("hero 3D interativo") e
-  `specs/design-system.md` §1 pelo contrato de fallback obrigatório.
+- Motion (`motion`) + Three.js via `@react-three/fiber`/`@react-three/drei` adotados para um hero 3D na
+  home da trilha Kafka (`/[locale]/kafka`) — decisão explícita do autor pra elevar a qualidade visual da
+  vitrine do produto, substituindo a regra anterior de "sem animação" só nas páginas de seletor/trilha (o
+  resto do site mantém a identidade calma original). O 3D ficou de fora do seletor `/[locale]/home`
+  (multi-trilha) por não fazer sentido mostrar o modelo de uma tecnologia específica ali — motion/reveal/
+  microinterações continuam em ambas as páginas, só o Canvas 3D é exclusivo da home do Kafka. **Não é
+  scroll-driven** — é autoplay (`setInterval`) + navegação manual (setas/indicadores, `<button>` reais),
+  autocontido, porque a primeira versão (câmera ligada ao scroll) incomodava: rolar a página não pode mudar
+  o que o 3D mostra. Escolhido R3F em vez de canvas/WebGL na mão ou CSS-only porque o grafo de cena
+  declarativo combina com o padrão de um-componente-por-responsabilidade do projeto. Ver
+  [`specs/roadmap.md`](./specs/roadmap.md) ("hero 3D interativo") e `specs/design-system.md` §1 pelo
+  contrato de fallback obrigatório.

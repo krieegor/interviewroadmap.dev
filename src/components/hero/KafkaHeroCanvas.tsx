@@ -1,7 +1,6 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import type { MotionValue } from "motion/react";
 import { HeroCanvasSkeleton } from "./HeroCanvasSkeleton";
 
 const KafkaFlowScene = dynamic(() => import("@/components/three/KafkaFlowScene"), {
@@ -9,12 +8,6 @@ const KafkaFlowScene = dynamic(() => import("@/components/three/KafkaFlowScene")
   loading: () => <HeroCanvasSkeleton />,
 });
 
-export function KafkaHeroCanvas({
-  scrollProgress,
-  mobile,
-}: {
-  scrollProgress?: MotionValue<number>;
-  mobile: boolean;
-}) {
-  return <KafkaFlowScene scrollProgress={scrollProgress} mobile={mobile} />;
+export function KafkaHeroCanvas({ step, mobile }: { step: number; mobile: boolean }) {
+  return <KafkaFlowScene step={step} mobile={mobile} />;
 }

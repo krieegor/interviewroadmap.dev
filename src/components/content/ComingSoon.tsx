@@ -25,7 +25,7 @@ export function ComingSoon({
       </h1>
       <p className="mt-4 text-[var(--color-text-muted)]">{dict.comingSoon.message}</p>
       <Link
-        href={`/${locale}`}
+        href={`/${locale}/home`}
         className="mt-8 inline-block text-sm font-medium text-[var(--color-accent)] hover:underline"
       >
         {dict.comingSoon.backToSelector}

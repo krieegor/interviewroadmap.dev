@@ -1,4 +1,24 @@
-export function BrokerClusterDiagram() {
+"use client";
+
+import dynamic from "next/dynamic";
+import { useShouldRender3D } from "@/components/three/webgl-support";
+import { HeroCanvasSkeleton } from "@/components/hero/HeroCanvasSkeleton";
+import type { BrokerClusterLabels } from "@/components/three/diagrams/BrokerClusterScene";
+
+const BrokerClusterScene = dynamic(() => import("@/components/three/diagrams/BrokerClusterScene"), {
+  ssr: false,
+  loading: () => <HeroCanvasSkeleton />,
+});
+
+const LABELS: BrokerClusterLabels = {
+  broker1: "Broker 1",
+  broker2: "Broker 2",
+  broker3: "Broker 3",
+  leader: "Leader",
+  follower: "Follower",
+};
+
+export function BrokerClusterDiagramSvg() {
   return (
     <svg
       viewBox="0 0 640 220"
@@ -155,5 +175,19 @@ export function BrokerClusterDiagram() {
         replicação (ISR)
       </text>
     </svg>
+  );
+}
+
+export function BrokerClusterDiagram() {
+  const shouldRender3D = useShouldRender3D();
+
+  if (!shouldRender3D) {
+    return <BrokerClusterDiagramSvg />;
+  }
+
+  return (
+    <div aria-hidden="true" className="mx-auto aspect-[16/9] w-full max-w-2xl">
+      <BrokerClusterScene labels={LABELS} />
+    </div>
   );
 }

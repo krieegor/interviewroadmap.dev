@@ -1,4 +1,21 @@
-export function OffsetCommitDiagramEn() {
+"use client";
+
+import dynamic from "next/dynamic";
+import { useShouldRender3D } from "@/components/three/webgl-support";
+import { HeroCanvasSkeleton } from "@/components/hero/HeroCanvasSkeleton";
+import type { OffsetCommitLabels } from "@/components/three/diagrams/OffsetCommitScene";
+
+const OffsetCommitScene = dynamic(() => import("@/components/three/diagrams/OffsetCommitScene"), {
+  ssr: false,
+  loading: () => <HeroCanvasSkeleton />,
+});
+
+const LABELS: OffsetCommitLabels = {
+  committed: "committed",
+  currentPosition: "current position",
+};
+
+export function OffsetCommitDiagramEnSvg() {
   const offsets = [0, 1, 2, 3, 4, 5, 6, 7];
   const committedOffset = 3;
   const currentPosition = 6;
@@ -87,5 +104,19 @@ export function OffsetCommitDiagramEn() {
         offsets 4-6: already processed, not yet committed — reprocessed if the consumer crashes now
       </text>
     </svg>
+  );
+}
+
+export function OffsetCommitDiagramEn() {
+  const shouldRender3D = useShouldRender3D();
+
+  if (!shouldRender3D) {
+    return <OffsetCommitDiagramEnSvg />;
+  }
+
+  return (
+    <div aria-hidden="true" className="mx-auto aspect-[16/9] w-full max-w-2xl">
+      <OffsetCommitScene labels={LABELS} />
+    </div>
   );
 }

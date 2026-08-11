@@ -228,6 +228,9 @@ export const pt = {
     heroCaptionProducer: "Producer",
     heroCaptionPartitions: "Partitions mantêm a ordem",
     heroCaptionConsumerGroup: "Consumer Group distribui o processamento",
+    heroPrevStep: "Etapa anterior",
+    heroNextStep: "Próxima etapa",
+    heroGoToStep: "Ir para a etapa",
     howItWorksTitle: "O mesmo formato em toda trilha",
     featureBookTitle: "Como se fosse um livro",
     featureBookDescription:

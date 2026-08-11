@@ -81,7 +81,7 @@ npm install
 npm run dev
 ```
 
-Acesse `http://localhost:3000` — redireciona pro seletor de trilha (`/pt`), de onde você escolhe Kafka,
+Acesse `http://localhost:3000` — redireciona pro seletor de trilha (`/pt/home`), de onde você escolhe Kafka,
 Java, Elastic Search, SQL, AWS ou GCP.
 
 ## Scripts

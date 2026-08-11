@@ -16,13 +16,13 @@ export default function NotFound() {
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Link
-              href="/pt"
+              href="/pt/home"
               className="rounded-md bg-[var(--color-accent)] px-4 py-2 text-sm font-medium text-white"
             >
               Português
             </Link>
             <Link
-              href="/en"
+              href="/en/home"
               className="rounded-md border border-[var(--color-border)] px-4 py-2 text-sm font-medium text-[var(--color-text)] hover:border-[var(--color-accent)]"
             >
               English

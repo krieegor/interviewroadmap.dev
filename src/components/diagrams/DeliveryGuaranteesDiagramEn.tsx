@@ -1,3 +1,31 @@
+"use client";
+
+import dynamic from "next/dynamic";
+import { useShouldRender3D } from "@/components/three/webgl-support";
+import { HeroCanvasSkeleton } from "@/components/hero/HeroCanvasSkeleton";
+import { useStepCarousel } from "@/lib/hooks/useStepCarousel";
+import { DiagramStepArrows, DiagramStepDots } from "@/components/hero/ChapterDiagramControls";
+import type { DeliveryGuaranteesLabels } from "@/components/three/diagrams/DeliveryGuaranteesScene";
+
+const DeliveryGuaranteesScene = dynamic(
+  () => import("@/components/three/diagrams/DeliveryGuaranteesScene"),
+  { ssr: false, loading: () => <HeroCanvasSkeleton /> },
+);
+
+const LABELS: DeliveryGuaranteesLabels = {
+  producer: "Producer",
+  kafka: "Kafka",
+  consumer: "Consumer",
+  steps: [
+    { title: "At Most Once", outcome: "message may be lost" },
+    { title: "At Least Once", outcome: "message may be duplicated" },
+    { title: "Exactly Once", outcome: "processed exactly once" },
+  ],
+};
+
+const STEP_LABELS = ["At Most Once", "At Least Once", "Exactly Once"];
+const AUTOPLAY_INTERVAL_MS = 4500;
+
 function Lane({
   y,
   title,
@@ -107,7 +135,7 @@ function Lane({
   );
 }
 
-export function DeliveryGuaranteesDiagramEn() {
+export function DeliveryGuaranteesDiagramEnSvg() {
   return (
     <svg
       viewBox="0 0 620 220"
@@ -139,5 +167,26 @@ export function DeliveryGuaranteesDiagramEn() {
         />
       </g>
     </svg>
+  );
+}
+
+export function DeliveryGuaranteesDiagramEn() {
+  const shouldRender3D = useShouldRender3D();
+  const { step, goTo } = useStepCarousel(STEP_LABELS.length, shouldRender3D, AUTOPLAY_INTERVAL_MS);
+
+  if (!shouldRender3D) {
+    return <DeliveryGuaranteesDiagramEnSvg />;
+  }
+
+  return (
+    <div>
+      <div className="relative mx-auto aspect-[16/9] w-full max-w-2xl">
+        <div aria-hidden="true" className="h-full w-full">
+          <DeliveryGuaranteesScene step={step} labels={LABELS} />
+        </div>
+        <DiagramStepArrows step={step} onGoTo={goTo} prevLabel="Previous step" nextLabel="Next step" />
+      </div>
+      <DiagramStepDots step={step} stepLabels={STEP_LABELS} onGoTo={goTo} goToLabel="Go to step" />
+    </div>
   );
 }

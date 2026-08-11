@@ -1,4 +1,31 @@
-export function RetryDlqDiagram() {
+"use client";
+
+import dynamic from "next/dynamic";
+import { useShouldRender3D } from "@/components/three/webgl-support";
+import { HeroCanvasSkeleton } from "@/components/hero/HeroCanvasSkeleton";
+import { useStepCarousel } from "@/lib/hooks/useStepCarousel";
+import { DiagramStepArrows, DiagramStepDots } from "@/components/hero/ChapterDiagramControls";
+import type { RetryDlqLabels } from "@/components/three/diagrams/RetryDlqScene";
+
+const RetryDlqScene = dynamic(() => import("@/components/three/diagrams/RetryDlqScene"), {
+  ssr: false,
+  loading: () => <HeroCanvasSkeleton />,
+});
+
+const LABELS: RetryDlqLabels = {
+  topic: "Topic: pagamentos",
+  consumer: "Consumer",
+  consumerFail: "falha ao processar",
+  retryTopic: "Topic: pagamentos-retry",
+  backoff: "backoff exponencial",
+  dlqTopic: "Topic: pagamentos-dlq",
+  dlqSub: "investigação manual",
+};
+
+const STEP_LABELS = ["Tenta processar", "Retry com backoff", "Esgotou — vai pro DLQ"];
+const AUTOPLAY_INTERVAL_MS = 4500;
+
+export function RetryDlqDiagramSvg() {
   return (
     <svg
       viewBox="0 0 700 260"
@@ -188,5 +215,26 @@ export function RetryDlqDiagram() {
         a mensagem problemática não bloqueia a partition (sem efeito poison pill).
       </text>
     </svg>
+  );
+}
+
+export function RetryDlqDiagram() {
+  const shouldRender3D = useShouldRender3D();
+  const { step, goTo } = useStepCarousel(STEP_LABELS.length, shouldRender3D, AUTOPLAY_INTERVAL_MS);
+
+  if (!shouldRender3D) {
+    return <RetryDlqDiagramSvg />;
+  }
+
+  return (
+    <div>
+      <div className="relative mx-auto aspect-[16/9] w-full max-w-2xl">
+        <div aria-hidden="true" className="h-full w-full">
+          <RetryDlqScene step={step} labels={LABELS} />
+        </div>
+        <DiagramStepArrows step={step} onGoTo={goTo} prevLabel="Etapa anterior" nextLabel="Próxima etapa" />
+      </div>
+      <DiagramStepDots step={step} stepLabels={STEP_LABELS} onGoTo={goTo} goToLabel="Ir para a etapa" />
+    </div>
   );
 }

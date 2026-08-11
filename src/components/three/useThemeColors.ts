@@ -15,6 +15,7 @@ export type SceneColors = {
   accentSubtle: THREE.Color;
   border: THREE.Color;
   surface: THREE.Color;
+  text: THREE.Color;
   textMuted: THREE.Color;
 };
 
@@ -28,6 +29,7 @@ export function useThemeColors(): SceneColors {
       accentSubtle: readColor("--color-accent-subtle"),
       border: readColor("--color-border"),
       surface: readColor("--color-surface"),
+      text: readColor("--color-text"),
       textMuted: readColor("--color-text-muted"),
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps -- isDark fully determines every --color-* token

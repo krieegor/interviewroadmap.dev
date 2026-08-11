@@ -1,3 +1,25 @@
+"use client";
+
+import dynamic from "next/dynamic";
+import { useShouldRender3D } from "@/components/three/webgl-support";
+import { HeroCanvasSkeleton } from "@/components/hero/HeroCanvasSkeleton";
+import { useStepCarousel } from "@/lib/hooks/useStepCarousel";
+import { DiagramStepArrows, DiagramStepDots } from "@/components/hero/ChapterDiagramControls";
+import type { ReplayLabels } from "@/components/three/diagrams/ReplayScene";
+
+const ReplayScene = dynamic(() => import("@/components/three/diagrams/ReplayScene"), {
+  ssr: false,
+  loading: () => <HeroCanvasSkeleton />,
+});
+
+const LABELS: ReplayLabels = {
+  committedOffset: "committed offset",
+  newReadPosition: "new read position",
+};
+
+const STEP_LABELS = ["Before replay", "After resetting the offset to 2"];
+const AUTOPLAY_INTERVAL_MS = 4500;
+
 function OffsetRow({
   y,
   label,
@@ -78,7 +100,7 @@ function OffsetRow({
   );
 }
 
-export function ReplayDiagramEn() {
+export function ReplayDiagramEnSvg() {
   return (
     <svg
       viewBox="0 0 640 260"
@@ -97,5 +119,26 @@ export function ReplayDiagramEn() {
         reprocessTo={6}
       />
     </svg>
+  );
+}
+
+export function ReplayDiagramEn() {
+  const shouldRender3D = useShouldRender3D();
+  const { step, goTo } = useStepCarousel(STEP_LABELS.length, shouldRender3D, AUTOPLAY_INTERVAL_MS);
+
+  if (!shouldRender3D) {
+    return <ReplayDiagramEnSvg />;
+  }
+
+  return (
+    <div>
+      <div className="relative mx-auto aspect-[16/9] w-full max-w-2xl">
+        <div aria-hidden="true" className="h-full w-full">
+          <ReplayScene step={step} labels={LABELS} />
+        </div>
+        <DiagramStepArrows step={step} onGoTo={goTo} prevLabel="Previous step" nextLabel="Next step" />
+      </div>
+      <DiagramStepDots step={step} stepLabels={STEP_LABELS} onGoTo={goTo} goToLabel="Go to step" />
+    </div>
   );
 }

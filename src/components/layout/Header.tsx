@@ -32,14 +32,14 @@ export async function Header({
         <MobileNav locale={locale} tech={tech} dict={dict} />
         <div className="flex shrink-0 items-center gap-2">
           <Link
-            href={`/${locale}`}
+            href={`/${locale}/home`}
             className="flex items-center gap-1.5 truncate text-sm font-semibold text-[var(--color-text)] sm:text-base"
           >
             <Logo className="text-[var(--color-accent)]" />
             {siteConfig.shortName}
           </Link>
           <Link
-            href={`/${locale}`}
+            href={`/${locale}/home`}
             aria-label={dict.trackSwitcher.backToSelector}
             className="rounded-full border border-[var(--color-border)] px-2 py-0.5 text-xs text-[var(--color-text-muted)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]"
           >

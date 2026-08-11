@@ -1,4 +1,16 @@
-type ConsumerLagLabels = {
+"use client";
+
+import dynamic from "next/dynamic";
+import { useShouldRender3D } from "@/components/three/webgl-support";
+import { HeroCanvasSkeleton } from "@/components/hero/HeroCanvasSkeleton";
+import type { ConsumerLagLabels } from "@/components/three/diagrams/ConsumerLagScene";
+
+const ConsumerLagScene = dynamic(() => import("@/components/three/diagrams/ConsumerLagScene"), {
+  ssr: false,
+  loading: () => <HeroCanvasSkeleton />,
+});
+
+type ConsumerLagSvgLabels = {
   ariaLabel: string;
   consumerAt: string;
   logEnd: string;
@@ -9,7 +21,7 @@ type ConsumerLagLabels = {
 // irmão) — só o texto muda entre os dois idiomas, a geometria do SVG é idêntica. Ver
 // specs/roadmap.md (spike de consolidação de diagramas) antes de replicar esse padrão pros outros
 // 12 pares PT/EN.
-export function ConsumerLagDiagramBase({ labels }: { labels: ConsumerLagLabels }) {
+export function ConsumerLagDiagramBase({ labels }: { labels: ConsumerLagSvgLabels }) {
   const offsets = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
   const consumerOffset = 4;
   const logEndOffset = 9;
@@ -93,16 +105,37 @@ export function ConsumerLagDiagramBase({ labels }: { labels: ConsumerLagLabels }
   );
 }
 
+export function ConsumerLagDiagramImpl({
+  svgLabels,
+  sceneLabels,
+}: {
+  svgLabels: ConsumerLagSvgLabels;
+  sceneLabels: ConsumerLagLabels;
+}) {
+  const shouldRender3D = useShouldRender3D();
+
+  if (!shouldRender3D) {
+    return <ConsumerLagDiagramBase labels={svgLabels} />;
+  }
+
+  return (
+    <div aria-hidden="true" className="mx-auto aspect-[16/7] w-full max-w-2xl">
+      <ConsumerLagScene labels={sceneLabels} />
+    </div>
+  );
+}
+
 export function ConsumerLagDiagram() {
   return (
-    <ConsumerLagDiagramBase
-      labels={{
+    <ConsumerLagDiagramImpl
+      svgLabels={{
         ariaLabel:
-          "O producer ja escreveu ate o offset 9 (log end offset). O consumer so processou ate o offset 4. Consumer lag e a diferenca entre os dois: 5 mensagens ainda nao processadas.",
+          "O producer já escreveu até o offset 9 (log end offset). O consumer só processou até o offset 4. Consumer lag é a diferença entre os dois: 5 mensagens ainda não processadas.",
         consumerAt: "consumer em 4",
         logEnd: "log end: 9",
         lag: "consumer lag = 9 − 4 = 5 mensagens pendentes",
       }}
+      sceneLabels={{ consumerAt: "consumer em 4", logEnd: "log end: 9" }}
     />
   );
 }

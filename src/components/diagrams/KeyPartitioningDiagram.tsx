@@ -1,4 +1,29 @@
-export function KeyPartitioningDiagram() {
+"use client";
+
+import dynamic from "next/dynamic";
+import { useShouldRender3D } from "@/components/three/webgl-support";
+import { HeroCanvasSkeleton } from "@/components/hero/HeroCanvasSkeleton";
+import type { KeyPartitioningLabels } from "@/components/three/diagrams/KeyPartitioningScene";
+
+const KeyPartitioningScene = dynamic(() => import("@/components/three/diagrams/KeyPartitioningScene"), {
+  ssr: false,
+  loading: () => <HeroCanvasSkeleton />,
+});
+
+const LABELS: KeyPartitioningLabels = {
+  keys: [
+    { label: "conta-101", partition: 0 },
+    { label: "conta-204", partition: 2 },
+    { label: "conta-101", partition: 0 },
+    { label: "conta-357", partition: 1 },
+    { label: "conta-204", partition: 2 },
+  ],
+  hash: "hash(key)",
+  hashSub: "% partitions",
+  partition: "Partition",
+};
+
+export function KeyPartitioningDiagramSvg() {
   const keys = [
     { label: "conta-101", partition: 0 },
     { label: "conta-204", partition: 2 },
@@ -124,5 +149,19 @@ export function KeyPartitioningDiagram() {
         </g>
       ))}
     </svg>
+  );
+}
+
+export function KeyPartitioningDiagram() {
+  const shouldRender3D = useShouldRender3D();
+
+  if (!shouldRender3D) {
+    return <KeyPartitioningDiagramSvg />;
+  }
+
+  return (
+    <div aria-hidden="true" className="mx-auto aspect-[16/9] w-full max-w-2xl">
+      <KeyPartitioningScene labels={LABELS} />
+    </div>
   );
 }

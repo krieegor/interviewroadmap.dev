@@ -1,4 +1,16 @@
-export function ProducerConsumerFlow() {
+"use client";
+
+import { useMediaQuery } from "@/lib/hooks/useMediaQuery";
+import { useShouldRender3D } from "@/components/three/webgl-support";
+import { AUTOPLAY_INTERVAL_MS, STEP_COUNT } from "@/components/three/scene-constants";
+import { useStepCarousel } from "@/lib/hooks/useStepCarousel";
+import { KafkaHeroCanvas } from "@/components/hero/KafkaHeroCanvas";
+import { HeroCaption } from "@/components/hero/HeroCaption";
+import { DiagramStepArrows, DiagramStepDots } from "@/components/hero/ChapterDiagramControls";
+
+const CAPTIONS = ["Producer", "Partitions mantêm a ordem", "Consumer Group distribui o processamento"];
+
+export function ProducerConsumerFlowSvg() {
   return (
     <svg
       viewBox="0 0 720 260"
@@ -161,5 +173,28 @@ export function ProducerConsumerFlow() {
         </g>
       ))}
     </svg>
+  );
+}
+
+export function ProducerConsumerFlow() {
+  const isMobile = useMediaQuery("(max-width: 767px)");
+  const shouldRender3D = useShouldRender3D();
+  const { step, goTo } = useStepCarousel(STEP_COUNT, shouldRender3D, AUTOPLAY_INTERVAL_MS);
+
+  if (!shouldRender3D) {
+    return <ProducerConsumerFlowSvg />;
+  }
+
+  return (
+    <div>
+      <div className="relative mx-auto aspect-[16/9] w-full max-w-2xl">
+        <div aria-hidden="true" className="h-full w-full">
+          <KafkaHeroCanvas step={step} mobile={isMobile} />
+          <HeroCaption text={CAPTIONS[step]!} />
+        </div>
+        <DiagramStepArrows step={step} onGoTo={goTo} prevLabel="Etapa anterior" nextLabel="Próxima etapa" />
+      </div>
+      <DiagramStepDots step={step} stepLabels={CAPTIONS} onGoTo={goTo} goToLabel="Ir para a etapa" />
+    </div>
   );
 }

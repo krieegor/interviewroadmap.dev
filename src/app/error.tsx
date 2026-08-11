@@ -25,13 +25,13 @@ export default function GlobalError({ reset }: { error: Error & { digest?: strin
               Tentar de novo · Try again
             </button>
             <Link
-              href="/pt"
+              href="/pt/home"
               className="rounded-md border border-[var(--color-border)] px-4 py-2 text-sm font-medium text-[var(--color-text)] hover:border-[var(--color-accent)]"
             >
               Português
             </Link>
             <Link
-              href="/en"
+              href="/en/home"
               className="rounded-md border border-[var(--color-border)] px-4 py-2 text-sm font-medium text-[var(--color-text)] hover:border-[var(--color-accent)]"
             >
               English

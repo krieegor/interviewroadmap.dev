@@ -1,0 +1,46 @@
+import { describe, it, expect, vi } from "vitest";
+import { render, screen } from "@testing-library/react";
+import { ProducerConsumerFlow } from "@/components/diagrams/ProducerConsumerFlow";
+
+const { useHasWebGLMock, useReducedMotionMock } = vi.hoisted(() => ({
+  useHasWebGLMock: vi.fn(),
+  useReducedMotionMock: vi.fn(),
+}));
+
+vi.mock("@/components/three/webgl-support", () => ({
+  useHasWebGL: useHasWebGLMock,
+  useShouldRender3D: () => {
+    const supportsWebGL = useHasWebGLMock();
+    const prefersReducedMotion = useReducedMotionMock();
+    return supportsWebGL && !prefersReducedMotion;
+  },
+  hasWebGL: () => false,
+}));
+
+vi.mock("@/lib/hooks/useMediaQuery", () => ({
+  useMediaQuery: () => false,
+}));
+
+vi.mock("motion/react", () => ({
+  useReducedMotion: useReducedMotionMock,
+}));
+
+describe("ProducerConsumerFlow", () => {
+  it("renderiza o SVG estático quando WebGL não está disponível, sem montar um canvas 3D", () => {
+    useHasWebGLMock.mockReturnValue(false);
+    useReducedMotionMock.mockReturnValue(false);
+    render(<ProducerConsumerFlow />);
+
+    expect(screen.getByRole("img")).toBeInTheDocument();
+    expect(document.querySelector("canvas")).not.toBeInTheDocument();
+  });
+
+  it("renderiza o SVG estático quando o usuário prefere reduced motion, mesmo com WebGL disponível", () => {
+    useHasWebGLMock.mockReturnValue(true);
+    useReducedMotionMock.mockReturnValue(true);
+    render(<ProducerConsumerFlow />);
+
+    expect(screen.getByRole("img")).toBeInTheDocument();
+    expect(document.querySelector("canvas")).not.toBeInTheDocument();
+  });
+});

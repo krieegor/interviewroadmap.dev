@@ -188,8 +188,8 @@
 
 - [x] `motion`, `three`, `@react-three/fiber`, `@react-three/drei` adicionados como dependências (e
       `@types/three` como devDependency) — mudança de direção visual deliberada, pedida pelo autor,
-      substituindo a regra "sem animação de scroll" só na página `/[locale]` (seletor de trilha); as páginas
-      de leitura do livro mantêm a identidade calma original. Ver `specs/design-system.md` §1.
+      substituindo a regra "sem animação de scroll" nas páginas de seletor/trilha; as páginas de leitura do
+      livro mantêm a identidade calma original. Ver `specs/design-system.md` §1.
 - [x] Hero 3D scroll-driven do fluxo canônico do Kafka (Producer → Partitions → Consumer Group) — mesmo
       modelo já usado no diagrama 2D `src/components/diagrams/ProducerConsumerFlow.tsx`, agora em
       `src/components/three/` (cena R3F: `KafkaFlowScene.tsx` + meshes/câmera/luz em módulos próprios) e
@@ -214,6 +214,75 @@
       lendo `words`/`options` via ref sincronizado em efeito próprio; o `aria-hidden` do hero escondia o
       fallback SVG (que tem seu próprio `role="img"` e deveria ficar acessível) — corrigido restringindo
       `aria-hidden` só ao wrapper do Canvas 3D.
+- [x] Feedback do autor após ver o resultado: o hero 3D do Kafka não fazia sentido no seletor `/[locale]`
+      (página multi-trilha — Kafka, Java, Elastic, SQL, AWS, GCP; um modelo 3D específico de uma tecnologia
+      favorecia ela sobre as demais). `KafkaHero` movido pra home da trilha Kafka
+      (`src/app/[locale]/[tech]/page.tsx`, renderizado só quando `tech === "kafka"`), logo após o
+      `ReadingProgressCard` — não bloqueia os CTAs principais (Começar a estudar/Ver perguntas/Simular) atrás
+      do scroll de 180vh do hero. `/[locale]` voltou a ser só texto + Motion (`Reveal`/`RevealGroup`/
+      `HoverLift`/typewriter), sem Canvas 3D. Também corrigido nessa passada: `whileTap` no `HoverLift` dos
+      cards de trilha fazia o Motion injetar `tabindex="0"` num `<div>` já aninhado dentro do `<Link>`
+      focável, criando um tab-stop duplicado e não-funcional — pego testando navegação por teclado no
+      navegador; removido `whileTap` (feedback de toque agora é só CSS `active:scale` no `<Link>`).
+- [x] Seletor de trilha movido de `/[locale]` pra `/[locale]/home` (rota estática irmã de `[tech]`, sem
+      colisão — `home` não é um `Tech` válido). `/[locale]` e `/` (raiz) viraram só `redirect()` estático
+      pro destino final, sem renderizar nada. Todos os links internos que apontavam pro seletor
+      (`Header.tsx`, `ComingSoon.tsx`, `not-found.tsx`, `error.tsx`, `sitemap.ts`) atualizados; `/` redireciona
+      direto pra `/[locale]/home` (sem passar por `/[locale]` no meio).
+- [x] Feedback do autor após ver o hero do Kafka animando a câmera junto com o scroll da página: incomodava.
+      Trocado o mecanismo inteiro — de scroll-driven (`useScroll`/`useSpring` de `motion/react`, câmera
+      interpolando por progresso de scroll) pra **autoplay + navegação manual**: `KafkaHero` agora guarda um
+      `step` (0–2) em `useState`, avançado automaticamente por `setInterval` (`AUTOPLAY_INTERVAL_MS`,
+      `scene-constants.ts`) e manualmente por setas (`‹`/`›`, `<button>` reais com `aria-label`) e
+      indicadores (dots clicáveis, `aria-current` no ativo) — qualquer interação reinicia o timer do
+      autoplay. `ScrollCameraRig.tsx` e `IdleOrbitCamera.tsx` removidos; `StepCameraRig.tsx` os substitui,
+      interpolando a câmera (`camera.position.lerp`) até o enquadramento da etapa atual
+      (`CAMERA_STEPS[step]`) a cada frame — suave, mas sem depender de scroll, então a distinção
+      desktop/mobile de câmera deixou de existir (só contagem de cubos e `dpr` continuam menores no
+      mobile). Container do hero deixou de ser `h-[180vh]`/`sticky` (não precisa mais de espaço de scroll
+      pra "acontecer") — voltou a ser um bloco normal no fluxo da página. Testes atualizados
+      (`test/components/KafkaHero.test.tsx`) pra cobrir setas, loop nas pontas, clique em indicador e
+      avanço via `vi.advanceTimersByTime`, sem nunca montar `<Canvas>` real.
+
+## Pós-lançamento — 3D nos diagramas do livro Kafka (concluído)
+
+- [x] Pedido do autor: o hero 3D (Producer → Partitions → Consumer Group) ficava "desconexo" por só existir
+      na home da trilha Kafka, sem relação com o conteúdo real do livro — perguntou se dava pra levar 3D pras
+      seções do livro onde cada diagrama já existe, representando especificamente o que aquele capítulo
+      explica. Opções apresentadas (ligar o hero aos capítulos / piloto em 1-2 capítulos / cobertura completa
+      nos capítulos relevantes) — o autor escolheu explicitamente a cobertura completa.
+- [x] Inventariados os 14 componentes de diagrama 2D em `src/components/diagrams/`: 12 ganharam cena 3D nova,
+      `ProducerConsumerFlow`/`...En` (capítulos 01/03/14) passaram a reaproveitar a cena do hero
+      (`KafkaFlowScene`) via `KafkaHeroCanvas`/`HeroCaption` já existentes, e `CircuitBreakerDiagram`/
+      `Mermaid` ficaram fora de escopo (nenhum capítulo os usa).
+- [x] Kit compartilhado novo em `src/components/three/shared/`: `Node3D` (caixa arredondada + label via
+      `<Html>` do drei), `Connector3D` (linha sólida/tracejada entre dois pontos), `FlowParticles3D`
+      (generalização do `EventCubes` do hero — anima cubos ao longo de um `CatmullRomCurve3` arbitrário),
+      `OffsetLog3D` (fileira de offsets numerados com faixa de destaque e marcadores — cobre toda a família
+      "log linear": `OffsetCommitDiagram`, `ReplayDiagram`, `ConsumerLagDiagram`) e `StepCameraRig`
+      (generalizado do rig do hero, agora recebendo os `CAMERA_STEPS` como prop em vez de ler uma constante
+      fixa). `tones.ts` fixa as cores semânticas (erro/warning/sucesso) já usadas nos SVGs originais.
+- [x] Decisão de integração: nenhum arquivo `.mdx` de capítulo mudou, e `mdx-components.tsx` não precisou de
+      edição — cada `src/components/diagrams/XDiagram.tsx`/`XDiagramEn.tsx` manteve o mesmo nome/export, só o
+      miolo mudou pra escolher entre a cena 3D (`src/components/three/diagrams/XScene.tsx`, code-split via
+      `next/dynamic(..., { ssr: false })`, um chunk por cena) e o SVG original — preservado verbatim como
+      fallback (`XDiagramSvg`/`XDiagramEnSvg`) sob `!useHasWebGL() || useReducedMotion()`, mesmo contrato já
+      validado no hero. `ConsumerLagDiagram.tsx` ficou como caso especial: passou a exportar uma base
+      compartilhada (`ConsumerLagDiagramImpl`) chamada tanto pela versão PT quanto pela EN (que a importa do
+      arquivo irmão), já que só o texto muda entre os dois idiomas.
+- [x] Texto das cenas 3D hardcoded por idioma dentro de cada arquivo `X.tsx`/`XEn.tsx`, do mesmo jeito que o
+      SVG já fazia — sem entrar no dicionário i18n, mantendo a convenção existente dos diagramas.
+- [x] `three`/`@react-three/fiber`/`@react-three/drei` confirmados como um chunk compartilhado entre as cenas
+      novas (baixado uma vez, cacheado nos capítulos seguintes) e distinto do chunk do hero — dois chunks no
+      total no pior caso, nunca um por diagrama.
+- [x] 13 testes novos em `test/components/` (um por componente de diagrama, incluindo `ProducerConsumerFlow`)
+      seguindo o template de `KafkaHero.test.tsx`: mock de `useHasWebGL`/`useReducedMotion`, assert que o SVG
+      (`role="img"`) renderiza e nenhum `<canvas>` aparece — tanto sem WebGL quanto sob
+      `prefers-reduced-motion`.
+- [x] `specs/design-system.md` §1 revisado: a regra "sem 3D" nas páginas de leitura passou a ter uma exceção
+      explícita e escopada — 3D só pra recriar um diagrama que já existe em 2D, seguindo o contrato de
+      fallback obrigatório, nunca como decoração solta em prosa. `CLAUDE.md` atualizado no mesmo espírito
+      ("Como criar um diagrama").
 
 ## Backlog (trilhas futuras e itens ainda em aberto)
 

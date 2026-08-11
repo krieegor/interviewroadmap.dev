@@ -1,3 +1,29 @@
+"use client";
+
+import dynamic from "next/dynamic";
+import { useShouldRender3D } from "@/components/three/webgl-support";
+import { HeroCanvasSkeleton } from "@/components/hero/HeroCanvasSkeleton";
+import { useStepCarousel } from "@/lib/hooks/useStepCarousel";
+import { DiagramStepArrows, DiagramStepDots } from "@/components/hero/ChapterDiagramControls";
+import type { LeaderFailoverLabels } from "@/components/three/diagrams/LeaderFailoverScene";
+
+const LeaderFailoverScene = dynamic(() => import("@/components/three/diagrams/LeaderFailoverScene"), {
+  ssr: false,
+  loading: () => <HeroCanvasSkeleton />,
+});
+
+const LABELS: LeaderFailoverLabels = {
+  broker1: "Broker 1",
+  broker2: "Broker 2",
+  broker3: "Broker 3",
+  leader: "Leader",
+  follower: "Follower (ISR)",
+  down: "indisponível",
+};
+
+const STEP_LABELS = ["Antes", "Depois da queda do Broker 1"];
+const AUTOPLAY_INTERVAL_MS = 4500;
+
 function Broker({
   x,
   label,
@@ -63,7 +89,7 @@ function Broker({
   );
 }
 
-export function LeaderFailoverDiagram() {
+export function LeaderFailoverDiagramSvg() {
   return (
     <svg
       viewBox="0 0 640 320"
@@ -114,5 +140,26 @@ export function LeaderFailoverDiagram() {
         sem perda de dados confirmados
       </text>
     </svg>
+  );
+}
+
+export function LeaderFailoverDiagram() {
+  const shouldRender3D = useShouldRender3D();
+  const { step, goTo } = useStepCarousel(STEP_LABELS.length, shouldRender3D, AUTOPLAY_INTERVAL_MS);
+
+  if (!shouldRender3D) {
+    return <LeaderFailoverDiagramSvg />;
+  }
+
+  return (
+    <div>
+      <div className="relative mx-auto aspect-[16/9] w-full max-w-2xl">
+        <div aria-hidden="true" className="h-full w-full">
+          <LeaderFailoverScene step={step} labels={LABELS} />
+        </div>
+        <DiagramStepArrows step={step} onGoTo={goTo} prevLabel="Etapa anterior" nextLabel="Próxima etapa" />
+      </div>
+      <DiagramStepDots step={step} stepLabels={STEP_LABELS} onGoTo={goTo} goToLabel="Ir para a etapa" />
+    </div>
   );
 }

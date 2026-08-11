@@ -1,4 +1,30 @@
-export function OutboxPatternDiagram() {
+"use client";
+
+import dynamic from "next/dynamic";
+import { useShouldRender3D } from "@/components/three/webgl-support";
+import { HeroCanvasSkeleton } from "@/components/hero/HeroCanvasSkeleton";
+import { useStepCarousel } from "@/lib/hooks/useStepCarousel";
+import { DiagramStepArrows, DiagramStepDots } from "@/components/hero/ChapterDiagramControls";
+import type { OutboxPatternLabels } from "@/components/three/diagrams/OutboxPatternScene";
+
+const OutboxPatternScene = dynamic(() => import("@/components/three/diagrams/OutboxPatternScene"), {
+  ssr: false,
+  loading: () => <HeroCanvasSkeleton />,
+});
+
+const LABELS: OutboxPatternLabels = {
+  service: "Serviço",
+  paymentsTable: "tabela pagamentos",
+  outboxTable: "tabela outbox",
+  relay: "Relay / Debezium",
+  relaySub: "(CDC)",
+  kafka: "Kafka",
+};
+
+const STEP_LABELS = ["Grava", "Lê (CDC)", "Publica"];
+const AUTOPLAY_INTERVAL_MS = 4500;
+
+export function OutboxPatternDiagramSvg() {
   return (
     <svg
       viewBox="0 0 640 240"
@@ -166,5 +192,26 @@ export function OutboxPatternDiagram() {
         Se a transação falhar, nem o pagamento nem o evento outbox existem — nunca um sem o outro.
       </text>
     </svg>
+  );
+}
+
+export function OutboxPatternDiagram() {
+  const shouldRender3D = useShouldRender3D();
+  const { step, goTo } = useStepCarousel(STEP_LABELS.length, shouldRender3D, AUTOPLAY_INTERVAL_MS);
+
+  if (!shouldRender3D) {
+    return <OutboxPatternDiagramSvg />;
+  }
+
+  return (
+    <div>
+      <div className="relative mx-auto aspect-[16/9] w-full max-w-2xl">
+        <div aria-hidden="true" className="h-full w-full">
+          <OutboxPatternScene step={step} labels={LABELS} />
+        </div>
+        <DiagramStepArrows step={step} onGoTo={goTo} prevLabel="Etapa anterior" nextLabel="Próxima etapa" />
+      </div>
+      <DiagramStepDots step={step} stepLabels={STEP_LABELS} onGoTo={goTo} goToLabel="Ir para a etapa" />
+    </div>
   );
 }

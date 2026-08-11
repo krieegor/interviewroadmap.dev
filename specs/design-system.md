@@ -5,23 +5,45 @@
 Duas identidades convivem no projeto, por design — não é inconsistência, é escopo deliberado:
 
 - **Páginas de leitura** (`/[locale]/[tech]/livro/**`, `perguntas`, `glossario`, `casos`, `sobre`, `simulador`):
-  documentação técnica premium, não landing page. Sem gradientes chamativos, sem 3D, sem scroll-drive, sem
-  seções "hero" com CTA gigante. Otimizadas para leitura prolongada: largura de linha confortável, contraste
-  alto, espaçamento generoso. Diferenciação clara entre prosa e blocos técnicos (código, diagrama, callouts)
+  documentação técnica premium, não landing page. Sem gradientes chamativos, sem scroll-drive, sem seções
+  "hero" com CTA gigante. Otimizadas para leitura prolongada: largura de linha confortável, contraste alto,
+  espaçamento generoso. Diferenciação clara entre prosa e blocos técnicos (código, diagrama, callouts)
   através de cor de fundo e borda lateral, não de decoração pesada. Poucas animações, todas curtas e
   desativadas sob `prefers-reduced-motion`.
-- **`/[locale]` (seletor de trilha)**: a vitrine do produto, com identidade própria e mais expressiva —
-  hero 3D interativo (Motion + Three.js/`@react-three/fiber`), scroll storytelling contido à própria seção,
-  microinterações, typewriter. Ver `specs/roadmap.md` ("Pós-lançamento — hero 3D interativo") pelo histórico
-  da decisão. Regras obrigatórias para qualquer elemento 3D/motion pesado adicionado aqui:
-  - **Scroll-drive sempre contido à própria seção** — nunca um rig de pinned-scroll de página inteira;
-    a narrativa por scroll acontece dentro dos limites do componente que a usa, não sequestra o scroll da
-    página toda.
+  - **3D é permitido, mas só pra recriar um diagrama que já existe em 2D** — nunca como decoração gratuita
+    em prosa. Cada capítulo do livro Kafka que já tinha um diagrama SVG (cluster de brokers, failover de
+    leader, particionamento por key, rebalance, offsets/replay/lag, retry/DLQ, delivery guarantees,
+    idempotência, outbox, callback do producer, fluxo producer→partition→consumer) ganhou uma cena 3D
+    equivalente, reaproveitando o mesmo kit de primitives da home da trilha (`Node3D`, `Connector3D`,
+    `FlowParticles3D`, `OffsetLog3D`, `StepCameraRig` em `src/components/three/shared/`). O nome do
+    componente MDX (`src/components/diagrams/XDiagram.tsx`/`XDiagramEn.tsx`) nunca muda — o que muda é o
+    miolo do arquivo, que passa a escolher entre a cena 3D e o SVG original conforme o mesmo contrato de
+    fallback do bullet abaixo. Não abre precedente pra 3D solto no meio de um parágrafo ou pra elementos sem
+    equivalente 2D prévio.
+- **`/[locale]` (seletor de trilha) e `/[locale]/[tech]` (home de cada trilha)**: a vitrine do produto,
+  identidade própria e mais expressiva — reveal/stagger ao rolar, microinterações em cards e CTAs, typewriter
+  (Motion). Ver `specs/roadmap.md` ("Pós-lançamento — hero 3D interativo") pelo histórico da decisão.
+  - **3D é específico de trilha, nunca do seletor genérico**: `/[locale]` lista várias tecnologias (Kafka,
+    Java, Elastic, SQL, AWS, GCP) — um elemento 3D modelado no conceito de uma trilha específica (ex.: o
+    fluxo Producer/Partitions/Consumer Group do Kafka) não pertence a essa página, só à home da própria
+    trilha (`/[locale]/kafka`, condicionado a `tech === "kafka"` em
+    `src/app/[locale]/[tech]/page.tsx`). Se uma trilha nova ganhar um elemento 3D próprio, ele entra do
+    mesmo jeito — escopado à home dela, não promovido pro seletor.
+  - **Scroll da página nunca controla conteúdo 3D** — feedback direto do autor após a primeira versão
+    (que ligava a câmera ao scroll): incomodava rolar a página e ver a cena mudar sozinha. O hero do Kafka
+    (`src/components/hero/KafkaHero.tsx`) hoje é autocontido — autoplay por `setInterval` avança a etapa
+    (Producer → Partitions → Consumer Group) a cada `AUTOPLAY_INTERVAL_MS`, com setas/indicadores
+    (`<button>` reais, focáveis, `aria-label`) pra avançar/voltar manualmente; qualquer interação reinicia
+    o timer do autoplay. Scroll da página não lê nem escreve nesse estado — role a página inteira e a etapa
+    não muda. Se algum componente futuro realmente precisar de scroll-drive, ele deve ficar contido à
+    própria seção (nunca um rig de pinned-scroll de página inteira) e nunca ser a única forma de navegar o
+    conteúdo.
   - **Fallback obrigatório, não opcional**: sem suporte a WebGL ou sob `prefers-reduced-motion: reduce`,
     renderiza um equivalente estático e semanticamente completo (ex.: o diagrama SVG 2D correspondente) —
     nenhuma informação essencial pode depender exclusivamente do canvas 3D.
-  - Usar os primitives do `motion/react` (`useScroll`, `useInView`, `useReducedMotion`, `useSpring`) em vez
-    de listener de scroll/IntersectionObserver escritos na mão.
+  - Usar os primitives do `motion/react` (`useInView`, `useReducedMotion`, etc.) em vez de listener de
+    scroll/IntersectionObserver escritos na mão, quando scroll-reveal fizer sentido (cards, CTAs) — mas
+    scroll nunca é a fonte de verdade do estado de um elemento 3D (ver bullet acima).
   - Todo o código de Three.js/R3F é carregado via `next/dynamic(..., { ssr: false })`, nunca importado no
     topo de um Server Component — ver `src/components/hero/KafkaHeroCanvas.tsx`.
 

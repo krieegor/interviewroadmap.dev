@@ -4,6 +4,7 @@ import { getAllChapters } from "@/lib/content/chapters";
 import { getTechConfig } from "@/config/tech";
 import { siteConfig as platformConfig } from "@/config/site";
 import { ReadingProgressCard } from "@/components/home/ReadingProgressCard";
+import { KafkaHero } from "@/components/hero/KafkaHero";
 import { ComingSoon } from "@/components/content/ComingSoon";
 import { isLocale, type Locale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/get-dictionary";
@@ -63,6 +64,10 @@ export default async function TechHome({
       </div>
 
       <ReadingProgressCard totalChapters={chapters.length} locale={locale} tech={tech} dict={dict} />
+
+      {/* Modelo Producer/Partitions/Consumer Group é específico do Kafka — não faz sentido reaproveitar
+          pra Java/Elastic/etc. quando ganharem conteúdo real. */}
+      {tech === "kafka" ? <KafkaHero dict={dict} /> : null}
 
       <section className="mt-16">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-[var(--color-text-muted)]">
