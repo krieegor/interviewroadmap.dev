@@ -25,9 +25,10 @@ Configure-a com a URL final do deploy (ex.: `https://kafka-entrevistas.vercel.ap
 ## Cloudflare Workers (assets estáticos, sem adapter)
 
 O app não precisa de servidor, então **não** usa `@opennextjs/cloudflare`/R2 — já tentamos esse caminho e foi
-revertido (ver `specs/roadmap.md`). Em vez disso, `wrangler.jsonc` na raiz configura um Worker "só assets":
-sem `main`/Worker script, só `assets.directory: "./out"`. Funciona tanto num projeto criado como **Pages**
-quanto como **Worker** com git integration — o repositório atual (`trainerdev-app.workers.dev`) usa o segundo.
+revertido (ver [`specs/roadmap.md`](../specs/roadmap.md)). Em vez disso, `wrangler.jsonc` na raiz configura
+um Worker "só assets": sem `main`/Worker script, só `assets.directory: "./out"`. Funciona tanto num projeto
+criado como **Pages** quanto como **Worker** com git integration — o repositório atual
+(`trainerdev-app.workers.dev`) usa o segundo.
 
 1. Build command: `npm run build`.
 2. Deploy command: `npx wrangler deploy` (detecta o `assets.directory` do `wrangler.jsonc` e sobe os arquivos

@@ -2,8 +2,9 @@
 
 Este guia é para quem vai escrever ou editar capítulos, perguntas, termos de glossário ou estudos de caso
 **dentro de uma trilha que já existe**. Para as regras editoriais completas (tom, os 10 pontos obrigatórios
-por conceito, blocos disponíveis), veja `specs/content-guidelines.md`. Este documento é o passo a passo
-prático. Para dar de alta uma trilha (`tech`) nova, veja `docs/adding-a-tech.md` primeiro.
+por conceito, blocos disponíveis), veja [`specs/content-guidelines.md`](../specs/content-guidelines.md).
+Este documento é o passo a passo prático. Para dar de alta uma trilha (`tech`) nova, veja
+[`docs/adding-a-tech.md`](./adding-a-tech.md) primeiro.
 
 ## Estrutura de arquivos
 
@@ -51,7 +52,8 @@ conceitual nos dois locales (não traduza o slug).
    ---
    ```
 
-3. Escreva o corpo cobrindo os 10 pontos de `content-guidelines.md` (o que é, por que existe, quando usar,
+3. Escreva o corpo cobrindo os 10 pontos de
+   [`specs/content-guidelines.md`](../specs/content-guidelines.md) (o que é, por que existe, quando usar,
    limitações, como aparece em entrevista, relação com Java/Spring, exemplo real).
 4. Use pelo menos um `<Diagrama>` e um `<ExemploFinanceiro>`, e feche com `<Resumo>`.
 5. Não precisa registrar o capítulo em nenhum arquivo de configuração — a ordem no sumário é derivada
@@ -171,8 +173,8 @@ Todos os blocos abaixo já estão disponíveis globalmente em qualquer `.mdx` do
 ## Criando um novo diagrama
 
 - Para um fluxo reutilizável em vários capítulos, crie um componente SVG/React em
-  `src/components/diagrams/NomeDoDiagrama.tsx`, seguindo a paleta de `specs/design-system.md`, e registre-o
-  em `src/mdx-components.tsx`.
+  `src/components/diagrams/NomeDoDiagrama.tsx`, seguindo a paleta de
+  [`specs/design-system.md`](../specs/design-system.md), e registre-o em `src/mdx-components.tsx`.
 - Para um fluxo específico de um único capítulo, use `<Mermaid chart="...">` diretamente no MDX — não é
   necessário criar um componente novo.
 

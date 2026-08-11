@@ -5,14 +5,14 @@
 ## Tipo de mudança
 
 - [ ] Conteúdo (capítulo, pergunta, glossário, estudo de caso)
-- [ ] Trilha nova (ver `docs/adding-a-tech.md`)
+- [ ] Trilha nova (ver [`docs/adding-a-tech.md`](../docs/adding-a-tech.md))
 - [ ] Correção de bug na aplicação
 - [ ] Melhoria de acessibilidade/design
 - [ ] Outro (descreva acima)
 
 ## Checklist
 
-- [ ] Li `CLAUDE.md` e, se for mudança de conteúdo, `docs/content-authoring.md`
+- [ ] Li [`CLAUDE.md`](../CLAUDE.md) e, se for mudança de conteúdo, [`docs/content-authoring.md`](../docs/content-authoring.md)
 - [ ] `npm run lint` passa
 - [ ] `npm run typecheck` passa
 - [ ] `npm run validate-content` passa (mudanças em `src/content/**`)

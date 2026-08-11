@@ -22,5 +22,5 @@ labels: content
 ---
 
 Abrir a issue antes do PR ajuda a alinhar escopo — evita PR grande sem combinar antes. Veja
-`docs/content-authoring.md` (conteúdo dentro de uma trilha existente) ou `docs/adding-a-tech.md` (trilha
-nova) para os requisitos estruturais.
+[`docs/content-authoring.md`](../../docs/content-authoring.md) (conteúdo dentro de uma trilha existente) ou
+[`docs/adding-a-tech.md`](../../docs/adding-a-tech.md) (trilha nova) para os requisitos estruturais.

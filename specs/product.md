@@ -63,8 +63,8 @@ entrevista. Cursos existentes cobram por esse recorte. Este projeto fecha essa l
   100% navegável por teclado.
 - O projeto pode ser clonado, rodado localmente (`npm install && npm run dev`) e publicado de graça em
   Vercel/Cloudflare Pages/Netlify sem nenhuma chave de API ou serviço pago.
-- Contribuidores externos conseguem adicionar um capítulo ou pergunta seguindo `docs/content-authoring.md`
-  sem precisar entender o app inteiro.
+- Contribuidores externos conseguem adicionar um capítulo ou pergunta seguindo
+  [`docs/content-authoring.md`](../docs/content-authoring.md) sem precisar entender o app inteiro.
 
 ## 7. Tom editorial
 

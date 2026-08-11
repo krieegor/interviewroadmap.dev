@@ -76,7 +76,7 @@
       `LocaleSwitcher` com fallback seguro. **Conteúdo 100% traduzido**: 15/15 capítulos, 50/50 perguntas,
       glossário completo (24 termos) e os 5 estudos de caso. Cada capítulo com diagrama próprio (SVG/React)
       ganhou a variante `*En.tsx` correspondente (padrão em `ProducerConsumerFlowEn.tsx`). Ver
-      `specs/architecture.md` seção 13.
+      [`specs/architecture.md`](./architecture.md) seção 13.
 
 ## Fase 6 — trainer.dev: plataforma multi-trilha (concluída)
 
@@ -89,8 +89,8 @@
 - [x] Capa do PDF com caixa de contribuidores e versão datada (dia/mês/ano).
 - [x] Restruturação completa da plataforma para multi-trilha: `/[locale]/[tech]/...`, trilha Kafka
       completa, Java e Elastic Search como trilhas "em construção" com página própria. Ver
-      `specs/architecture.md` seção 14 (inclui o bug do Next.js 16 com `generateStaticParams` aninhado que
-      foi descoberto e contornado nessa migração).
+      [`specs/architecture.md`](./architecture.md) seção 14 (inclui o bug do Next.js 16 com
+      `generateStaticParams` aninhado que foi descoberto e contornado nessa migração).
 - [x] Landing page do seletor de trilha (`/[locale]`), com hero, seção "como funciona" e ícones por
       trilha (`src/components/icons/TechIcon.tsx`).
 - [x] Logo próprio (`src/components/icons/Logo.tsx`, lambda estilizada) aplicado a favicon, `/icon`,
@@ -113,13 +113,14 @@
 ## Pós-lançamento — vídeo de demonstração (concluído)
 
 - [x] Vídeo de demonstração curto (recriação estilizada do hero + do simulador em modo múltipla escolha,
-      paleta dark do design system) usado no topo do `README.md` (GIF) e num bloco discreto perto do CTA de
-      GitHub na landing page (MP4, mudo, loop, oculto sob `prefers-reduced-motion`). Gerado por um
-      subprojeto isolado `remotion/` (Remotion), com `package.json` próprio — **não** é dependência do app
-      Next.js, nunca é importado por `src/`, e o render não roda no `npm run build`/CI (é manual, ver
-      `docs/contributing.md`). Segue o mesmo espírito de `scripts/generate-pdf.ts` (ferramenta de build-time
-      isolada), mas sem hook automático por ser lento e exigir Chromium. Justificativa do desvio: a landing
-      page hoje segue `specs/design-system.md` §1 ("sem seções hero com CTA gigante"), então o vídeo
+      paleta dark do design system) usado no topo do [`README.md`](../README.md) (GIF) e num bloco discreto
+      perto do CTA de GitHub na landing page (MP4, mudo, loop, oculto sob `prefers-reduced-motion`). Gerado
+      por um subprojeto isolado `remotion/` (Remotion), com `package.json` próprio — **não** é dependência
+      do app Next.js, nunca é importado por `src/`, e o render não roda no `npm run build`/CI (é manual, ver
+      [`docs/contributing.md`](../docs/contributing.md)). Segue o mesmo espírito de
+      `scripts/generate-pdf.ts` (ferramenta de build-time isolada), mas sem hook automático por ser lento e
+      exigir Chromium. Justificativa do desvio: a landing page hoje segue
+      [`specs/design-system.md`](./design-system.md) §1 ("sem seções hero com CTA gigante"), então o vídeo
       deliberadamente **não** entra no hero acima da dobra — fica como preview pequeno e opcional perto do
       link do GitHub existente.
 
@@ -144,28 +145,32 @@
       `wrangler.jsonc` voltou, mas minimalista — só `assets.directory: "./out"`, sem `main`/Worker script:
       o Worker existente na Cloudflare (`trainer-dev.workers.dev`, criado no fluxo de git integration)
       continuou funcionando sem precisar recriar o projeto como Pages, porque Workers suporta "só assets
-      estáticos" como modo nativo. `docs/deployment.md` atualizado; GitHub Pages passou de "não recomendado"
-      para viável (site agora é estático puro).
+      estáticos" como modo nativo. [`docs/deployment.md`](../docs/deployment.md) atualizado; GitHub Pages
+      passou de "não recomendado" para viável (site agora é estático puro).
 - [x] `public/livro.pdf` passou a ser **committado no git** em vez de gerado do zero em todo build — o
       Cloudflare Workers Builds não tem as libs gráficas do Chromium (mesmo problema de antes), então nesse
       provedor o `postbuild` sempre pulava a geração e o deploy ficava sem PDF (`/livro.pdf` 404). Como
       `next build` copia `public/**` pra `out/` antes do `postbuild` rodar, ter o PDF committado garante que
       todo deploy — mesmo sem Chromium — publica pelo menos a última versão gerada. Regenerar continua
       automático em ambientes com Chromium (local, GitHub Actions, Vercel, Netlify); o autor comita o
-      `public/livro.pdf` atualizado quando muda conteúdo do livro (ver `docs/contributing.md`).
+      `public/livro.pdf` atualizado quando muda conteúdo do livro (ver
+      [`docs/contributing.md`](../docs/contributing.md)).
 
 ## Pós-lançamento — rebranding para trainerdev.app (concluído)
 
 - [x] Domínio `trainer.dev` trocado por `trainerdev.app` (o primeiro ficou caro demais pra manter) — marca
-      atualizada em `src/config/site.ts`, dicionários de i18n, README, `CLAUDE.md`, `specs/`,
-      `docs/content-authoring.md`, logo/favicon (`aria-label`) e `package.json`/`remotion/package.json`.
+      atualizada em `src/config/site.ts`, dicionários de i18n, README, [`CLAUDE.md`](../CLAUDE.md),
+      [`specs/`](.), [`docs/content-authoring.md`](../docs/content-authoring.md), logo/favicon
+      (`aria-label`) e `package.json`/`remotion/package.json`.
 - [x] Vídeo de demonstração (`remotion/src/scenes/Intro.tsx` e `Outro.tsx`) re-renderizado com o novo nome —
       `public/videos/demo.mp4`, `public/videos/demo-poster.jpg` e `docs/media/demo.gif` regenerados via
-      `npm run render:mp4`/`render:gif` + `remotion still` (ver `docs/contributing.md`).
+      `npm run render:mp4`/`render:gif` + `remotion still` (ver
+      [`docs/contributing.md`](../docs/contributing.md)).
 - [x] Repositório GitHub renomeado de `trainer.dev` para `trainerdev.app` — `githubUrl` em
       `src/config/site.ts` e o badge de CI do README atualizados para a nova URL.
 - [x] Worker da Cloudflare renomeado de `trainer-dev` para `trainerdev-app` — `wrangler.jsonc` (`name`) e
-      `docs/deployment.md` atualizados para a nova URL (`trainerdev-app.workers.dev`). As entradas antigas
+      [`docs/deployment.md`](../docs/deployment.md) atualizados para a nova URL
+      (`trainerdev-app.workers.dev`). As entradas antigas
       deste changelog (Fase 6, "export estático puro") não foram reescritas — permanecem como registro
       histórico do nome em uso na época de cada uma.
 

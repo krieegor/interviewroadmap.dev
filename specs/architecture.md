@@ -197,11 +197,12 @@ em runtime, sem adapter. Compatível com qualquer host estático:
   sem `main`/Worker script) ou **Cloudflare Pages** clássico — ambos servem `out/` diretamente.
 - **Netlify** (publish directory `out/`, sem plugin — `@netlify/plugin-nextjs` só é necessário pra
   SSR/ISR, que este projeto não usa).
-- **GitHub Pages** (também viável desde o export estático; ver `docs/deployment.md`).
+- **GitHub Pages** (também viável desde o export estático; ver
+  [`docs/deployment.md`](../docs/deployment.md)).
 
 Detalhes de cada plataforma, incluindo por que a tentativa inicial de deploy no Cloudflare via
-`@opennextjs/cloudflare`/Workers com cache R2 foi revertida, em `docs/deployment.md` e
-`specs/roadmap.md`. Nenhuma opção exige cartão de crédito ou variável secreta.
+`@opennextjs/cloudflare`/Workers com cache R2 foi revertida, em [`docs/deployment.md`](../docs/deployment.md)
+e [`specs/roadmap.md`](./roadmap.md). Nenhuma opção exige cartão de crédito ou variável secreta.
 
 ## 12. Testes
 

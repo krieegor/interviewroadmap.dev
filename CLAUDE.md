@@ -8,11 +8,12 @@ Guia para execuções futuras do Claude Code neste repositório.
 organizada por trilhas de tecnologia (`Tech` — `kafka` | `java` | `elastic` | `sql` | `aws` | `gcp`). A
 trilha **Kafka** está completa (e-book, 50 perguntas, glossário, estudos de caso, simulador); as demais
 estão "em construção" (página própria, sem conteúdo ainda). Não é landing page, não é documentação de
-referência, não é curso pago. Especificação completa em `specs/`.
+referência, não é curso pago. Especificação completa em [`specs/`](./specs).
 
-Leia `specs/product.md`, `specs/architecture.md`, `specs/content-guidelines.md` e `specs/design-system.md`
-antes de qualquer mudança estrutural. Eles são a fonte da verdade — este arquivo resume o essencial para o
-dia a dia.
+Leia [`specs/product.md`](./specs/product.md), [`specs/architecture.md`](./specs/architecture.md),
+[`specs/content-guidelines.md`](./specs/content-guidelines.md) e
+[`specs/design-system.md`](./specs/design-system.md) antes de qualquer mudança estrutural. Eles são a fonte
+da verdade — este arquivo resume o essencial para o dia a dia.
 
 ## Stack
 
@@ -35,8 +36,8 @@ de dados, sem autenticação, sem serviços pagos. Estado do usuário (tema, pro
 - Não copie conteúdo de livros, cursos ou da documentação oficial. Todo texto é original. Não invente
   experiências profissionais atribuídas ao autor.
 - Não trate Kafka como "só uma fila" em nenhum texto.
-- Siga `specs/content-guidelines.md` à risca: os 10 pontos por conceito, a estrutura fixa de pergunta de
-  entrevista, os blocos MDX disponíveis.
+- Siga [`specs/content-guidelines.md`](./specs/content-guidelines.md) à risca: os 10 pontos por conceito, a
+  estrutura fixa de pergunta de entrevista, os blocos MDX disponíveis.
 
 ## Como criar um novo capítulo
 
@@ -44,8 +45,8 @@ de dados, sem autenticação, sem serviços pagos. Estado do usuário (tema, pro
    praticamente sempre `kafka`, o único com conteúdo real).
 2. Frontmatter: `title`, `part`, `partOrder`, `chapterOrder`, `slug`, `description`.
 3. Estrutura de texto: abertura contextual → desenvolvimento cobrindo os 10 pontos de
-   `content-guidelines.md` seção 2 → pelo menos um `<Diagrama>` → pelo menos um `<ExemploFinanceiro>` →
-   `<Resumo>`.
+   [`specs/content-guidelines.md`](./specs/content-guidelines.md) seção 2 → pelo menos um `<Diagrama>` →
+   pelo menos um `<ExemploFinanceiro>` → `<Resumo>`.
 4. Não é preciso editar nenhum arquivo de configuração de navegação — `src/lib/content/chapters.ts` deriva o
    índice do livro (partes → capítulos, em ordem) diretamente do frontmatter (`partOrder`/`chapterOrder`) de
    todos os arquivos em `src/content/<tech>/chapters`.
@@ -55,22 +56,24 @@ de dados, sem autenticação, sem serviços pagos. Estado do usuário (tema, pro
 
 1. Arquivo em `src/content/<tech>/questions/<locale>/NNN-slug.mdx` (NNN = número da pergunta, 1–50).
 2. Frontmatter: `id`, `title`, `slug`, `level` (`pleno`/`senior`/`tech-lead`), `topics`, `relatedChapters`.
-3. Seções obrigatórias, nesta ordem (ver `content-guidelines.md` seção 5): Pergunta → O que o entrevistador
-   quer avaliar → `<RespostaCurta>` → `<RespostaSenior>` → Explicação aprofundada → `<ExemploFinanceiro>` →
-   `<Pegadinha>` (uma ou mais) → `<PerguntaDerivada>` (2–4).
+3. Seções obrigatórias, nesta ordem (ver [`specs/content-guidelines.md`](./specs/content-guidelines.md)
+   seção 5): Pergunta → O que o entrevistador quer avaliar → `<RespostaCurta>` → `<RespostaSenior>` →
+   Explicação aprofundada → `<ExemploFinanceiro>` → `<Pegadinha>` (uma ou mais) → `<PerguntaDerivada>`
+   (2–4).
 4. Nunca pule a explicação aprofundada — o objetivo é estudo real, não flashcard raso.
 
 ## Como adicionar uma trilha (`tech`) nova
 
-Ver `docs/adding-a-tech.md` para o passo a passo completo (declarar o `Tech`, nome/descrição, ícone, cor de
-destaque `data-tech`, disclaimer de marca). Resumo: quase toda trilha nova entra só como "em construção" —
-conteúdo real é trabalho separado e maior, coberto por "Como criar um novo capítulo"/"pergunta" acima e por
-`docs/content-authoring.md`.
+Ver [`docs/adding-a-tech.md`](./docs/adding-a-tech.md) para o passo a passo completo (declarar o `Tech`,
+nome/descrição, ícone, cor de destaque `data-tech`, disclaimer de marca). Resumo: quase toda trilha nova
+entra só como "em construção" — conteúdo real é trabalho separado e maior, coberto por "Como criar um novo
+capítulo"/"pergunta" acima e por [`docs/content-authoring.md`](./docs/content-authoring.md).
 
 ## Como criar um diagrama
 
 - Fluxo simples e reutilizável (Producer→Topic→Partition→Consumer, Leader/Follower, etc.) → componente
-  React/SVG em `src/components/diagrams/`, estilizado com os tokens de cor de `specs/design-system.md`.
+  React/SVG em `src/components/diagrams/`, estilizado com os tokens de cor de
+  [`specs/design-system.md`](./specs/design-system.md).
 - Fluxo mais elaborado/único (rebalance, outbox pattern) → `<Mermaid chart="...">` (import dinâmico,
   `ssr: false`), tema customizado para herdar a paleta do projeto.
 - Nunca use imagens externas ou hotlink de diagrama de terceiros.
@@ -107,7 +110,7 @@ formatar um `.mdx` manualmente, verifique visualmente qualquer tabela depois.
 - Sem abstrações prematuras — três linhas parecidas são melhores que uma abstração precoce.
 - Sem componentes gigantes — quebre por responsabilidade (layout / navegação / conteúdo / diagrama / ui).
 - Preserve a arquitetura existente ao estender o projeto; justifique qualquer desvio das specs em
-  `specs/roadmap.md` (seção correspondente) antes de implementar.
+  [`specs/roadmap.md`](./specs/roadmap.md) (seção correspondente) antes de implementar.
 
 ## Decisões arquiteturais já tomadas (não reabrir sem motivo forte)
 
@@ -120,6 +123,6 @@ formatar um `.mdx` manualmente, verifique visualmente qualquer tabela depois.
   visual e bundle enxuto.
 - `output: "export"` em `next.config.ts` (HTML/CSS/JS puro em `out/`) em vez de servidor Next.js — deploy
   funciona em qualquer host estático (Cloudflare Workers/Pages, Vercel, Netlify, GitHub Pages) sem adapter,
-  sem cache incremental, sem serviço pago extra. Ver `specs/roadmap.md` (seção "export estático puro") pelo
-  porquê — uma tentativa anterior de rodar como servidor num adapter de edge (Cloudflare Workers via
-  `@opennextjs/cloudflare`) esbarrou em limite de tamanho e exigiu R2, e foi revertida.
+  sem cache incremental, sem serviço pago extra. Ver [`specs/roadmap.md`](./specs/roadmap.md) (seção "export
+  estático puro") pelo porquê — uma tentativa anterior de rodar como servidor num adapter de edge (Cloudflare
+  Workers via `@opennextjs/cloudflare`) esbarrou em limite de tamanho e exigiu R2, e foi revertida.

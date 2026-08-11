@@ -3,13 +3,14 @@
 Este guia é para quem vai adicionar uma trilha nova ao seletor (`/[locale]`) — seja uma trilha "em
 construção" (só a página existe, sem conteúdo ainda, como Java/Elastic/SQL/AWS/GCP hoje) ou uma trilha que
 já nasce com conteúdo real. Para escrever capítulos/perguntas/glossário/estudos de caso **dentro** de uma
-trilha que já existe, veja `docs/content-authoring.md` — este guia aqui é só sobre dar de alta a trilha em
-si. Contexto arquitetural completo em `specs/architecture.md` §14.
+trilha que já existe, veja [`docs/content-authoring.md`](./content-authoring.md) — este guia aqui é só sobre
+dar de alta a trilha em si. Contexto arquitetural completo em
+[`specs/architecture.md`](../specs/architecture.md) §14.
 
 Pré-requisito: decida se a trilha já entra com conteúdo real ou só como placeholder "em construção". A
 imensa maioria das trilhas novas entra como placeholder — escrever o conteúdo completo (livro + 50 perguntas
 + glossário + estudos de caso, nos dois idiomas) é o trabalho grande e separado, coberto por
-`docs/content-authoring.md`.
+[`docs/content-authoring.md`](./content-authoring.md).
 
 ## 1. Declarar o `Tech`
 
@@ -87,7 +88,8 @@ o problema quase sempre está em `techs`/`techsWithContent` desatualizado, não 
 
 ## 7. Quando a trilha ganha conteúdo real
 
-Siga `docs/content-authoring.md` para criar os arquivos `.mdx` (`src/content/<tech>/...`), depois:
+Siga [`docs/content-authoring.md`](./content-authoring.md) para criar os arquivos `.mdx`
+(`src/content/<tech>/...`), depois:
 
 1. Adicione `<tech>` a `techsWithContent` em `src/lib/tech/config.ts` — isso sozinho liga sitemap, busca e
    todas as rotas de conteúdo (`livro`, `perguntas`, `glossario`, `casos`, `simulador`) para a trilha.
