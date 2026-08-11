@@ -2,12 +2,28 @@
 
 ## 1. Princípios
 
-- Documentação técnica premium, não landing page. Sem gradientes chamativos, sem animações de scroll, sem
-  seções "hero" com CTA gigante.
-- Otimizado para leitura prolongada: largura de linha confortável, contraste alto, espaçamento generoso.
-- Diferenciação clara entre prosa e blocos técnicos (código, diagrama, callouts) através de cor de fundo e
-  borda lateral, não de decoração pesada.
-- Poucas animações, todas curtas e desativadas sob `prefers-reduced-motion`.
+Duas identidades convivem no projeto, por design — não é inconsistência, é escopo deliberado:
+
+- **Páginas de leitura** (`/[locale]/[tech]/livro/**`, `perguntas`, `glossario`, `casos`, `sobre`, `simulador`):
+  documentação técnica premium, não landing page. Sem gradientes chamativos, sem 3D, sem scroll-drive, sem
+  seções "hero" com CTA gigante. Otimizadas para leitura prolongada: largura de linha confortável, contraste
+  alto, espaçamento generoso. Diferenciação clara entre prosa e blocos técnicos (código, diagrama, callouts)
+  através de cor de fundo e borda lateral, não de decoração pesada. Poucas animações, todas curtas e
+  desativadas sob `prefers-reduced-motion`.
+- **`/[locale]` (seletor de trilha)**: a vitrine do produto, com identidade própria e mais expressiva —
+  hero 3D interativo (Motion + Three.js/`@react-three/fiber`), scroll storytelling contido à própria seção,
+  microinterações, typewriter. Ver `specs/roadmap.md` ("Pós-lançamento — hero 3D interativo") pelo histórico
+  da decisão. Regras obrigatórias para qualquer elemento 3D/motion pesado adicionado aqui:
+  - **Scroll-drive sempre contido à própria seção** — nunca um rig de pinned-scroll de página inteira;
+    a narrativa por scroll acontece dentro dos limites do componente que a usa, não sequestra o scroll da
+    página toda.
+  - **Fallback obrigatório, não opcional**: sem suporte a WebGL ou sob `prefers-reduced-motion: reduce`,
+    renderiza um equivalente estático e semanticamente completo (ex.: o diagrama SVG 2D correspondente) —
+    nenhuma informação essencial pode depender exclusivamente do canvas 3D.
+  - Usar os primitives do `motion/react` (`useScroll`, `useInView`, `useReducedMotion`, `useSpring`) em vez
+    de listener de scroll/IntersectionObserver escritos na mão.
+  - Todo o código de Three.js/R3F é carregado via `next/dynamic(..., { ssr: false })`, nunca importado no
+    topo de um Server Component — ver `src/components/hero/KafkaHeroCanvas.tsx`.
 
 ## 2. Identidade visual
 

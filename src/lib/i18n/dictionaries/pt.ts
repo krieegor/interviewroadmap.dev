@@ -225,6 +225,9 @@ export const pt = {
     heroTitle: "trainerdev.app",
     heroIntro:
       "Uma plataforma gratuita e open source de preparação para entrevistas técnicas. Cada trilha de tecnologia segue o mesmo formato: um livro navegável, perguntas de entrevista reais, glossário e um simulador — sem curso pago, sem cadastro, sem anúncio.",
+    heroCaptionProducer: "Producer",
+    heroCaptionPartitions: "Partitions mantêm a ordem",
+    heroCaptionConsumerGroup: "Consumer Group distribui o processamento",
     howItWorksTitle: "O mesmo formato em toda trilha",
     featureBookTitle: "Como se fosse um livro",
     featureBookDescription:

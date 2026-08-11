@@ -226,6 +226,9 @@ export const en: Dictionary = {
     heroTitle: "trainerdev.app",
     heroIntro:
       "A free, open-source technical interview prep platform. Every technology track follows the same format: a navigable book, real interview questions, a glossary, and a practice simulator — no paid course, no sign-up, no ads.",
+    heroCaptionProducer: "Producer",
+    heroCaptionPartitions: "Partitions keep the order",
+    heroCaptionConsumerGroup: "Consumer Group distributes the processing",
     howItWorksTitle: "The same format, every track",
     featureBookTitle: "Like a real book",
     featureBookDescription:

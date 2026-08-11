@@ -117,6 +117,29 @@ button:not(:disabled) {
   max-width: 65ch;
 }
 
+.skeleton-shimmer {
+  position: relative;
+  overflow: hidden;
+  background-color: var(--color-surface);
+}
+
+.skeleton-shimmer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, var(--color-border), transparent);
+  animation: skeleton-shimmer-sweep 1.6s ease-in-out infinite;
+}
+
+@keyframes skeleton-shimmer-sweep {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
 .prose-content h2 {
   margin-top: 2.5rem;
   margin-bottom: 1rem;

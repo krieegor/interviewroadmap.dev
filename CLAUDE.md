@@ -38,6 +38,11 @@ de dados, sem autenticação, sem serviços pagos. Estado do usuário (tema, pro
 - Não trate Kafka como "só uma fila" em nenhum texto.
 - Siga [`specs/content-guidelines.md`](./specs/content-guidelines.md) à risca: os 10 pontos por conceito, a
   estrutura fixa de pergunta de entrevista, os blocos MDX disponíveis.
+- `/[locale]` (seletor de trilha) tem identidade visual própria, mais expressiva (hero 3D, motion, scroll
+  storytelling) — ver `specs/design-system.md` §1. Qualquer componente 3D/motion pesado adicionado ali
+  **precisa** ter fallback real sob "sem WebGL"/`prefers-reduced-motion` (não é opcional) e ser carregado via
+  `next/dynamic(..., { ssr: false })`. As páginas de leitura do livro continuam com a identidade calma
+  original — não estenda 3D/scroll-drive pra lá sem justificar antes.
 
 ## Como criar um novo capítulo
 
@@ -126,3 +131,11 @@ formatar um `.mdx` manualmente, verifique visualmente qualquer tabela depois.
   sem cache incremental, sem serviço pago extra. Ver [`specs/roadmap.md`](./specs/roadmap.md) (seção "export
   estático puro") pelo porquê — uma tentativa anterior de rodar como servidor num adapter de edge (Cloudflare
   Workers via `@opennextjs/cloudflare`) esbarrou em limite de tamanho e exigiu R2, e foi revertida.
+- Motion (`motion`) + Three.js via `@react-three/fiber`/`@react-three/drei` adotados para um hero 3D
+  scroll-driven em `/[locale]` — decisão explícita do autor pra elevar a qualidade visual da vitrine do
+  produto, substituindo a regra anterior de "sem animação de scroll" só nessa página (o resto do site mantém
+  a identidade calma original). Escolhido em vez de canvas/WebGL na mão ou CSS-only porque o grafo de cena
+  declarativo do R3F combina com o padrão de um-componente-por-responsabilidade do projeto, e os
+  `MotionValue`s do Motion cruzam pra dentro do loop `useFrame` do R3F sem causar re-render React a cada
+  frame de scroll. Ver [`specs/roadmap.md`](./specs/roadmap.md) ("hero 3D interativo") e
+  `specs/design-system.md` §1 pelo contrato de fallback obrigatório.

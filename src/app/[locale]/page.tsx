@@ -6,6 +6,12 @@ import { siteConfig } from "@/config/site";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { TechIcon } from "@/components/icons/TechIcon";
 import { Logo } from "@/components/icons/Logo";
+import { KafkaHero } from "@/components/hero/KafkaHero";
+import { HeroTypewriter } from "@/components/hero/HeroTypewriter";
+import { GithubCtaLink } from "@/components/hero/GithubCtaLink";
+import { Reveal } from "@/components/motion/Reveal";
+import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
+import { HoverLift } from "@/components/motion/HoverLift";
 import { isLocale, locales, type Locale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/get-dictionary";
 import { techs, techsWithContent } from "@/lib/tech/config";
@@ -76,23 +82,26 @@ export default async function LocaleHome({
           <p className="mt-4 max-w-2xl text-[var(--color-text-muted)]">
             {dict.trackSelector.heroIntro}
           </p>
+          <HeroTypewriter label={dict.home.conceptsTitle} words={dict.home.coreConcepts} />
         </div>
+
+        <KafkaHero dict={dict} />
 
         <section className="mt-16">
           <h2 className="text-center text-sm font-semibold uppercase tracking-wide text-[var(--color-text-muted)]">
             {dict.trackSelector.howItWorksTitle}
           </h2>
-          <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <RevealGroup className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
             {features.map((feature) => (
-              <div
+              <RevealItem
                 key={feature.title}
                 className="rounded-md border border-[var(--color-border)] p-4"
               >
                 <p className="font-medium text-[var(--color-text)]">{feature.title}</p>
                 <p className="mt-1 text-sm text-[var(--color-text-muted)]">{feature.description}</p>
-              </div>
+              </RevealItem>
             ))}
-          </div>
+          </RevealGroup>
         </section>
 
         <section className="mt-16">
@@ -101,46 +110,42 @@ export default async function LocaleHome({
           </h2>
           <p className="mt-2 text-center text-[var(--color-text-muted)]">{dict.trackSelector.intro}</p>
 
-          <div className="mt-8 grid w-full grid-cols-1 gap-4 sm:grid-cols-3">
+          <RevealGroup className="mt-8 grid w-full grid-cols-1 gap-4 sm:grid-cols-3">
             {techs.map((tech) => {
               const techConfig = getTechConfig(tech, locale);
               const hasContent = techsWithContent.includes(tech);
               return (
-                <Link
-                  key={tech}
-                  href={`/${locale}/${tech}`}
-                  data-tech={tech}
-                  className="flex flex-col gap-2 rounded-md border border-[var(--color-border)] p-6 text-left transition-colors hover:border-[var(--color-accent)]"
-                >
-                  <TechIcon tech={tech} className="text-[var(--color-accent)]" />
-                  <div className="flex items-center gap-2">
-                    <span className="text-lg font-semibold text-[var(--color-text)]">
-                      {techConfig.shortName}
-                    </span>
-                    {!hasContent ? (
-                      <span className="rounded-full border border-[var(--color-border)] px-2 py-0.5 text-xs text-[var(--color-text-muted)]">
-                        {dict.trackSelector.comingSoonBadge}
-                      </span>
-                    ) : null}
-                  </div>
-                  <p className="text-sm text-[var(--color-text-muted)]">{techConfig.description}</p>
-                </Link>
+                <RevealItem key={tech}>
+                  <Link
+                    href={`/${locale}/${tech}`}
+                    data-tech={tech}
+                    className="block rounded-md border border-[var(--color-border)] transition-colors hover:border-[var(--color-accent)] active:scale-[0.99]"
+                  >
+                    <HoverLift className="flex flex-col gap-2 p-6 text-left">
+                      <TechIcon tech={tech} className="text-[var(--color-accent)]" />
+                      <div className="flex items-center gap-2">
+                        <span className="text-lg font-semibold text-[var(--color-text)]">
+                          {techConfig.shortName}
+                        </span>
+                        {!hasContent ? (
+                          <span className="rounded-full border border-[var(--color-border)] px-2 py-0.5 text-xs text-[var(--color-text-muted)]">
+                            {dict.trackSelector.comingSoonBadge}
+                          </span>
+                        ) : null}
+                      </div>
+                      <p className="text-sm text-[var(--color-text-muted)]">{techConfig.description}</p>
+                    </HoverLift>
+                  </Link>
+                </RevealItem>
               );
             })}
-          </div>
+          </RevealGroup>
         </section>
 
-        <section className="mt-16 rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] p-6 text-center">
+        <Reveal className="mt-16 rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] p-6 text-center">
           <p className="text-sm text-[var(--color-text-muted)]">{dict.trackSelector.openSourceText}</p>
-          <a
-            href={siteConfig.githubUrl}
-            target="_blank"
-            rel="noreferrer"
-            className="mt-3 inline-block text-sm font-medium text-[var(--color-accent)] hover:underline"
-          >
-            {dict.trackSelector.githubCta}
-          </a>
-        </section>
+          <GithubCtaLink href={siteConfig.githubUrl} label={dict.trackSelector.githubCta} />
+        </Reveal>
       </main>
 
       <footer className="border-t border-[var(--color-border)] py-10">

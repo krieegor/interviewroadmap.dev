@@ -184,6 +184,37 @@
       atualizar, é só substituir o arquivo). Referências a `remotion/` removidas de `.prettierignore`,
       `eslint.config.mjs` e `tsconfig.json` (`exclude`).
 
+## Pós-lançamento — hero 3D interativo (Motion + Three.js) (concluído)
+
+- [x] `motion`, `three`, `@react-three/fiber`, `@react-three/drei` adicionados como dependências (e
+      `@types/three` como devDependency) — mudança de direção visual deliberada, pedida pelo autor,
+      substituindo a regra "sem animação de scroll" só na página `/[locale]` (seletor de trilha); as páginas
+      de leitura do livro mantêm a identidade calma original. Ver `specs/design-system.md` §1.
+- [x] Hero 3D scroll-driven do fluxo canônico do Kafka (Producer → Partitions → Consumer Group) — mesmo
+      modelo já usado no diagrama 2D `src/components/diagrams/ProducerConsumerFlow.tsx`, agora em
+      `src/components/three/` (cena R3F: `KafkaFlowScene.tsx` + meshes/câmera/luz em módulos próprios) e
+      `src/components/hero/` (orquestração, code-split via `next/dynamic(..., { ssr: false })` a partir de
+      `KafkaHeroCanvas.tsx`). Câmera ligada ao scroll via `motion/react` (`useScroll`/`useSpring`), lida
+      dentro do `useFrame` do R3F via `MotionValue.get()` — sem re-render React por frame. Cores lidas de
+      `--color-*` (tema reativo via `theme-store.ts`, mesmo hook do `ThemeToggle.tsx`).
+- [x] Fallback obrigatório: sem WebGL (`useHasWebGL`, `src/components/three/webgl-support.ts`) ou
+      `prefers-reduced-motion: reduce` renderiza o `ProducerConsumerFlow` existente em vez do Canvas — só o
+      wrapper decorativo (`aria-hidden`) muda, o fallback continua com seu `role="img"`/`aria-label`
+      próprios, sem depender do 3D pra nenhuma informação essencial.
+- [x] `Reveal`/`RevealGroup` (`src/components/motion/`) para entrada dos cards de feature/trilha e da seção
+      de CTA; `HoverLift` nos cards de trilha e `GithubCtaLink` no CTA do GitHub — microinterações sutis
+      (`whileHover`/`whileTap`), todas desativadas sob `useReducedMotion()`.
+- [x] Typewriter (`useTypewriter`, `src/lib/hooks/`) no hero, reaproveitando `dict.home.coreConcepts`
+      (conteúdo real já existente, usado antes só na página por trilha) — nenhuma string nova inventada.
+- [x] Skeleton shimmer (`.skeleton-shimmer`, `globals.css`) como `loading` do `next/dynamic` enquanto o chunk
+      do Three.js (isolado, ~890 KB, confirmado fora do bundle de `/[locale]/kafka` e de qualquer outra rota)
+      carrega.
+- [x] Dois bugs reais pegos pelos testes novos antes de ir pra produção: `useTypewriter` reiniciava a cadeia
+      de timers a cada tecla quando `words` era um array literal (referência nova a cada render) — corrigido
+      lendo `words`/`options` via ref sincronizado em efeito próprio; o `aria-hidden` do hero escondia o
+      fallback SVG (que tem seu próprio `role="img"` e deveria ficar acessível) — corrigido restringindo
+      `aria-hidden` só ao wrapper do Canvas 3D.
+
 ## Backlog (trilhas futuras e itens ainda em aberto)
 
 - Conteúdo real para a trilha **Java** (hoje só "em construção").
