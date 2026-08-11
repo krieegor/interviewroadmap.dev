@@ -56,40 +56,10 @@ atualizado no commit (ver [`docs/deployment.md`](./deployment.md) § "PDF do liv
 - Sem dependências novas sem justificativa — avalie o custo de bundle antes de propor uma biblioteca.
 - Prettier formata automaticamente (`npm run format`); não brigue com o formatter.
 
-## Vídeo de demonstração (README + landing page)
+## GIF de demonstração (README)
 
-O GIF do topo do [`README.md`](../README.md) (`docs/media/demo.gif`) e o vídeo da landing page
-(`public/videos/demo.mp4`) são renderizados a partir do subprojeto isolado `remotion/` (Remotion), que
-**não** é dependência do app Next.js — tem `package.json` próprio e nunca é importado por `src/`. Para
-regenerar depois de alterar a
-animação:
-
-```bash
-cd remotion
-npm install
-npm run render:mp4   # gera remotion/out/demo.mp4
-npm run render:gif   # gera remotion/out/demo.gif
-```
-
-O poster do `<video>` (`public/videos/demo-poster.jpg`, exibido antes do autoplay) é um frame estático da
-cena `Intro` — regenere com `remotion still` apontando pro mesmo frame usado hoje (frame 60, depois que texto
-e badge já terminaram de aparecer):
-
-```bash
-npx remotion still Demo out/demo-poster.jpg --frame=60
-```
-
-Depois, copie manualmente os arquivos gerados para os destinos finais:
-
-```bash
-cp remotion/out/demo.mp4 public/videos/demo.mp4
-cp remotion/out/demo.gif docs/media/demo.gif
-cp remotion/out/demo-poster.jpg public/videos/demo-poster.jpg
-```
-
-Não há passo automático no `npm run build` raiz nem no CI para isso — renderizar vídeo é lento e exige
-Chromium, o que o pipeline estático do site não tem hoje. Os dois arquivos finais (`.mp4`/`.gif`) são
-commitados manualmente como qualquer outro asset estático.
+`docs/media/demo.gif` é um asset estático committado no repo, sem pipeline de geração — pra atualizar,
+grave um novo GIF e substitua o arquivo diretamente.
 
 ## Estilo editorial
 

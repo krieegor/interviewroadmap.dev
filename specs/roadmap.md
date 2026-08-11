@@ -174,6 +174,16 @@
       deste changelog (Fase 6, "export estático puro") não foram reescritas — permanecem como registro
       histórico do nome em uso na época de cada uma.
 
+## Pós-lançamento — remoção do Remotion (concluído)
+
+- [x] Subprojeto `remotion/` removido inteiramente (custo de manutenção de uma segunda toolchain só pra
+      gerar um vídeo curto não se justificava). `public/videos/demo.mp4` e `public/videos/demo-poster.jpg`
+      removidos junto — a landing page voltou a ter só a seção de texto + CTA de GitHub, sem o bloco de
+      vídeo, e a seção "vídeo de demonstração" (Pós-lançamento, acima) passou a ser histórico puro.
+      `docs/media/demo.gif` foi mantido como asset estático no topo do README (sem pipeline de geração — pra
+      atualizar, é só substituir o arquivo). Referências a `remotion/` removidas de `.prettierignore`,
+      `eslint.config.mjs` e `tsconfig.json` (`exclude`).
+
 ## Backlog (trilhas futuras e itens ainda em aberto)
 
 - Conteúdo real para a trilha **Java** (hoje só "em construção").
