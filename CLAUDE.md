@@ -5,10 +5,10 @@ Guia para execuções futuras do Claude Code neste repositório.
 ## Objetivo do projeto
 
 **trainerdev.app**: plataforma interativa, gratuita e open source de preparação para entrevistas técnicas,
-organizada por trilhas de tecnologia (`Tech` — `kafka` | `java` | `elastic`). A trilha **Kafka** está
-completa (e-book, 50 perguntas, glossário, estudos de caso, simulador); **Java** e **Elastic Search** estão
-"em construção" (página própria, sem conteúdo ainda). Não é landing page, não é documentação de referência,
-não é curso pago. Especificação completa em `specs/`.
+organizada por trilhas de tecnologia (`Tech` — `kafka` | `java` | `elastic` | `sql` | `aws` | `gcp`). A
+trilha **Kafka** está completa (e-book, 50 perguntas, glossário, estudos de caso, simulador); as demais
+estão "em construção" (página própria, sem conteúdo ainda). Não é landing page, não é documentação de
+referência, não é curso pago. Especificação completa em `specs/`.
 
 Leia `specs/product.md`, `specs/architecture.md`, `specs/content-guidelines.md` e `specs/design-system.md`
 antes de qualquer mudança estrutural. Eles são a fonte da verdade — este arquivo resume o essencial para o
@@ -59,6 +59,13 @@ de dados, sem autenticação, sem serviços pagos. Estado do usuário (tema, pro
    quer avaliar → `<RespostaCurta>` → `<RespostaSenior>` → Explicação aprofundada → `<ExemploFinanceiro>` →
    `<Pegadinha>` (uma ou mais) → `<PerguntaDerivada>` (2–4).
 4. Nunca pule a explicação aprofundada — o objetivo é estudo real, não flashcard raso.
+
+## Como adicionar uma trilha (`tech`) nova
+
+Ver `docs/adding-a-tech.md` para o passo a passo completo (declarar o `Tech`, nome/descrição, ícone, cor de
+destaque `data-tech`, disclaimer de marca). Resumo: quase toda trilha nova entra só como "em construção" —
+conteúdo real é trabalho separado e maior, coberto por "Como criar um novo capítulo"/"pergunta" acima e por
+`docs/content-authoring.md`.
 
 ## Como criar um diagrama
 

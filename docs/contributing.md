@@ -1,7 +1,12 @@
 # Contribuindo
 
 Obrigado por considerar contribuir com este projeto. Ele é gratuito, aberto e depende de contribuições da
-comunidade para crescer em conteúdo e qualidade.
+comunidade para crescer em conteúdo e qualidade. Ao participar, você concorda em seguir o
+[`CODE_OF_CONDUCT.md`](../CODE_OF_CONDUCT.md) do projeto.
+
+Para propor conteúdo novo (capítulo, pergunta, trilha) antes de abrir um PR grande, abra uma
+[issue de proposta de conteúdo](../.github/ISSUE_TEMPLATE/content_proposal.md) — alinha escopo antes do
+trabalho pesado.
 
 ## O que você pode contribuir
 
@@ -64,11 +69,20 @@ npm run render:mp4   # gera remotion/out/demo.mp4
 npm run render:gif   # gera remotion/out/demo.gif
 ```
 
+O poster do `<video>` (`public/videos/demo-poster.jpg`, exibido antes do autoplay) é um frame estático da
+cena `Intro` — regenere com `remotion still` apontando pro mesmo frame usado hoje (frame 60, depois que texto
+e badge já terminaram de aparecer):
+
+```bash
+npx remotion still Demo out/demo-poster.jpg --frame=60
+```
+
 Depois, copie manualmente os arquivos gerados para os destinos finais:
 
 ```bash
 cp remotion/out/demo.mp4 public/videos/demo.mp4
 cp remotion/out/demo.gif docs/media/demo.gif
+cp remotion/out/demo-poster.jpg public/videos/demo-poster.jpg
 ```
 
 Não há passo automático no `npm run build` raiz nem no CI para isso — renderizar vídeo é lento e exige

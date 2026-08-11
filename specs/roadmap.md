@@ -164,6 +164,10 @@
       `npm run render:mp4`/`render:gif` + `remotion still` (ver `docs/contributing.md`).
 - [x] Repositório GitHub renomeado de `trainer.dev` para `trainerdev.app` — `githubUrl` em
       `src/config/site.ts` e o badge de CI do README atualizados para a nova URL.
+- [x] Worker da Cloudflare renomeado de `trainer-dev` para `trainerdev-app` — `wrangler.jsonc` (`name`) e
+      `docs/deployment.md` atualizados para a nova URL (`trainerdev-app.workers.dev`). As entradas antigas
+      deste changelog (Fase 6, "export estático puro") não foram reescritas — permanecem como registro
+      histórico do nome em uso na época de cada uma.
 
 ## Backlog (trilhas futuras e itens ainda em aberto)
 

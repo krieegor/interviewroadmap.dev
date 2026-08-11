@@ -1,54 +1,28 @@
-# Remotion video
+# Vídeo de demonstração (Remotion)
 
-<p align="center">
-  <a href="https://github.com/remotion-dev/logo">
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="https://github.com/remotion-dev/logo/raw/main/animated-logo-banner-dark.apng">
-      <img alt="Animated Remotion Logo" src="https://github.com/remotion-dev/logo/raw/main/animated-logo-banner-light.gif">
-    </picture>
-  </a>
-</p>
+Subprojeto isolado que gera o vídeo de demonstração usado no topo do `README.md` (GIF) e na landing page do
+site (MP4). Tem `package.json` próprio e **não** é dependência do app Next.js — nunca é importado por `src/`.
 
-Welcome to your Remotion project!
+## Estrutura
 
-## Commands
+- `src/Root.tsx` — declara a composição `Demo` (1280×720, 30fps).
+- `src/Demo.tsx` — encadeia as cenas via `Sequence` (`Intro` → `QuizCard` → `Outro`).
+- `src/scenes/` — `Intro.tsx`, `QuizCard.tsx`, `Outro.tsx`.
+- `src/tokens.ts` — paleta de cores/fonte, espelhando os tokens de `specs/design-system.md`.
 
-**Install Dependencies**
+## Comandos
 
-```console
-npm i
+```bash
+npm install
+npm run dev            # abre o Remotion Studio (preview interativo)
+npm run render:mp4     # gera out/demo.mp4
+npm run render:gif     # gera out/demo.gif
 ```
 
-**Start Preview**
-
-```console
-npm run dev
-```
-
-**Render video**
-
-```console
-npx remotion render
-```
-
-**Upgrade Remotion**
-
-```console
-npx remotion upgrade
-```
+Depois de renderizar, copie os arquivos gerados pros destinos finais do site — ver
+`docs/contributing.md` § "Vídeo de demonstração (README + landing page)" pelo passo a passo completo
+(inclui como gerar o poster do vídeo com `npx remotion still`).
 
 ## Docs
 
-Get started with Remotion by reading the [fundamentals page](https://www.remotion.dev/docs/the-fundamentals).
-
-## Help
-
-We provide help on our [Discord server](https://discord.gg/6VzzNDwUwV).
-
-## Issues
-
-Found an issue with Remotion? [File an issue here](https://github.com/remotion-dev/remotion/issues/new).
-
-## License
-
-Note that for some entities a company license is needed. [Read the terms here](https://github.com/remotion-dev/remotion/blob/main/LICENSE.md).
+[Fundamentos do Remotion](https://www.remotion.dev/docs/the-fundamentals).

@@ -103,6 +103,7 @@ npm run validate-content                # valida frontmatter e links internos do
 - [`specs/`](./specs) — especificações de produto, arquitetura, diretrizes de conteúdo, design system e roadmap.
 - [`docs/contributing.md`](./docs/contributing.md) — como contribuir.
 - [`docs/content-authoring.md`](./docs/content-authoring.md) — como escrever capítulos, perguntas, glossário e estudos de caso.
+- [`docs/adding-a-tech.md`](./docs/adding-a-tech.md) — pré-requisitos e passo a passo para adicionar uma trilha (`tech`) nova.
 - [`docs/deployment.md`](./docs/deployment.md) — como publicar em Vercel, Cloudflare (Workers ou Pages),
   Netlify ou GitHub Pages.
 
@@ -110,7 +111,8 @@ npm run validate-content                # valida frontmatter e links internos do
 
 Contribuições são bem-vindas: correções técnicas, novos capítulos/perguntas, conteúdo para as trilhas Java,
 Elastic Search, SQL, AWS e GCP, ou melhorias de acessibilidade e design. Veja
-[`docs/contributing.md`](./docs/contributing.md) antes de abrir um Pull Request.
+[`docs/contributing.md`](./docs/contributing.md) antes de abrir um Pull Request. Este projeto segue o
+[`CODE_OF_CONDUCT.md`](./CODE_OF_CONDUCT.md).
 
 ### Contribuidores
 

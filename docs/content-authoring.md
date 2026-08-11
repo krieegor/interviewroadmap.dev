@@ -1,8 +1,9 @@
 # Guia de autoria de conteúdo
 
-Este guia é para quem vai escrever ou editar capítulos, perguntas, termos de glossário ou estudos de caso.
-Para as regras editoriais completas (tom, os 10 pontos obrigatórios por conceito, blocos disponíveis), veja
-`specs/content-guidelines.md`. Este documento é o passo a passo prático.
+Este guia é para quem vai escrever ou editar capítulos, perguntas, termos de glossário ou estudos de caso
+**dentro de uma trilha que já existe**. Para as regras editoriais completas (tom, os 10 pontos obrigatórios
+por conceito, blocos disponíveis), veja `specs/content-guidelines.md`. Este documento é o passo a passo
+prático. Para dar de alta uma trilha (`tech`) nova, veja `docs/adding-a-tech.md` primeiro.
 
 ## Estrutura de arquivos
 
