@@ -40,7 +40,7 @@ export default async function TechHome({
         {techConfig.description}
       </p>
 
-      <p className="mt-6 max-w-prose text-[var(--color-text-muted)]">{dict.home.intro}</p>
+      <p className="mt-6 max-w-prose text-[var(--color-text-muted)]">{techConfig.intro}</p>
 
       <div className="mt-8 flex flex-wrap gap-3">
         <Link
@@ -98,7 +98,7 @@ export default async function TechHome({
           {dict.home.conceptsTitle}
         </h2>
         <div className="mt-4 flex flex-wrap gap-2">
-          {dict.home.coreConcepts.map((concept) => (
+          {techConfig.coreConcepts.map((concept) => (
             <span
               key={concept}
               className="rounded-full border border-[var(--color-border)] px-3 py-1 text-sm text-[var(--color-text-muted)]"

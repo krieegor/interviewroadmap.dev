@@ -69,24 +69,12 @@ export const pt = {
   },
   home: {
     badge: "Gratuito & open source",
-    intro:
-      "Para quem já trabalha com Java, Spring Boot e microsserviços, tem contato básico ou intermediário com mensageria e está se preparando para entrevistas técnicas de nível Pleno, Sênior ou Tech Lead — sem precisar administrar clusters Kafka para tirar proveito do conteúdo.",
     ctaStart: "Começar a estudar",
     ctaQuestions: "Ver as 50 perguntas",
     ctaSimulate: "Simular entrevista",
     summaryTitle: "Sumário do livro",
     seeSummary: "Ver sumário completo →",
     conceptsTitle: "Principais conceitos",
-    coreConcepts: [
-      "Partitions e ordenação",
-      "Consumer Groups e rebalance",
-      "Offset e commit",
-      "Retention e replay",
-      "Retry e DLQ",
-      "Idempotência",
-      "Garantias de entrega",
-      "Outbox pattern",
-    ],
     openSourceText:
       "Este material é 100% gratuito, sem cadastro e sem paywall. O código-fonte é aberto — contribuições de conteúdo e correções são bem-vindas.",
     githubCta: "Ver no GitHub →",
@@ -225,6 +213,7 @@ export const pt = {
     heroTitle: "trainerdev.app",
     heroIntro:
       "Uma plataforma gratuita e open source de preparação para entrevistas técnicas. Cada trilha de tecnologia segue o mesmo formato: um livro navegável, perguntas de entrevista reais, glossário e um simulador — sem curso pago, sem cadastro, sem anúncio.",
+    tracksLabel: "Trilhas",
     heroCaptionProducer: "Producer",
     heroCaptionPartitions: "Partitions mantêm a ordem",
     heroCaptionConsumerGroup: "Consumer Group distribui o processamento",
@@ -246,7 +235,8 @@ export const pt = {
       "Pratique no seu ritmo — modo aberto (explique em voz alta) ou múltipla escolha, tudo salvo só no seu navegador.",
     title: "Escolha sua trilha",
     intro: "trainerdev.app é uma plataforma gratuita e open source de preparação para entrevistas técnicas, organizada por tecnologia.",
-    comingSoonBadge: "Em breve",
+    availableBadge: "Disponível",
+    unavailableBadge: "Indisponível",
     openSourceText: "Esse projeto é gratuito e open source. Contribuições são bem-vindas.",
     githubCta: "Ver no GitHub",
   },

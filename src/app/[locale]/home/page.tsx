@@ -81,7 +81,10 @@ export default async function LocaleHome({
           <p className="mt-4 max-w-2xl text-[var(--color-text-muted)]">
             {dict.trackSelector.heroIntro}
           </p>
-          <HeroTypewriter label={dict.home.conceptsTitle} words={dict.home.coreConcepts} />
+          <HeroTypewriter
+            label={dict.trackSelector.tracksLabel}
+            words={techs.map((tech) => getTechConfig(tech, locale).shortName)}
+          />
         </div>
 
         <section className="mt-16">
@@ -112,23 +115,27 @@ export default async function LocaleHome({
               const techConfig = getTechConfig(tech, locale);
               const hasContent = techsWithContent.includes(tech);
               return (
-                <RevealItem key={tech}>
+                <RevealItem key={tech} className="h-full">
                   <Link
                     href={`/${locale}/${tech}`}
                     data-tech={tech}
-                    className="block rounded-md border border-[var(--color-border)] transition-colors hover:border-[var(--color-accent)] active:scale-[0.99]"
+                    className="flex h-full flex-col rounded-md border border-[var(--color-border)] transition-colors hover:border-[var(--color-accent)] active:scale-[0.99]"
                   >
-                    <HoverLift className="flex flex-col gap-2 p-6 text-left">
+                    <HoverLift className="flex h-full flex-col gap-2 p-6 text-left">
                       <TechIcon tech={tech} className="text-[var(--color-accent)]" />
                       <div className="flex items-center gap-2">
                         <span className="text-lg font-semibold text-[var(--color-text)]">
                           {techConfig.shortName}
                         </span>
-                        {!hasContent ? (
-                          <span className="rounded-full border border-[var(--color-border)] px-2 py-0.5 text-xs text-[var(--color-text-muted)]">
-                            {dict.trackSelector.comingSoonBadge}
-                          </span>
-                        ) : null}
+                        <span
+                          className={
+                            hasContent
+                              ? "rounded-full border border-emerald-600/40 bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700 dark:border-emerald-400/30 dark:bg-emerald-400/10 dark:text-emerald-400"
+                              : "rounded-full border border-[var(--color-border)] px-2 py-0.5 text-xs text-[var(--color-text-muted)]"
+                          }
+                        >
+                          {hasContent ? dict.trackSelector.availableBadge : dict.trackSelector.unavailableBadge}
+                        </span>
                       </div>
                       <p className="text-sm text-[var(--color-text-muted)]">{techConfig.description}</p>
                     </HoverLift>

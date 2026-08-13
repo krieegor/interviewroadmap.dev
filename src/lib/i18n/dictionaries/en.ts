@@ -71,24 +71,12 @@ export const en: Dictionary = {
   },
   home: {
     badge: "Free & open source",
-    intro:
-      "For developers who already work with Java, Spring Boot and microservices, have basic to intermediate exposure to messaging, and are preparing for Mid-level, Senior or Tech Lead technical interviews — no need to administer Kafka clusters to get value from this content.",
     ctaStart: "Start studying",
     ctaQuestions: "See the 50 questions",
     ctaSimulate: "Simulate an interview",
     summaryTitle: "Book contents",
     seeSummary: "See full contents →",
     conceptsTitle: "Core concepts",
-    coreConcepts: [
-      "Partitions and ordering",
-      "Consumer groups and rebalance",
-      "Offset and commit",
-      "Retention and replay",
-      "Retry and DLQ",
-      "Idempotency",
-      "Delivery guarantees",
-      "Outbox pattern",
-    ],
     openSourceText:
       "This material is 100% free, with no signup and no paywall. The source code is open — content contributions and fixes are welcome.",
     githubCta: "See on GitHub →",
@@ -226,6 +214,7 @@ export const en: Dictionary = {
     heroTitle: "trainerdev.app",
     heroIntro:
       "A free, open-source technical interview prep platform. Every technology track follows the same format: a navigable book, real interview questions, a glossary, and a practice simulator — no paid course, no sign-up, no ads.",
+    tracksLabel: "Tracks",
     heroCaptionProducer: "Producer",
     heroCaptionPartitions: "Partitions keep the order",
     heroCaptionConsumerGroup: "Consumer Group distributes the processing",
@@ -247,7 +236,8 @@ export const en: Dictionary = {
       "Practice at your own pace — open-ended mode (explain out loud) or multiple choice, everything saved only in your browser.",
     title: "Choose your track",
     intro: "trainerdev.app is a free, open-source technical interview prep platform, organized by technology.",
-    comingSoonBadge: "Coming soon",
+    availableBadge: "Available",
+    unavailableBadge: "Unavailable",
     openSourceText: "This project is free and open source. Contributions are welcome.",
     githubCta: "View on GitHub",
   },
