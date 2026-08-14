@@ -84,7 +84,7 @@ export default async function LocaleHome({
             </p>
           </Reveal>
           <Reveal delay={0.16} className="mt-3">
-            <h1 className="text-4xl font-semibold text-[var(--color-text)]">
+            <h1 className="text-3xl font-semibold text-[var(--color-text)] sm:text-4xl">
               <AnimatedWordmark />
             </h1>
           </Reveal>

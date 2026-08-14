@@ -22,6 +22,9 @@ export function AnimatedWordmark({ className }: { className?: string }) {
       <span className="sr-only">{FULL_TEXT}</span>
       <span aria-hidden="true">
         {name}
+        {/* Ponto de quebra seguro: "InterviewRoadmap.dev" não tem espaço nenhum, então sem isso o
+            navegador não tem onde quebrar linha em telas estreitas e o texto estoura a largura. */}
+        {name.length >= SPLIT ? <wbr /> : null}
         <span className="relative font-normal text-[var(--color-accent)]">
           {tld}
           <motion.span
