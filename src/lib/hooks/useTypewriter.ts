@@ -9,6 +9,9 @@ type TypewriterOptions = {
   typingMs?: number;
   deletingMs?: number;
   pauseMs?: number;
+  // Para depois de digitar a primeira palavra por completo — sem pausa/exclusão/loop. Pensado pra
+  // um wordmark de marca (digita uma vez, fica parado), diferente do uso cíclico normal.
+  once?: boolean;
 };
 
 export function useTypewriter(words: string[], options?: TypewriterOptions): string {
@@ -44,6 +47,7 @@ export function useTypewriter(words: string[], options?: TypewriterOptions): str
         s.charIndex++;
         setDisplay(word.slice(0, s.charIndex));
         if (s.charIndex === word.length) {
+          if (optionsRef.current?.once) return;
           s.phase = "pausing";
           timeoutId = setTimeout(tick, pauseMs);
         } else {

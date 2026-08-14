@@ -7,6 +7,7 @@ import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { TechIcon } from "@/components/icons/TechIcon";
 import { Logo } from "@/components/icons/Logo";
 import { Wordmark } from "@/components/icons/Wordmark";
+import { AnimatedWordmark } from "@/components/hero/AnimatedWordmark";
 import { HeroTypewriter } from "@/components/hero/HeroTypewriter";
 import { GithubCtaLink } from "@/components/hero/GithubCtaLink";
 import { Reveal } from "@/components/motion/Reveal";
@@ -74,44 +75,57 @@ export default async function LocaleHome({
 
       <main id="conteudo-principal" className="mx-auto w-full max-w-4xl flex-1 px-4 py-16">
         <div className="flex flex-col items-center text-center">
-          <Logo className="h-20 w-20 text-[var(--color-accent)]" />
-          <p className="mt-4 text-sm font-medium uppercase tracking-wide text-[var(--color-accent)]">
-            {dict.trackSelector.badge}
-          </p>
-          <h1 className="mt-3 text-4xl font-semibold text-[var(--color-text)]">
-            <Wordmark />
-          </h1>
-          <p className="mt-4 max-w-2xl text-[var(--color-text-muted)]">
-            {dict.trackSelector.heroIntro}
-          </p>
-          <HeroTypewriter
-            label={dict.trackSelector.tracksLabel}
-            words={techs.map((tech) => getTechConfig(tech, locale).shortName)}
-          />
+          <Reveal>
+            <Logo className="h-20 w-20 text-[var(--color-accent)]" />
+          </Reveal>
+          <Reveal delay={0.08} className="mt-4">
+            <p className="text-sm font-medium uppercase tracking-wide text-[var(--color-accent)]">
+              {dict.trackSelector.badge}
+            </p>
+          </Reveal>
+          <Reveal delay={0.16} className="mt-3">
+            <h1 className="text-4xl font-semibold text-[var(--color-text)]">
+              <AnimatedWordmark />
+            </h1>
+          </Reveal>
+          <Reveal delay={0.24} className="mt-4 max-w-2xl">
+            <p className="text-[var(--color-text-muted)]">{dict.trackSelector.heroIntro}</p>
+          </Reveal>
+          <Reveal delay={0.32}>
+            <HeroTypewriter
+              label={dict.trackSelector.tracksLabel}
+              words={techs.map((tech) => getTechConfig(tech, locale).shortName)}
+            />
+          </Reveal>
         </div>
 
         <section className="mt-16">
-          <h2 className="text-center text-sm font-semibold uppercase tracking-wide text-[var(--color-text-muted)]">
-            {dict.trackSelector.howItWorksTitle}
-          </h2>
+          <Reveal>
+            <h2 className="text-center text-sm font-semibold uppercase tracking-wide text-[var(--color-text-muted)]">
+              {dict.trackSelector.howItWorksTitle}
+            </h2>
+          </Reveal>
           <RevealGroup className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
             {features.map((feature) => (
-              <RevealItem
-                key={feature.title}
-                className="rounded-md border border-[var(--color-border)] p-4"
-              >
-                <p className="font-medium text-[var(--color-text)]">{feature.title}</p>
-                <p className="mt-1 text-sm text-[var(--color-text-muted)]">{feature.description}</p>
+              <RevealItem key={feature.title} className="h-full">
+                <HoverLift className="flex h-full flex-col rounded-md border border-[var(--color-border)] p-4 transition-colors hover:border-[var(--color-accent)]">
+                  <p className="font-medium text-[var(--color-text)]">{feature.title}</p>
+                  <p className="mt-1 text-sm text-[var(--color-text-muted)]">{feature.description}</p>
+                </HoverLift>
               </RevealItem>
             ))}
           </RevealGroup>
         </section>
 
         <section className="mt-16">
-          <h2 className="text-center text-sm font-semibold uppercase tracking-wide text-[var(--color-text-muted)]">
-            {dict.trackSelector.title}
-          </h2>
-          <p className="mt-2 text-center text-[var(--color-text-muted)]">{dict.trackSelector.intro}</p>
+          <Reveal>
+            <h2 className="text-center text-sm font-semibold uppercase tracking-wide text-[var(--color-text-muted)]">
+              {dict.trackSelector.title}
+            </h2>
+          </Reveal>
+          <Reveal delay={0.08} className="mt-2">
+            <p className="text-center text-[var(--color-text-muted)]">{dict.trackSelector.intro}</p>
+          </Reveal>
 
           <RevealGroup className="mt-8 grid w-full grid-cols-1 gap-4 sm:grid-cols-3">
             {techs.map((tech) => {
