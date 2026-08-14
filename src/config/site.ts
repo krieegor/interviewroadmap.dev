@@ -11,26 +11,26 @@ const author = {
 
 const shared = {
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
-  githubUrl: "https://github.com/krieegor/trainerdev.app",
+  githubUrl: "https://github.com/krieegor/interviewroadmap.dev",
   author,
   // Cresce conforme PRs de novos colaboradores forem aceitos no repositório.
   contributors: [{ name: author.name, url: author.github }],
 };
 
-// Identidade da plataforma (trainerdev.app) — nível acima de qualquer trilha específica.
+// Identidade da plataforma (interviewroadmap.dev) — nível acima de qualquer trilha específica.
 // Nome/descrição por trilha (Kafka, Java, Elastic) vivem em src/config/tech.ts.
 const localizedSiteConfig = {
   pt: {
     ...shared,
-    name: "trainerdev.app",
-    shortName: "trainerdev.app",
+    name: "interviewroadmap.dev",
+    shortName: "interviewroadmap.dev",
     description: "Plataforma gratuita e open source de preparação para entrevistas técnicas, com trilhas por tecnologia.",
     locale: "pt-BR",
   },
   en: {
     ...shared,
-    name: "trainerdev.app",
-    shortName: "trainerdev.app",
+    name: "interviewroadmap.dev",
+    shortName: "interviewroadmap.dev",
     description: "A free, open-source technical interview prep platform, with tracks per technology.",
     locale: "en-US",
   },

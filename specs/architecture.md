@@ -28,7 +28,7 @@
 ## 3. Modelo de conteúdo
 
 Conteúdo vive em `src/content/<tech>/**` como arquivos `.mdx` com frontmatter tipado — `tech` é a
-plataforma trainerdev.app particionada por trilha (`kafka`, `java`, `elastic`; ver seção 14). O código de app
+plataforma interviewroadmap.dev particionada por trilha (`kafka`, `java`, `elastic`; ver seção 14). O código de app
 (`src/app`) apenas roteia e renderiza; nunca contém texto do livro hardcoded.
 
 ```
@@ -102,7 +102,7 @@ src/
 │   └── seo/         # helpers de metadata/OG/JSON-LD
 ├── types/           # tipos compartilhados (Chapter, Question, GlossaryTerm, CaseStudy) — sem campo tech,
 │                     # é dimensão de path/rota, não de dado
-└── config/          # site.ts (identidade da plataforma trainerdev.app) + tech.ts (nome/descrição por
+└── config/          # site.ts (identidade da plataforma interviewroadmap.dev) + tech.ts (nome/descrição por
                       # trilha) + navegação de topo (não a ordem de capítulos, que é derivada do
                       # frontmatter em src/lib/content)
 ```
@@ -144,7 +144,7 @@ sob `[tech]` (`livro/[...slug]`, `perguntas/[slug]`, etc.) só geram `generateSt
 `techsWithContent` — `/en/java/livro/qualquer-coisa` dá 404 de build, sem custo extra, já que o site é SSG
 puro. `sitemap.ts`, `robots.ts`, `manifest.ts`, `not-found.tsx`, `icon.tsx` e `opengraph-image.tsx`
 continuam fora de `[locale]` — são rotas globais únicas do App Router, com identidade de plataforma
-(trainerdev.app), não de trilha; `sitemap.ts` itera locale × tech.
+(interviewroadmap.dev), não de trilha; `sitemap.ts` itera locale × tech.
 
 ## 6. Busca local
 
@@ -274,7 +274,7 @@ e [`specs/roadmap.md`](./roadmap.md). Nenhuma opção exige cartão de crédito 
   globais — essas não têm `tech` disponível estruturalmente (Header renderiza de dentro de
   `[tech]/layout.tsx`, mas rotas fora de `[locale]` como `manifest.ts` não têm `tech` nunca).
   `getTechConfig(tech, locale)` cobre nome/descrição por trilha (ex.: "Apache Kafka para Entrevistas Java
-  Sênior" vs. "trainerdev.app"), usado em `generateMetadata` e no corpo de páginas dentro de `[tech]`.
+  Sênior" vs. "interviewroadmap.dev"), usado em `generateMetadata` e no corpo de páginas dentro de `[tech]`.
 - **`scripts/generate-pdf.ts` continua kafka-only** — o script nunca teve loop de locale ou tech (gera um
   PDF só, a partir de uma rota fixa), então só a constante `PRINT_ROUTE` precisou ganhar o segmento
   (`/pt/kafka/livro/impressao`); não vale a pena generalizar antes de Java/Elastic terem conteúdo e alguém

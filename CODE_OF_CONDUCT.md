@@ -48,7 +48,7 @@ se aplica quando um indivíduo estiver representando oficialmente o projeto em e
 ## Aplicação
 
 Casos de comportamento abusivo, de assédio ou de outra forma inaceitável podem ser reportados abrindo uma
-[issue](https://github.com/krieegor/trainerdev.app/issues) marcada como confidencial/sensível ou entrando em
+[issue](https://github.com/krieegor/interviewroadmap.dev/issues) marcada como confidencial/sensível ou entrando em
 contato diretamente com o mantenedor via [GitHub](https://github.com/krieegor). Todas as reclamações serão
 revisadas e investigadas de forma pronta e justa.
 

@@ -8,7 +8,7 @@ Este documento é o passo a passo prático. Para dar de alta uma trilha (`tech`)
 
 ## Estrutura de arquivos
 
-trainerdev.app tem uma dimensão de **trilha** (`tech`) além de idioma — hoje só `kafka` tem conteúdo real
+interviewroadmap.dev tem uma dimensão de **trilha** (`tech`) além de idioma — hoje só `kafka` tem conteúdo real
 (`java` e `elastic` são trilhas "em breve", sem arquivos ainda). Todo conteúdo é um arquivo `.mdx` com
 frontmatter YAML, em `src/content/<tech>/<tipo>/<locale>/`. Ao contribuir para a trilha Kafka, `<tech>` é
 sempre `kafka`. Hoje o conteúdo do Kafka está completo nos dois idiomas; ao adicionar conteúdo novo, escreva

@@ -4,7 +4,7 @@ Guia para execuções futuras do Claude Code neste repositório.
 
 ## Objetivo do projeto
 
-**trainerdev.app**: plataforma interativa, gratuita e open source de preparação para entrevistas técnicas,
+**interviewroadmap.dev**: plataforma interativa, gratuita e open source de preparação para entrevistas técnicas,
 organizada por trilhas de tecnologia (`Tech` — `kafka` | `java` | `elastic` | `sql` | `aws` | `gcp`). A
 trilha **Kafka** está completa (e-book, 50 perguntas, glossário, estudos de caso, simulador); as demais
 estão "em construção" (página própria, sem conteúdo ainda). Não é landing page, não é documentação de

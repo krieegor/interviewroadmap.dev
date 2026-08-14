@@ -1,8 +1,8 @@
-# Product Spec — trainerdev.app
+# Product Spec — interviewroadmap.dev
 
 ## 1. O que é
 
-**trainerdev.app** é uma plataforma interativa, gratuita e open source, publicada como site estático, de
+**interviewroadmap.dev** é uma plataforma interativa, gratuita e open source, publicada como site estático, de
 preparação para entrevistas técnicas — organizada por trilhas de tecnologia. Cada trilha é um e-book
 navegável com a mesma estrutura de estudo (capítulos, perguntas de entrevista, glossário, estudos de caso,
 simulador).
