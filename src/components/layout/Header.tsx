@@ -35,7 +35,7 @@ export async function Header({
           <Link
             href={`/${locale}/home`}
             aria-label={siteConfig.shortName}
-            className="flex items-center gap-1.5 text-sm font-semibold text-[var(--color-text)] sm:text-base"
+            className="group flex items-center gap-1.5 text-sm font-semibold text-[var(--color-text)] sm:text-base"
           >
             <Logo className="text-[var(--color-accent)]" />
             <span className="hidden sm:inline">
