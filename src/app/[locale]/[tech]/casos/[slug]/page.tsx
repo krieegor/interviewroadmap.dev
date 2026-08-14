@@ -6,6 +6,7 @@ import { CopyLinkButton } from "@/components/ui/CopyLinkButton";
 import { isLocale, locales, type Locale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/get-dictionary";
 import { isTech, techsWithContent, type Tech } from "@/lib/tech/config";
+import { buildAlternates } from "@/lib/seo";
 
 // Gera a tupla completa (locale+tech+slug) "de baixo pra cima", em vez de depender dos params do
 // segmento pai — quando o retorno varia entre vazio (techs sem conteúdo) e não-vazio (kafka) por
@@ -40,6 +41,7 @@ export async function generateMetadata({
   return {
     title: caseStudy.frontmatter.title,
     description: caseStudy.frontmatter.description,
+    alternates: buildAlternates(rawLocale, `/${rawTech}/casos/${slug}`),
   };
 }
 

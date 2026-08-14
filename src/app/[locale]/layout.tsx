@@ -5,6 +5,7 @@ import { themeInitScript } from "@/lib/theme-script";
 import { getSiteConfig } from "@/config/site";
 import { locales, isLocale, type Locale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/get-dictionary";
+import { buildAlternates } from "@/lib/seo";
 
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
@@ -31,10 +32,9 @@ export async function generateMetadata({
       template: `%s · ${siteConfig.shortName}`,
     },
     description: siteConfig.description,
-    alternates: {
-      canonical: `/${rawLocale}`,
-      languages: { pt: "/pt", en: "/en" },
-    },
+    // Fallback só pra rotas que não definem o próprio `alternates` (nenhuma deveria chegar aqui hoje
+    // — cada página de conteúdo já sobrescreve com o path real via `buildAlternates`).
+    alternates: buildAlternates(rawLocale, "/home"),
     icons: {
       icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
     },
@@ -45,10 +45,12 @@ export async function generateMetadata({
       title: siteConfig.name,
       description: siteConfig.description,
     },
+    // Sem `title`/`description` fixos aqui: a maioria dos leitores de card (incluindo X/Twitter) cai
+    // de volta pro `openGraph.title`/`description` quando o campo `twitter` não os define — e esse OG
+    // já é correto por página (pergunta, capítulo etc.). Definir um valor fixo aqui bloquearia esse
+    // fallback pra todo o site com o texto genérico da plataforma.
     twitter: {
       card: "summary_large_image",
-      title: siteConfig.name,
-      description: siteConfig.description,
     },
   };
 }

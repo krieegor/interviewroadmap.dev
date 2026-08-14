@@ -8,6 +8,7 @@ import { isLocale, locales, type Locale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/get-dictionary";
 import { formatTemplate } from "@/lib/i18n/format";
 import { isTech, techsWithContent, type Tech } from "@/lib/tech/config";
+import { buildAlternates } from "@/lib/seo";
 
 // Gera a tupla completa (locale+tech+slug) "de baixo pra cima" — ver nota em casos/[slug]/page.tsx
 // e specs/architecture.md seção 14 sobre o bug do Next 16 com retorno vazio por combinação de pai.
@@ -39,6 +40,7 @@ export async function generateMetadata({
   return {
     title: question.frontmatter.title,
     description: question.frontmatter.shortAnswer,
+    alternates: buildAlternates(rawLocale, `/${rawTech}/perguntas/${slug}`),
     openGraph: {
       title: question.frontmatter.title,
       description: question.frontmatter.shortAnswer,

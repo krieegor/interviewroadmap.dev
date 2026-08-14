@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -16,6 +17,17 @@ import { HoverLift } from "@/components/motion/HoverLift";
 import { isLocale, locales, type Locale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/get-dictionary";
 import { techs, techsWithContent } from "@/lib/tech/config";
+import { buildAlternates } from "@/lib/seo";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale: rawLocale } = await params;
+  if (!isLocale(rawLocale)) return {};
+  return { alternates: buildAlternates(rawLocale, "/home") };
+}
 
 export default async function LocaleHome({
   params,

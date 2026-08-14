@@ -6,6 +6,7 @@ import { SimulatorHistory } from "@/components/interview/SimulatorHistory";
 import { isLocale, type Locale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/get-dictionary";
 import { isTech, techsWithContent, type Tech } from "@/lib/tech/config";
+import { buildAlternates } from "@/lib/seo";
 
 export async function generateMetadata({
   params,
@@ -18,6 +19,7 @@ export async function generateMetadata({
   return {
     title: dict.simuladorPage.title,
     description: dict.simuladorPage.description,
+    alternates: buildAlternates(rawLocale, `/${rawTech}/simulador`),
   };
 }
 

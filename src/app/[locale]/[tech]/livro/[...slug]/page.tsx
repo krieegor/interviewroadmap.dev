@@ -15,6 +15,7 @@ import { CopyLinkButton } from "@/components/ui/CopyLinkButton";
 import { isLocale, locales, type Locale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/get-dictionary";
 import { isTech, techsWithContent, type Tech } from "@/lib/tech/config";
+import { buildAlternates } from "@/lib/seo";
 
 // Gera a tupla completa (locale+tech+slug) "de baixo pra cima" — ver nota em casos/[slug]/page.tsx
 // e specs/architecture.md seção 14 sobre o bug do Next 16 com retorno vazio por combinação de pai.
@@ -46,6 +47,7 @@ export async function generateMetadata({
   return {
     title: chapter.frontmatter.title,
     description: chapter.frontmatter.description,
+    alternates: buildAlternates(rawLocale, `/${rawTech}/livro/${slug.join("/")}`),
     openGraph: {
       title: chapter.frontmatter.title,
       description: chapter.frontmatter.description,

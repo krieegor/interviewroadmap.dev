@@ -17,9 +17,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     entries.push({ url: `${siteConfig.url}/${locale}/home`, lastModified: new Date() });
 
     for (const tech of techs) {
-      entries.push({ url: `${siteConfig.url}/${locale}/${tech}`, lastModified: new Date() });
-
+      // Trilhas "em construção" ficam fora do sitemap — a própria página delas já é `noindex`
+      // (ver [locale]/[tech]/layout.tsx), então submetê-las aqui mandaria um sinal contraditório.
       if (!techsWithContent.includes(tech)) continue;
+
+      entries.push({ url: `${siteConfig.url}/${locale}/${tech}`, lastModified: new Date() });
 
       const [chapters, questions, caseStudies, terms] = await Promise.all([
         getAllChapters(tech, locale),
