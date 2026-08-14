@@ -6,6 +6,7 @@ import { siteConfig } from "@/config/site";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { TechIcon } from "@/components/icons/TechIcon";
 import { Logo } from "@/components/icons/Logo";
+import { Wordmark } from "@/components/icons/Wordmark";
 import { HeroTypewriter } from "@/components/hero/HeroTypewriter";
 import { GithubCtaLink } from "@/components/hero/GithubCtaLink";
 import { Reveal } from "@/components/motion/Reveal";
@@ -46,7 +47,9 @@ export default async function LocaleHome({
       <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-4">
         <span className="flex items-center gap-1.5 text-sm font-semibold text-[var(--color-text)] sm:text-base">
           <Logo className="text-[var(--color-accent)]" />
-          {siteConfig.shortName}
+          <span className="hidden sm:inline">
+            <Wordmark />
+          </span>
         </span>
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-1 text-xs">
@@ -76,7 +79,7 @@ export default async function LocaleHome({
             {dict.trackSelector.badge}
           </p>
           <h1 className="mt-3 text-4xl font-semibold text-[var(--color-text)]">
-            {dict.trackSelector.heroTitle}
+            <Wordmark />
           </h1>
           <p className="mt-4 max-w-2xl text-[var(--color-text-muted)]">
             {dict.trackSelector.heroIntro}

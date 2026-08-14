@@ -211,7 +211,6 @@ export const en: Dictionary = {
   },
   trackSelector: {
     badge: "Free & open source",
-    heroTitle: "interviewroadmap.dev",
     heroIntro:
       "A free, open-source technical interview prep platform. Every technology track follows the same format: a navigable book, real interview questions, a glossary, and a practice simulator — no paid course, no sign-up, no ads.",
     tracksLabel: "Tracks",

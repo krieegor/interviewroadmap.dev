@@ -3,18 +3,12 @@
 [![CI](https://github.com/krieegor/interviewroadmap.dev/actions/workflows/ci.yml/badge.svg)](https://github.com/krieegor/interviewroadmap.dev/actions/workflows/ci.yml)
 [![Licença MIT](https://img.shields.io/badge/licença-MIT-blue.svg)](./LICENSE)
 
-![Demonstração do interviewroadmap.dev](./docs/media/demo.gif)
+**🔗 [interviewroadmap.dev](https://interviewroadmap.dev)**
 
 Plataforma interativa, gratuita e open source de preparação para entrevistas técnicas, organizada por
-trilhas de tecnologia.
-
-- **Kafka** — trilha completa: livro navegável, 50 perguntas de entrevista, glossário, estudos de caso e
-  simulador.
-- **Java**, **Elastic Search**, **SQL**, **AWS** e **GCP** — em construção.
-
-Cada trilha segue o mesmo formato: guia prático produzido para estudo real (não é cópia da documentação
-oficial), com resposta rápida, resposta nível sênior, explicação aprofundada, exemplo financeiro e
-pegadinhas comuns para cada pergunta de entrevista.
+trilhas de tecnologia. Cada trilha segue o mesmo formato: guia prático produzido para estudo real (não é
+cópia da documentação oficial), com resposta rápida, resposta nível sênior, explicação aprofundada, exemplo
+financeiro e pegadinhas comuns para cada pergunta de entrevista.
 
 ## Sumário
 
@@ -31,14 +25,14 @@ pegadinhas comuns para cada pergunta de entrevista.
 
 ## Trilhas
 
-| Trilha             | Status           | Conteúdo hoje                                                 |
-| ------------------ | ---------------- | -------------------------------------------------------------- |
-| **Kafka**          | ✅ Completa       | 15 capítulos, 50 perguntas, 24 termos de glossário, 5 estudos de caso |
-| **Java**           | 🚧 Em construção |  —                                                              |
-| **Elastic Search** | 🚧 Em construção |  —                                                              |
-| **SQL**            | 🚧 Em construção |  —                                                              |
-| **AWS**            | 🚧 Em construção |  —                                                              |
-| **GCP**            | 🚧 Em construção |  —                                                              |
+| Trilha             | Status           | Conteúdo hoje                                                         |
+| ------------------ | ---------------- | --------------------------------------------------------------------- |
+| **Kafka**          | ✅ Completa      | 15 capítulos, 50 perguntas, 24 termos de glossário, 5 estudos de caso |
+| **Java**           | 🚧 Em construção | —                                                                     |
+| **Elastic Search** | 🚧 Em construção | —                                                                     |
+| **SQL**            | 🚧 Em construção | —                                                                     |
+| **AWS**            | 🚧 Em construção | —                                                                     |
+| **GCP**            | 🚧 Em construção | —                                                                     |
 
 ## Funcionalidades
 

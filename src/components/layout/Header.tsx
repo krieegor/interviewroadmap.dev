@@ -7,6 +7,7 @@ import { MobileNav } from "@/components/layout/MobileNav";
 import { SearchDialog } from "@/components/ui/SearchDialog";
 import { LocaleSwitcher } from "@/components/layout/LocaleSwitcher";
 import { Logo } from "@/components/icons/Logo";
+import { Wordmark } from "@/components/icons/Wordmark";
 import { getEnAvailability } from "@/lib/i18n/en-availability";
 import type { Locale } from "@/lib/i18n/config";
 import type { Dictionary } from "@/lib/i18n/get-dictionary";
@@ -28,15 +29,18 @@ export async function Header({
 
   return (
     <header className="sticky top-0 z-40 border-b border-[var(--color-border)] bg-[var(--color-bg)]/95 backdrop-blur">
-      <div className="mx-auto flex h-14 max-w-6xl items-center gap-4 px-4">
+      <div className="mx-auto flex h-14 max-w-6xl items-center gap-2 px-4 sm:gap-4">
         <MobileNav locale={locale} tech={tech} dict={dict} />
         <div className="flex shrink-0 items-center gap-2">
           <Link
             href={`/${locale}/home`}
-            className="flex items-center gap-1.5 truncate text-sm font-semibold text-[var(--color-text)] sm:text-base"
+            aria-label={siteConfig.shortName}
+            className="flex items-center gap-1.5 text-sm font-semibold text-[var(--color-text)] sm:text-base"
           >
             <Logo className="text-[var(--color-accent)]" />
-            {siteConfig.shortName}
+            <span className="hidden sm:inline">
+              <Wordmark />
+            </span>
           </Link>
           <Link
             href={`/${locale}/home`}

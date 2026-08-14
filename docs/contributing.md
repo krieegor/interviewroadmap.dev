@@ -56,11 +56,6 @@ atualizado no commit (ver [`docs/deployment.md`](./deployment.md) § "PDF do liv
 - Sem dependências novas sem justificativa — avalie o custo de bundle antes de propor uma biblioteca.
 - Prettier formata automaticamente (`npm run format`); não brigue com o formatter.
 
-## GIF de demonstração (README)
-
-`docs/media/demo.gif` é um asset estático committado no repo, sem pipeline de geração — pra atualizar,
-grave um novo GIF e substitua o arquivo diretamente.
-
 ## Estilo editorial
 
 Todo conteúdo deve seguir [`specs/content-guidelines.md`](../specs/content-guidelines.md): os 10 pontos

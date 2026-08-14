@@ -210,7 +210,6 @@ export const pt = {
   },
   trackSelector: {
     badge: "Gratuito & open source",
-    heroTitle: "interviewroadmap.dev",
     heroIntro:
       "Uma plataforma gratuita e open source de preparação para entrevistas técnicas. Cada trilha de tecnologia segue o mesmo formato: um livro navegável, perguntas de entrevista reais, glossário e um simulador — sem curso pago, sem cadastro, sem anúncio.",
     tracksLabel: "Trilhas",
