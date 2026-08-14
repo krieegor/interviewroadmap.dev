@@ -10,7 +10,7 @@ const author = {
 };
 
 const shared = {
-  url: process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
+  url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://interviewroadmap.dev",
   githubUrl: "https://github.com/krieegor/interviewroadmap.dev",
   author,
   // Cresce conforme PRs de novos colaboradores forem aceitos no repositório.

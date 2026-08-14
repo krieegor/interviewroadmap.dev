@@ -11,7 +11,7 @@ Apenas uma variável é usada, e é opcional:
 
 | Variável               | Uso                                          | Padrão                  |
 | ---------------------- | -------------------------------------------- | ----------------------- |
-| `NEXT_PUBLIC_SITE_URL` | URL canônica usada em metadata, sitemap e OG | `http://localhost:3000` |
+| `NEXT_PUBLIC_SITE_URL` | URL canônica usada em metadata, sitemap e OG | `https://interviewroadmap.dev` |
 
 Configure-a com a URL final do deploy (ex.: `https://kafka-entrevistas.vercel.app`).
 
