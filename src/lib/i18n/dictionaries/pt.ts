@@ -8,6 +8,10 @@ export const pt = {
     simulador: "Simulador",
     sobre: "Sobre",
   },
+  breadcrumbs: {
+    ariaLabel: "Trilha de navegação",
+    home: "Início",
+  },
   header: {
     githubLabel: "Repositório no GitHub",
     searchButton: "Buscar",
@@ -236,7 +240,7 @@ export const pt = {
     title: "Escolha sua trilha",
     intro: "interviewroadmap.dev é uma plataforma gratuita e open source de preparação para entrevistas técnicas, organizada por tecnologia.",
     availableBadge: "Disponível - Acesse agora!",
-    unavailableBadge: "Indisponível - Ambiente em construção",
+    unavailableBadge: "Indisponível",
     openSourceText: "Esse projeto é gratuito e open source. Contribuições são bem-vindas.",
     githubCta: "Ver no GitHub",
   },

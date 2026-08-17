@@ -3,7 +3,11 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getAllQuestions, getQuestionBySlug } from "@/lib/content/questions";
 import { LevelBadge } from "@/components/interview/LevelBadge";
+import { Breadcrumbs } from "@/components/navigation/Breadcrumbs";
+import { JsonLdScript } from "@/components/seo/JsonLdScript";
 import { CopyLinkButton } from "@/components/ui/CopyLinkButton";
+import { getTechConfig } from "@/config/tech";
+import { getTechBreadcrumb } from "@/config/navigation";
 import { isLocale, locales, type Locale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/get-dictionary";
 import { formatTemplate } from "@/lib/i18n/format";
@@ -58,6 +62,7 @@ export default async function QuestionPage({
   const locale: Locale = rawLocale;
   const tech: Tech = rawTech;
   const dict = getDictionary(locale);
+  const techConfig = getTechConfig(tech, locale);
   const question = await getQuestionBySlug(tech, slug, locale);
   if (!question) notFound();
 
@@ -83,12 +88,16 @@ export default async function QuestionPage({
     ],
   };
 
+  const breadcrumbItems = [
+    ...getTechBreadcrumb(locale, tech, techConfig.name, dict),
+    { label: dict.nav.perguntas, href: `/${locale}/${tech}/perguntas` },
+    { label: frontmatter.title, href: `/${locale}/${tech}/perguntas/${frontmatter.slug}` },
+  ];
+
   return (
     <div className="mx-auto max-w-3xl px-4 py-12">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <JsonLdScript data={jsonLd} />
+      <Breadcrumbs items={breadcrumbItems} locale={locale} ariaLabel={dict.breadcrumbs.ariaLabel} />
 
       <p className="text-sm font-medium text-[var(--color-text-muted)]">
         {formatTemplate(dict.perguntaDetail.questionOf, { id: frontmatter.id })}

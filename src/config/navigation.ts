@@ -18,3 +18,17 @@ export function getTopNav(locale: Locale, tech: Tech, dict: Dictionary): TopNavI
     { label: dict.nav.sobre, href: `/${locale}/${tech}/sobre` },
   ];
 }
+
+// Primeiros dois nós compartilhados por toda breadcrumb sob uma trilha — cada página completa com sua
+// própria seção (e, quando aplicável, o item atual) via `[...getTechBreadcrumb(...), { label, href }]`.
+export function getTechBreadcrumb(
+  locale: Locale,
+  tech: Tech,
+  techName: string,
+  dict: Dictionary,
+): TopNavItem[] {
+  return [
+    { label: dict.breadcrumbs.home, href: `/${locale}/home` },
+    { label: techName, href: `/${locale}/${tech}` },
+  ];
+}

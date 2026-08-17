@@ -1,12 +1,15 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
+import { Breadcrumbs } from "@/components/navigation/Breadcrumbs";
+import { JsonLdScript } from "@/components/seo/JsonLdScript";
 import { getSiteConfig } from "@/config/site";
 import { getTechConfig } from "@/config/tech";
+import { getTechBreadcrumb } from "@/config/navigation";
 import { isLocale, type Locale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/get-dictionary";
 import { isTech, techsWithContent, type Tech } from "@/lib/tech/config";
-import { buildAlternates } from "@/lib/seo";
+import { buildAlternates, buildPersonJsonLd } from "@/lib/seo";
 
 export async function generateMetadata({
   params,
@@ -37,9 +40,16 @@ export default async function SobrePage({
   const siteConfig = getSiteConfig(locale);
   const techConfig = getTechConfig(tech, locale);
   const { author } = siteConfig;
+  const pageUrl = `${siteConfig.url}/${locale}/${tech}/sobre`;
+  const breadcrumbItems = [
+    ...getTechBreadcrumb(locale, tech, techConfig.name, dict),
+    { label: dict.nav.sobre, href: `/${locale}/${tech}/sobre` },
+  ];
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-12">
+      {author.name ? <JsonLdScript data={buildPersonJsonLd(siteConfig, pageUrl)} /> : null}
+      <Breadcrumbs items={breadcrumbItems} locale={locale} ariaLabel={dict.breadcrumbs.ariaLabel} />
       <h1 className="text-3xl font-semibold text-[var(--color-text)]">{dict.sobre.title}</h1>
 
       <div className="prose-content mt-6">

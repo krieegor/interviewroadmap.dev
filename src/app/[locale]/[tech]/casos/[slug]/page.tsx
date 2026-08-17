@@ -2,7 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getAllCaseStudies, getCaseStudyBySlug } from "@/lib/content/case-studies";
+import { Breadcrumbs } from "@/components/navigation/Breadcrumbs";
 import { CopyLinkButton } from "@/components/ui/CopyLinkButton";
+import { getTechConfig } from "@/config/tech";
+import { getTechBreadcrumb } from "@/config/navigation";
 import { isLocale, locales, type Locale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/get-dictionary";
 import { isTech, techsWithContent, type Tech } from "@/lib/tech/config";
@@ -55,13 +58,20 @@ export default async function CaseStudyPage({
   const locale: Locale = rawLocale;
   const tech: Tech = rawTech;
   const dict = getDictionary(locale);
+  const techConfig = getTechConfig(tech, locale);
   const caseStudy = await getCaseStudyBySlug(tech, slug, locale);
   if (!caseStudy) notFound();
 
   const { Content, frontmatter } = caseStudy;
+  const breadcrumbItems = [
+    ...getTechBreadcrumb(locale, tech, techConfig.name, dict),
+    { label: dict.nav.casos, href: `/${locale}/${tech}/casos` },
+    { label: frontmatter.title, href: `/${locale}/${tech}/casos/${frontmatter.slug}` },
+  ];
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-12">
+      <Breadcrumbs items={breadcrumbItems} locale={locale} ariaLabel={dict.breadcrumbs.ariaLabel} />
       <h1 className="text-3xl font-semibold text-[var(--color-text)]">{frontmatter.title}</h1>
       <p className="mt-3 text-[var(--color-text-muted)]">{frontmatter.description}</p>
       <div className="mt-4">

@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getAllQuestions } from "@/lib/content/questions";
 import { QuestionCard } from "@/components/interview/QuestionCard";
+import { Breadcrumbs } from "@/components/navigation/Breadcrumbs";
 import { getTechConfig } from "@/config/tech";
+import { getTechBreadcrumb } from "@/config/navigation";
 import { isLocale, type Locale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/get-dictionary";
 import { formatTemplate } from "@/lib/i18n/format";
@@ -35,10 +37,16 @@ export default async function PerguntasPage({
   const locale: Locale = rawLocale;
   const tech: Tech = rawTech;
   const dict = getDictionary(locale);
+  const techConfig = getTechConfig(tech, locale);
   const questions = await getAllQuestions(tech, locale);
+  const breadcrumbItems = [
+    ...getTechBreadcrumb(locale, tech, techConfig.name, dict),
+    { label: dict.nav.perguntas, href: `/${locale}/${tech}/perguntas` },
+  ];
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-12">
+      <Breadcrumbs items={breadcrumbItems} locale={locale} ariaLabel={dict.breadcrumbs.ariaLabel} />
       <h1 className="text-3xl font-semibold text-[var(--color-text)]">{dict.perguntasIndex.title}</h1>
       <p className="mt-3 max-w-prose text-[var(--color-text-muted)]">{dict.perguntasIndex.intro}</p>
 

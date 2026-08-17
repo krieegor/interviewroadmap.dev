@@ -159,11 +159,17 @@ export default async function LocaleHome({
                         <span
                           className={
                             hasContent
-                              ? "rounded-full border border-emerald-600/40 bg-emerald-50 px-2 py-0.5 text-xs font-bold text-emerald-700 dark:border-emerald-400/30 dark:bg-emerald-400/10 dark:text-emerald-400"
-                              : "rounded-full border border-[var(--color-border)] px-2 py-0.5 text-xs font-bold text-[var(--color-text-muted)]"
+                              ? "rounded-full border border-emerald-600/40 bg-emerald-50 px-2 py-0.5 text-xs text-emerald-700 dark:border-emerald-400/30 dark:bg-emerald-400/10 dark:text-emerald-400"
+                              : "rounded-full border border-[var(--color-border)] px-2 py-0.5 text-xs text-[var(--color-text-muted)]"
                           }
                         >
-                          {hasContent ? dict.trackSelector.availableBadge : dict.trackSelector.unavailableBadge}
+                          {hasContent ? (
+                            dict.trackSelector.availableBadge
+                          ) : (
+                            <span className="text-red-600 dark:text-red-400">
+                              {dict.trackSelector.unavailableBadge}
+                            </span>
+                          )}
                         </span>
                       </div>
                       <p className="text-sm text-[var(--color-text-muted)]">{techConfig.description}</p>

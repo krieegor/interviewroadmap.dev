@@ -10,6 +10,10 @@ export const en: Dictionary = {
     simulador: "Simulator",
     sobre: "About",
   },
+  breadcrumbs: {
+    ariaLabel: "Breadcrumb",
+    home: "Home",
+  },
   header: {
     githubLabel: "GitHub repository",
     searchButton: "Search",
@@ -237,7 +241,7 @@ export const en: Dictionary = {
     title: "Choose your track",
     intro: "interviewroadmap.dev is a free, open-source technical interview prep platform, organized by technology.",
     availableBadge: "Available - Access now!",
-    unavailableBadge: "Unavailable - Under construction",
+    unavailableBadge: "Unavailable",
     openSourceText: "This project is free and open source. Contributions are welcome.",
     githubCta: "View on GitHub",
   },

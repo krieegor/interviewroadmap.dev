@@ -3,6 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getChaptersByPart } from "@/lib/content/chapters";
 import { getTechConfig } from "@/config/tech";
+import { getTechBreadcrumb } from "@/config/navigation";
+import { Breadcrumbs } from "@/components/navigation/Breadcrumbs";
 import { isLocale, type Locale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/get-dictionary";
 import { formatTemplate } from "@/lib/i18n/format";
@@ -35,10 +37,16 @@ export default async function LivroPage({
   const locale: Locale = rawLocale;
   const tech: Tech = rawTech;
   const dict = getDictionary(locale);
+  const techConfig = getTechConfig(tech, locale);
   const parts = await getChaptersByPart(tech, locale);
+  const breadcrumbItems = [
+    ...getTechBreadcrumb(locale, tech, techConfig.name, dict),
+    { label: dict.nav.livro, href: `/${locale}/${tech}/livro` },
+  ];
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-12">
+      <Breadcrumbs items={breadcrumbItems} locale={locale} ariaLabel={dict.breadcrumbs.ariaLabel} />
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <h1 className="text-3xl font-semibold text-[var(--color-text)]">{dict.livroIndex.title}</h1>

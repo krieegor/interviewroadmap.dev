@@ -8,10 +8,13 @@ import {
   getChaptersByPart,
 } from "@/lib/content/chapters";
 import { BookSidebar } from "@/components/navigation/BookSidebar";
+import { Breadcrumbs } from "@/components/navigation/Breadcrumbs";
 import { ChapterPager } from "@/components/navigation/ChapterPager";
 import { ChapterProgressButton } from "@/components/navigation/ChapterProgressButton";
 import { TableOfContents } from "@/components/navigation/TableOfContents";
 import { CopyLinkButton } from "@/components/ui/CopyLinkButton";
+import { getTechConfig } from "@/config/tech";
+import { getTechBreadcrumb } from "@/config/navigation";
 import { isLocale, locales, type Locale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/get-dictionary";
 import { isTech, techsWithContent, type Tech } from "@/lib/tech/config";
@@ -65,6 +68,7 @@ export default async function ChapterPage({
   const locale: Locale = rawLocale;
   const tech: Tech = rawTech;
   const dict = getDictionary(locale);
+  const techConfig = getTechConfig(tech, locale);
   const slug = slugParts.join("/");
   const chapter = await getChapterBySlug(tech, slug, locale);
   if (!chapter) notFound();
@@ -76,9 +80,15 @@ export default async function ChapterPage({
   ]);
 
   const { Content, frontmatter } = chapter;
+  const breadcrumbItems = [
+    ...getTechBreadcrumb(locale, tech, techConfig.name, dict),
+    { label: dict.nav.livro, href: `/${locale}/${tech}/livro` },
+    { label: frontmatter.title, href: `/${locale}/${tech}/livro/${frontmatter.slug}` },
+  ];
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10">
+      <Breadcrumbs items={breadcrumbItems} locale={locale} ariaLabel={dict.breadcrumbs.ariaLabel} />
       <div className="grid grid-cols-1 gap-10 lg:grid-cols-[240px_1fr] xl:grid-cols-[240px_1fr_220px]">
         <aside className="hidden lg:block">
           <div className="sticky top-20">

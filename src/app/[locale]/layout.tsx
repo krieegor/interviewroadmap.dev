@@ -5,7 +5,8 @@ import { themeInitScript } from "@/lib/theme-script";
 import { getSiteConfig } from "@/config/site";
 import { locales, isLocale, type Locale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/get-dictionary";
-import { buildAlternates } from "@/lib/seo";
+import { buildAlternates, buildOrganizationJsonLd, buildWebSiteJsonLd } from "@/lib/seo";
+import { JsonLdScript } from "@/components/seo/JsonLdScript";
 
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
@@ -52,6 +53,11 @@ export async function generateMetadata({
     twitter: {
       card: "summary_large_image",
     },
+    // String pública fornecida pelo Google Search Console (não é segredo — ela vai pro HTML renderizado
+    // de qualquer forma). `undefined` quando não configurada: o Next omite a meta tag, sem afetar o build.
+    verification: {
+      google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
+    },
   };
 }
 
@@ -66,6 +72,7 @@ export default async function LocaleLayout({
   if (!isLocale(rawLocale)) notFound();
   const locale: Locale = rawLocale;
   const dict = getDictionary(locale);
+  const siteConfig = getSiteConfig(locale);
 
   return (
     <html lang={locale === "pt" ? "pt-BR" : "en-US"} suppressHydrationWarning>
@@ -75,6 +82,8 @@ export default async function LocaleLayout({
           strategy="beforeInteractive"
           dangerouslySetInnerHTML={{ __html: themeInitScript }}
         />
+        <JsonLdScript data={buildWebSiteJsonLd(siteConfig)} />
+        <JsonLdScript data={buildOrganizationJsonLd(siteConfig)} />
       </head>
       <body className="flex min-h-screen flex-col antialiased">
         <a
