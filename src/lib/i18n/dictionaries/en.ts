@@ -242,6 +242,7 @@ export const en: Dictionary = {
     intro: "interviewroadmap.dev is a free, open-source technical interview prep platform, organized by technology.",
     availableBadge: "Available - Access now!",
     unavailableBadge: "Unavailable",
+    unavailableBadgeSuffix: "Coming soon!",
     openSourceText: "This project is free and open source. Contributions are welcome.",
     githubCta: "View on GitHub",
   },

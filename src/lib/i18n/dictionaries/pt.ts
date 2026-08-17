@@ -241,6 +241,7 @@ export const pt = {
     intro: "interviewroadmap.dev é uma plataforma gratuita e open source de preparação para entrevistas técnicas, organizada por tecnologia.",
     availableBadge: "Disponível - Acesse agora!",
     unavailableBadge: "Indisponível",
+    unavailableBadgeSuffix: "Em breve!",
     openSourceText: "Esse projeto é gratuito e open source. Contribuições são bem-vindas.",
     githubCta: "Ver no GitHub",
   },

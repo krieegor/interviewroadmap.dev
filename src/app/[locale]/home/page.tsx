@@ -166,9 +166,12 @@ export default async function LocaleHome({
                           {hasContent ? (
                             dict.trackSelector.availableBadge
                           ) : (
-                            <span className="text-red-600 dark:text-red-400">
-                              {dict.trackSelector.unavailableBadge}
-                            </span>
+                            <>
+                              <span className="text-red-600 dark:text-red-400">
+                                {dict.trackSelector.unavailableBadge}
+                              </span>{" "}
+                              · {dict.trackSelector.unavailableBadgeSuffix}
+                            </>
                           )}
                         </span>
                       </div>
