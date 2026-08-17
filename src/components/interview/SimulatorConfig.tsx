@@ -1,15 +1,17 @@
 import type { InterviewLevel } from "@/types/content";
 import type { Dictionary } from "@/lib/i18n/get-dictionary";
-import type { Mode } from "@/lib/simulator/session";
+import { QUESTION_COUNT_OPTIONS, type Mode, type QuestionCount } from "@/lib/simulator/session";
 
 export function SimulatorConfig({
   topics,
   level,
   topic,
   mode,
+  questionCount,
   onLevelChange,
   onTopicChange,
   onModeChange,
+  onQuestionCountChange,
   onStart,
   dict,
 }: {
@@ -17,16 +19,18 @@ export function SimulatorConfig({
   level: InterviewLevel | "todos";
   topic: string;
   mode: Mode;
+  questionCount: QuestionCount;
   onLevelChange: (level: InterviewLevel | "todos") => void;
   onTopicChange: (topic: string) => void;
   onModeChange: (mode: Mode) => void;
+  onQuestionCountChange: (count: QuestionCount) => void;
   onStart: () => void;
   dict: Dictionary;
 }) {
   return (
     <div className="rounded-md border border-[var(--color-border)] p-6">
       <h2 className="text-lg font-semibold text-[var(--color-text)]">{dict.simulator.configureTitle}</h2>
-      <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
         <label className="flex flex-col gap-1 text-sm">
           <span className="font-medium text-[var(--color-text)]">{dict.simulator.levelLabel}</span>
           <select
@@ -51,6 +55,20 @@ export function SimulatorConfig({
             {topics.map((t) => (
               <option key={t} value={t}>
                 {t}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="flex flex-col gap-1 text-sm">
+          <span className="font-medium text-[var(--color-text)]">{dict.simulator.questionCountLabel}</span>
+          <select
+            value={questionCount}
+            onChange={(e) => onQuestionCountChange(Number(e.target.value) as QuestionCount)}
+            className="rounded-md border border-[var(--color-border)] bg-[var(--color-bg)] px-3 py-2"
+          >
+            {QUESTION_COUNT_OPTIONS.map((count) => (
+              <option key={count} value={count}>
+                {count}
               </option>
             ))}
           </select>

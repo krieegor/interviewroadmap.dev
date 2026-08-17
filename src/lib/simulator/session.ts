@@ -4,6 +4,9 @@ export type Answer = "acertei" | "parcial" | "nao-sabia";
 export type Mode = "aberta" | "multipla-escolha";
 export type ShuffledQuiz = { options: string[]; correctIndex: number };
 
+export const QUESTION_COUNT_OPTIONS = [5, 10, 15, 20, 30, 50] as const;
+export type QuestionCount = (typeof QUESTION_COUNT_OPTIONS)[number];
+
 export function shuffle<T>(items: T[]): T[] {
   const copy = [...items];
   for (let i = copy.length - 1; i > 0; i--) {

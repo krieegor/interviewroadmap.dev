@@ -94,7 +94,7 @@ export function SimulatorHistory({ locale, dict }: { locale: Locale; dict: Dicti
           >
             <div>
               <p className="font-medium text-[var(--color-text)]">
-                {levelLabel(result.level)} · {topicLabel(result.topic)}
+                {levelLabel(result.level)} · {topicLabel(result.topic)} · {dict.simulator.modeLabels[result.mode]}
               </p>
               <p className="text-xs text-[var(--color-text-muted)]">{formatDate(result.date, locale)}</p>
             </div>
@@ -102,9 +102,11 @@ export function SimulatorHistory({ locale, dict }: { locale: Locale; dict: Dicti
               <span className="text-emerald-600">
                 {result.correct} {dict.simulatorHistory.correctSuffix}
               </span>
-              <span className="text-amber-600">
-                {result.partial} {dict.simulatorHistory.partialSuffix}
-              </span>
+              {result.mode === "aberta" ? (
+                <span className="text-amber-600">
+                  {result.partial} {dict.simulatorHistory.partialSuffix}
+                </span>
+              ) : null}
               <span className="text-red-500">
                 {result.unknown} {dict.simulatorHistory.unknownSuffix}
               </span>

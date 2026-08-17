@@ -19,6 +19,7 @@ describe("SimulatorHistory", () => {
       date: new Date().toISOString(),
       level: "senior",
       topic: "fundamentos",
+      mode: "aberta",
       total: 5,
       correct: 3,
       partial: 1,
@@ -28,6 +29,7 @@ describe("SimulatorHistory", () => {
       date: new Date().toISOString(),
       level: "pleno",
       topic: "arquitetura",
+      mode: "multipla-escolha",
       total: 4,
       correct: 4,
       partial: 0,
@@ -38,7 +40,7 @@ describe("SimulatorHistory", () => {
 
     expect(screen.getByText("2")).toBeInTheDocument(); // simulados feitos
     expect(screen.getByText("9")).toBeInTheDocument(); // perguntas respondidas
-    expect(screen.getByText("Pleno · arquitetura")).toBeInTheDocument();
-    expect(screen.getByText("Sênior · fundamentos")).toBeInTheDocument();
+    expect(screen.getByText("Pleno · arquitetura · Múltipla escolha")).toBeInTheDocument();
+    expect(screen.getByText("Sênior · fundamentos · Aberta")).toBeInTheDocument();
   });
 });

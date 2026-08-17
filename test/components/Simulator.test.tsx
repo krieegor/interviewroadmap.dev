@@ -85,6 +85,6 @@ describe("Simulator", () => {
 
     expect(screen.getByText("Resultado")).toBeInTheDocument();
     expect(screen.getByText("2")).toBeInTheDocument();
-    expect(screen.getAllByText("0")).toHaveLength(2);
+    expect(screen.getAllByText("0")).toHaveLength(1);
   });
 });

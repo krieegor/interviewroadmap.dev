@@ -6,7 +6,15 @@ import { saveSimulatorResult } from "@/lib/progress/simulator-progress";
 import type { Locale } from "@/lib/i18n/config";
 import type { Dictionary } from "@/lib/i18n/get-dictionary";
 import type { Tech } from "@/lib/tech/config";
-import { type Answer, type Mode, type ShuffledQuiz, scoreAnswers, shuffle, shuffleQuiz } from "@/lib/simulator/session";
+import {
+  type Answer,
+  type Mode,
+  type QuestionCount,
+  type ShuffledQuiz,
+  scoreAnswers,
+  shuffle,
+  shuffleQuiz,
+} from "@/lib/simulator/session";
 import { SimulatorConfig } from "./SimulatorConfig";
 import { SimulatorQuestion } from "./SimulatorQuestion";
 import { SimulatorResult } from "./SimulatorResult";
@@ -30,6 +38,7 @@ export function Simulator({
   const [level, setLevel] = useState<InterviewLevel | "todos">("todos");
   const [topic, setTopic] = useState<string>("todos");
   const [mode, setMode] = useState<Mode>("aberta");
+  const [questionCount, setQuestionCount] = useState<QuestionCount>(10);
   const [session, setSession] = useState<QuestionFrontmatter[] | null>(null);
   const [quizByIndex, setQuizByIndex] = useState<ShuffledQuiz[]>([]);
   const [index, setIndex] = useState(0);
@@ -44,7 +53,7 @@ export function Simulator({
         (level === "todos" || q.level.includes(level)) &&
         (topic === "todos" || q.topics.includes(topic)),
     );
-    const shuffled = shuffle(filtered);
+    const shuffled = shuffle(filtered).slice(0, questionCount);
     setSession(shuffled);
     setQuizByIndex(shuffled.map(shuffleQuiz));
     setIndex(0);
@@ -69,6 +78,7 @@ export function Simulator({
         date: new Date().toISOString(),
         level,
         topic,
+        mode,
         total: next.length,
         ...scoreAnswers(next),
       });
@@ -98,9 +108,11 @@ export function Simulator({
         level={level}
         topic={topic}
         mode={mode}
+        questionCount={questionCount}
         onLevelChange={setLevel}
         onTopicChange={setTopic}
         onModeChange={setMode}
+        onQuestionCountChange={setQuestionCount}
         onStart={start}
         dict={dict}
       />
@@ -125,6 +137,7 @@ export function Simulator({
       <SimulatorResult
         total={session.length}
         level={level}
+        mode={mode}
         {...scoreAnswers(answers)}
         onRestart={restart}
         dict={dict}

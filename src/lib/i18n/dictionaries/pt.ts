@@ -143,6 +143,7 @@ export const pt = {
     allLevels: "Todos",
     topicLabel: "Assunto",
     allTopics: "Todos",
+    questionCountLabel: "Quantidade de perguntas",
     modeLabel: "Modo",
     modeLabels: {
       aberta: "Aberta",
@@ -234,8 +235,8 @@ export const pt = {
       "Pratique no seu ritmo — modo aberto (explique em voz alta) ou múltipla escolha, tudo salvo só no seu navegador.",
     title: "Escolha sua trilha",
     intro: "interviewroadmap.dev é uma plataforma gratuita e open source de preparação para entrevistas técnicas, organizada por tecnologia.",
-    availableBadge: "Disponível",
-    unavailableBadge: "Indisponível",
+    availableBadge: "Disponível - Acesse agora!",
+    unavailableBadge: "Indisponível - Ambiente em construção",
     openSourceText: "Esse projeto é gratuito e open source. Contribuições são bem-vindas.",
     githubCta: "Ver no GitHub",
   },

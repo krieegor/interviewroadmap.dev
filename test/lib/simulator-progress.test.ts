@@ -6,6 +6,7 @@ function makeResult(overrides: Partial<Parameters<typeof saveSimulatorResult>[0]
     date: new Date().toISOString(),
     level: "senior",
     topic: "fundamentos",
+    mode: "aberta" as const,
     total: 5,
     correct: 3,
     partial: 1,
