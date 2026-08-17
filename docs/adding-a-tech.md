@@ -79,14 +79,33 @@ Elastic NV, AWS → Amazon, GCP → Google), adicione o nome dela em `footer.dis
 frase que já cita Apache Kafka/Confluent/Apache Software Foundation/Elastic NV/Oracle/AWS/Google Cloud —
 só estenda a lista.
 
-## 6. O que **não** precisa mudar
+## 6. `Content-Type` da imagem OG (Cloudflare)
+
+`src/app/[locale]/[tech]/opengraph-image.tsx` gera uma rota por trilha sem extensão no path
+(`/pt/sua-trilha/opengraph-image`). O Cloudflare Workers (hosting atual, ver
+[`deployment.md`](./deployment.md)) infere `Content-Type` pela extensão do arquivo — sem extensão, ele serve
+o PNG com `HTTP 200` mas **sem** header `Content-Type`, e crawlers de redes sociais (WhatsApp, Twitter,
+etc.) descartam a imagem silenciosamente mesmo com o body correto. Adicione as duas linhas novas (pt + en)
+em `public/_headers`:
+
+```
+/pt/sua-trilha/opengraph-image
+  Content-Type: image/png
+
+/en/sua-trilha/opengraph-image
+  Content-Type: image/png
+```
+
+Depois do deploy, confirme com `curl -sD - https://interviewroadmap.dev/pt/sua-trilha/opengraph-image -o /dev/null` — a resposta precisa ter `Content-Type: image/png` na lista de headers.
+
+## 7. O que **não** precisa mudar
 
 Rotas (`src/app/[locale]/[tech]/**`), `sitemap.ts`, `robots.ts`, `scripts/build-search-index.ts` e o
 `LocaleSwitcher`/`TrackSwitcher` já iteram sobre `techs`/`techsWithContent` dinamicamente — nenhum deles tem
 lista própria de tecnologias para manter sincronizada. Se você adicionou uma trilha e algo não apareceu,
 o problema quase sempre está em `techs`/`techsWithContent` desatualizado, não em código de rota.
 
-## 7. Quando a trilha ganha conteúdo real
+## 8. Quando a trilha ganha conteúdo real
 
 Siga [`docs/content-authoring.md`](./content-authoring.md) para criar os arquivos `.mdx`
 (`src/content/<tech>/...`), depois:
@@ -104,4 +123,5 @@ Siga [`docs/content-authoring.md`](./content-authoring.md) para criar os arquivo
 - [ ] Ícone em `src/components/icons/TechIcon.tsx`
 - [ ] Cor `[data-tech]` em `src/app/globals.css` (light + dark, validada AA)
 - [ ] Disclaimer de marca em `footer.disclaimer`/`sobre.trademarkDisclaimer` (pt + en), se aplicável
+- [ ] Entradas `Content-Type: image/png` (pt + en) em `public/_headers` para a imagem OG da trilha
 - [ ] `npm run lint && npm run test && npm run validate-content && npm run build`

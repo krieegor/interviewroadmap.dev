@@ -2,11 +2,12 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { getSiteConfig } from "@/config/site";
 import { getTechConfig } from "@/config/tech";
 import { isLocale, type Locale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/get-dictionary";
 import { isTech, techs, techsWithContent, type Tech } from "@/lib/tech/config";
-import { buildAlternates } from "@/lib/seo";
+import { buildAlternates, buildOpenGraph, techOpengraphImageUrl } from "@/lib/seo";
 
 export function generateStaticParams({ params }: { params: { locale: string } }) {
   if (!isLocale(params.locale)) return [];
@@ -23,12 +24,21 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale: rawLocale, tech: rawTech } = await params;
   if (!isLocale(rawLocale) || !isTech(rawTech)) return {};
+  const siteConfig = getSiteConfig(rawLocale);
   const techConfig = getTechConfig(rawTech, rawLocale);
 
   return {
     title: techConfig.name,
     description: techConfig.description,
     alternates: buildAlternates(rawLocale, `/${rawTech}`),
+    openGraph: buildOpenGraph({
+      siteConfig,
+      locale: rawLocale,
+      pathWithoutLocale: `/${rawTech}`,
+      title: techConfig.name,
+      description: techConfig.description,
+      imageUrl: techOpengraphImageUrl(siteConfig, rawLocale, rawTech),
+    }),
     // Trilhas "em construção" (ComingSoon) têm conteúdo raso/quase idêntico entre si — não vale a
     // pena competir por índice de busca até terem conteúdo real (ver techsWithContent).
     ...(!techsWithContent.includes(rawTech) ? { robots: { index: false, follow: true } } : {}),

@@ -8,6 +8,7 @@ function makeResult(overrides: Partial<Parameters<typeof saveSimulatorResult>[0]
     topic: "fundamentos",
     mode: "aberta" as const,
     total: 5,
+    totalTimeMs: 120000,
     correct: 3,
     partial: 1,
     unknown: 1,

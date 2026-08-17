@@ -164,6 +164,7 @@ export const pt = {
     resultTitle: "Resultado",
     questionsCount: "{count} pergunta(s) —",
     allLevelsResult: "todos os níveis",
+    totalTime: "tempo total {time}",
     correct: "Acertei",
     partial: "Parcial",
     unknown: "Não sabia",

@@ -4,12 +4,13 @@ import { getAllQuestions } from "@/lib/content/questions";
 import { Simulator } from "@/components/interview/Simulator";
 import { SimulatorHistory } from "@/components/interview/SimulatorHistory";
 import { Breadcrumbs } from "@/components/navigation/Breadcrumbs";
+import { getSiteConfig } from "@/config/site";
 import { getTechConfig } from "@/config/tech";
 import { getTechBreadcrumb } from "@/config/navigation";
 import { isLocale, type Locale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/get-dictionary";
 import { isTech, techsWithContent, type Tech } from "@/lib/tech/config";
-import { buildAlternates } from "@/lib/seo";
+import { buildAlternates, buildOpenGraph, techOpengraphImageUrl } from "@/lib/seo";
 
 export async function generateMetadata({
   params,
@@ -19,10 +20,19 @@ export async function generateMetadata({
   const { locale: rawLocale, tech: rawTech } = await params;
   if (!isLocale(rawLocale) || !isTech(rawTech)) return {};
   const dict = getDictionary(rawLocale);
+  const siteConfig = getSiteConfig(rawLocale);
   return {
     title: dict.simuladorPage.title,
     description: dict.simuladorPage.description,
     alternates: buildAlternates(rawLocale, `/${rawTech}/simulador`),
+    openGraph: buildOpenGraph({
+      siteConfig,
+      locale: rawLocale,
+      pathWithoutLocale: `/${rawTech}/simulador`,
+      title: dict.simuladorPage.title,
+      description: dict.simuladorPage.description,
+      imageUrl: techOpengraphImageUrl(siteConfig, rawLocale, rawTech),
+    }),
   };
 }
 

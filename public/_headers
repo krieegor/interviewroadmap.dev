@@ -1,0 +1,55 @@
+# O Cloudflare Workers (assets estáticos, ver wrangler.jsonc) infere Content-Type pela extensão do
+# arquivo. As rotas de imagem geradas via `ImageResponse` do Next (icon.tsx, opengraph-image.tsx) não
+# têm extensão no path — sem isso, Cloudflare serve o PNG com HTTP 200 mas SEM header Content-Type, e
+# crawlers de redes sociais (WhatsApp, Twitter, etc.) descartam a imagem silenciosamente. Confirmado
+# em produção: com `curl -I` o body é um PNG válido, mas o header Content-Type simplesmente não existe.
+#
+# Lista fechada — precisa de uma entrada nova aqui sempre que um `tech` for adicionado em
+# src/lib/tech/config.ts (ver docs/adding-a-tech.md).
+/icon
+  Content-Type: image/png
+
+/opengraph-image
+  Content-Type: image/png
+
+/pt/opengraph-image
+  Content-Type: image/png
+
+/en/opengraph-image
+  Content-Type: image/png
+
+/pt/kafka/opengraph-image
+  Content-Type: image/png
+
+/pt/java/opengraph-image
+  Content-Type: image/png
+
+/pt/elastic/opengraph-image
+  Content-Type: image/png
+
+/pt/sql/opengraph-image
+  Content-Type: image/png
+
+/pt/aws/opengraph-image
+  Content-Type: image/png
+
+/pt/gcp/opengraph-image
+  Content-Type: image/png
+
+/en/kafka/opengraph-image
+  Content-Type: image/png
+
+/en/java/opengraph-image
+  Content-Type: image/png
+
+/en/elastic/opengraph-image
+  Content-Type: image/png
+
+/en/sql/opengraph-image
+  Content-Type: image/png
+
+/en/aws/opengraph-image
+  Content-Type: image/png
+
+/en/gcp/opengraph-image
+  Content-Type: image/png

@@ -165,6 +165,7 @@ export const en: Dictionary = {
     resultTitle: "Result",
     questionsCount: "{count} question(s) —",
     allLevelsResult: "all levels",
+    totalTime: "total time {time}",
     correct: "Got it",
     partial: "Partial",
     unknown: "Didn't know",

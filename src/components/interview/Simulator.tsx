@@ -46,6 +46,8 @@ export function Simulator({
   const [answerPanelOpen, setAnswerPanelOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [answers, setAnswers] = useState<Answer[]>([]);
+  const [questionStartedAt, setQuestionStartedAt] = useState(() => Date.now());
+  const [times, setTimes] = useState<number[]>([]);
 
   function start() {
     const filtered = questions.filter(
@@ -61,6 +63,8 @@ export function Simulator({
     setAnswerPanelOpen(false);
     setSelectedOption(null);
     setAnswers([]);
+    setTimes([]);
+    setQuestionStartedAt(Date.now());
   }
 
   function recordAnswer(value: Answer) {
@@ -70,9 +74,13 @@ export function Simulator({
     setAnswerPanelOpen(false);
     setSelectedOption(null);
 
+    const nextTimes = [...times, Date.now() - questionStartedAt];
+    setTimes(nextTimes);
+
     if (!session) return;
     if (index + 1 < session.length) {
       setIndex(index + 1);
+      setQuestionStartedAt(Date.now());
     } else {
       saveSimulatorResult({
         date: new Date().toISOString(),
@@ -80,6 +88,7 @@ export function Simulator({
         topic,
         mode,
         total: next.length,
+        totalTimeMs: nextTimes.reduce((sum, t) => sum + t, 0),
         ...scoreAnswers(next),
       });
       setIndex(session.length);
@@ -99,6 +108,7 @@ export function Simulator({
     setAnswerPanelOpen(false);
     setSelectedOption(null);
     setAnswers([]);
+    setTimes([]);
   }
 
   if (!session) {
@@ -138,6 +148,7 @@ export function Simulator({
         total={session.length}
         level={level}
         mode={mode}
+        totalTimeMs={times.reduce((sum, t) => sum + t, 0)}
         {...scoreAnswers(answers)}
         onRestart={restart}
         dict={dict}
@@ -154,6 +165,7 @@ export function Simulator({
       index={index}
       total={session.length}
       mode={mode}
+      questionStartedAt={questionStartedAt}
       revealed={revealed}
       onReveal={() => setRevealed(true)}
       onAnswer={recordAnswer}

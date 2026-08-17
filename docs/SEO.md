@@ -92,15 +92,55 @@ Aplicado em: `livro` (índice + capítulo), `perguntas` (índice + pergunta), `g
 
 ## Open Graph
 
-Cada trilha tem sua própria imagem OG (`src/app/[locale]/[tech]/opengraph-image.tsx`, mesmo padrão
-`ImageResponse`/`force-static` da imagem raiz em `src/app/opengraph-image.tsx`), usando `techConfig.name`/
-`description` reais — um link compartilhado de `/kafka` mostra "Apache Kafka para Entrevistas Java Sênior",
-não um card genérico do site inteiro. Gerada pra todas as trilhas (incluindo `ComingSoon`) porque é um
-asset de compartilhamento social, não uma página indexada — não reabre a questão de páginas vazias
-competindo por índice.
+### `openGraph` não é deep-merged entre segmentos — use sempre `buildOpenGraph`
 
-Páginas de conteúdo individuais (pergunta, capítulo, termo, caso) não têm imagem OG própria — caem no
-fallback da trilha. Ver [`SEO-OPPORTUNITIES.md`](./SEO-OPPORTUNITIES.md) pro porquê disso ser adiado.
+O Next.js **não** faz deep merge do campo `openGraph` entre `layout`/`page` aninhados: qualquer
+`generateMetadata` que defina `openGraph` (mesmo parcialmente, ex.: só `{ title, description }`)
+**substitui por inteiro** o que um segmento ancestral já tinha definido — derrubando junto `images`,
+`siteName`, `locale`, `type`, `url`. Foi exatamente isso que causava o bug de preview sem imagem no
+WhatsApp: páginas de pergunta/capítulo/termo sobrescreviam `openGraph` só com `title`/`description` e
+perdiam a imagem herdada do layout da trilha; outras páginas sequer sobrescreviam e por isso **mostravam
+título genérico do site** em vez do título específico da página.
+
+Por isso, todo `generateMetadata` que precisa de `openGraph` específico da página monta o objeto **inteiro**
+via `buildOpenGraph({ siteConfig, locale, pathWithoutLocale, title, description, imageUrl })` em
+`src/lib/seo.ts` — nunca um objeto parcial `{ title, description }` à mão. O helper cuida de:
+
+- `og:locale`/`og:locale:alternate` no formato correto do protocolo OG (`pt_BR`/`en_US`, com underscore —
+  diferente do formato BCP-47 `pt-BR`/`en-US` usado em `<html lang>`/`SiteConfig.locale`, não reusar um
+  pelo outro);
+- `og:url` absoluto e específico da página (`${siteConfig.url}/${locale}${pathWithoutLocale}`);
+- `og:image`/`og:image:width`/`height`/`type`/`alt` a partir da imagem correta (ver abaixo).
+
+`twitter:*` não precisa desse mesmo tratamento — o campo `twitter` (só `{ card: "summary_large_image" }` no
+layout raiz) cai de volta pro `openGraph` equivalente automaticamente quando a página não define seu
+próprio `twitter`, e nenhuma página do projeto define. Corrigir `openGraph` corrige `twitter:*` de graça.
+
+### Imagens
+
+Duas imagens dinâmicas (`ImageResponse`, `force-static`, mesmo padrão do ícone em `src/app/icon.tsx`):
+
+- `src/app/[locale]/opengraph-image.tsx` — fallback pra qualquer página direta sob `[locale]` sem trilha
+  (hoje, só `/[locale]/home`), usa `getSiteConfig(locale)`.
+- `src/app/[locale]/[tech]/opengraph-image.tsx` — usada por toda página de uma trilha (home da trilha,
+  livro, perguntas, glossário, casos, simulador, sobre — inclusive páginas de detalhe individuais, que não
+  têm imagem própria), usa `getTechConfig(tech, locale)`. Gerada pra todas as trilhas, incluindo
+  `ComingSoon`, porque é um asset de compartilhamento social, não uma página indexada.
+
+Páginas de conteúdo individuais (pergunta, capítulo, termo, caso) não têm imagem OG própria — caem na
+imagem da trilha. Ver [`SEO-OPPORTUNITIES.md`](./SEO-OPPORTUNITIES.md) pro porquê disso ser adiado.
+
+### Cloudflare precisa de `Content-Type` explícito pra essas imagens
+
+As rotas acima (e `/icon`) não têm extensão no path (`/pt/kafka/opengraph-image`, não `.../opengraph-image.png`).
+O Cloudflare Workers (hosting atual) infere `Content-Type` pela extensão do arquivo — sem uma, ele serve o
+PNG com `HTTP 200` e os bytes corretos, mas **sem header `Content-Type`**, e crawlers de redes sociais
+descartam a imagem mesmo assim (confirmado em produção com `curl -sD -`: body é PNG válido, header ausente).
+`public/_headers` declara `Content-Type: image/png` explicitamente pra cada uma dessas 16 rotas (lista
+fechada — precisa de entrada nova quando uma trilha é adicionada, ver
+[`adding-a-tech.md`](./adding-a-tech.md) §6). Se o hosting mudar (ver `deployment.md`), reavalie se esse
+arquivo ainda é necessário/tem o formato certo — a sintaxe de `_headers` é específica do Cloudflare
+Pages/Workers.
 
 ## Google Search Console Setup
 

@@ -3,6 +3,7 @@
 import { useSimulatorHistory } from "@/lib/progress/simulator-progress";
 import type { Locale } from "@/lib/i18n/config";
 import type { Dictionary } from "@/lib/i18n/get-dictionary";
+import { formatDuration } from "@/lib/simulator/session";
 
 function formatDate(iso: string, locale: Locale): string {
   return new Date(iso).toLocaleString(locale === "pt" ? "pt-BR" : "en-US", {
@@ -96,7 +97,9 @@ export function SimulatorHistory({ locale, dict }: { locale: Locale; dict: Dicti
               <p className="font-medium text-[var(--color-text)]">
                 {levelLabel(result.level)} · {topicLabel(result.topic)} · {dict.simulator.modeLabels[result.mode]}
               </p>
-              <p className="text-xs text-[var(--color-text-muted)]">{formatDate(result.date, locale)}</p>
+              <p className="text-xs text-[var(--color-text-muted)]">
+                {formatDate(result.date, locale)} · {formatDuration(result.totalTimeMs)}
+              </p>
             </div>
             <div className="flex gap-3 text-xs">
               <span className="text-emerald-600">

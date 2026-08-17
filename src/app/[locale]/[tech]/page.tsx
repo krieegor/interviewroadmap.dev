@@ -1,14 +1,41 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getAllChapters } from "@/lib/content/chapters";
 import { getTechConfig } from "@/config/tech";
-import { siteConfig as platformConfig } from "@/config/site";
+import { getSiteConfig, siteConfig as platformConfig } from "@/config/site";
 import { ReadingProgressCard } from "@/components/home/ReadingProgressCard";
 import { KafkaHero } from "@/components/hero/KafkaHero";
 import { ComingSoon } from "@/components/content/ComingSoon";
 import { isLocale, type Locale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/get-dictionary";
 import { isTech, techsWithContent, type Tech } from "@/lib/tech/config";
+import { buildOpenGraph, techOpengraphImageUrl } from "@/lib/seo";
+
+// `[tech]/layout.tsx` já define um `openGraph` correto pra essa mesma URL (`/${tech}`) como fallback,
+// mas sem `generateMetadata` própria aqui o Next prioriza a imagem via file-convention
+// (`opengraph-image.tsx`) sobre o `openGraph.images` explícito do layout, perdendo o `alt` da imagem.
+// Repetir aqui garante o mesmo objeto completo (com `alt`) que toda outra página já usa.
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string; tech: string }>;
+}): Promise<Metadata> {
+  const { locale: rawLocale, tech: rawTech } = await params;
+  if (!isLocale(rawLocale) || !isTech(rawTech)) return {};
+  const siteConfig = getSiteConfig(rawLocale);
+  const techConfig = getTechConfig(rawTech, rawLocale);
+  return {
+    openGraph: buildOpenGraph({
+      siteConfig,
+      locale: rawLocale,
+      pathWithoutLocale: `/${rawTech}`,
+      title: techConfig.name,
+      description: techConfig.description,
+      imageUrl: techOpengraphImageUrl(siteConfig, rawLocale, rawTech),
+    }),
+  };
+}
 
 export default async function TechHome({
   params,

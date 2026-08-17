@@ -19,7 +19,7 @@ export function Footer({
     <footer className="border-t border-[var(--color-border)] py-10">
       <div className="mx-auto flex max-w-6xl flex-col gap-4 px-4 text-sm text-[var(--color-text-muted)] sm:flex-row sm:items-center sm:justify-between">
         <p>
-          {siteConfig.name} {dict.footer.disclaimer}
+          {siteConfig.shortName} {dict.footer.disclaimer}
         </p>
         <div className="flex items-center gap-4">
           <Link href={`/${locale}/${tech}/sobre`} className="hover:text-[var(--color-accent)]">

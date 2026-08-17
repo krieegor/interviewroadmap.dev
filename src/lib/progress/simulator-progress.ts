@@ -3,7 +3,7 @@
 import { useSyncExternalStore } from "react";
 import type { Mode } from "@/lib/simulator/session";
 
-export const STORAGE_KEY = "kafka-ebook:simulator:v2";
+export const STORAGE_KEY = "kafka-ebook:simulator:v3";
 const MAX_HISTORY = 10;
 
 export type SimulatorResult = {
@@ -12,6 +12,7 @@ export type SimulatorResult = {
   topic: string;
   mode: Mode;
   total: number;
+  totalTimeMs: number;
   correct: number;
   partial: number;
   unknown: number;
@@ -32,6 +33,7 @@ function isSimulatorResult(value: unknown): value is SimulatorResult {
     typeof v.topic === "string" &&
     (v.mode === "aberta" || v.mode === "multipla-escolha") &&
     typeof v.total === "number" &&
+    typeof v.totalTimeMs === "number" &&
     typeof v.correct === "number" &&
     typeof v.partial === "number" &&
     typeof v.unknown === "number"

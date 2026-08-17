@@ -9,7 +9,8 @@ import { isLocale, type Locale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/get-dictionary";
 import { formatTemplate } from "@/lib/i18n/format";
 import { isTech, techsWithContent, type Tech } from "@/lib/tech/config";
-import { buildAlternates } from "@/lib/seo";
+import { getSiteConfig } from "@/config/site";
+import { buildAlternates, buildOpenGraph, techOpengraphImageUrl } from "@/lib/seo";
 
 export async function generateMetadata({
   params,
@@ -19,11 +20,22 @@ export async function generateMetadata({
   const { locale: rawLocale, tech: rawTech } = await params;
   if (!isLocale(rawLocale) || !isTech(rawTech)) return {};
   const dict = getDictionary(rawLocale);
+  const siteConfig = getSiteConfig(rawLocale);
   const techConfig = getTechConfig(rawTech, rawLocale);
+  const title = dict.livroIndex.title;
+  const description = formatTemplate(dict.livroIndex.description, { siteName: techConfig.name });
   return {
-    title: dict.livroIndex.title,
-    description: formatTemplate(dict.livroIndex.description, { siteName: techConfig.name }),
+    title,
+    description,
     alternates: buildAlternates(rawLocale, `/${rawTech}/livro`),
+    openGraph: buildOpenGraph({
+      siteConfig,
+      locale: rawLocale,
+      pathWithoutLocale: `/${rawTech}/livro`,
+      title,
+      description,
+      imageUrl: techOpengraphImageUrl(siteConfig, rawLocale, rawTech),
+    }),
   };
 }
 

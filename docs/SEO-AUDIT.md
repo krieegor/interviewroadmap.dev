@@ -49,3 +49,38 @@ build` rodados depois de todas as mudanças acima — todos passando, sem erro n
 OG por trilha (2 locales × 6 techs) e o `BreadcrumbList`/`WebSite`/`Organization`/`Person` JSON-LD
 verificados manualmente no HTML de `out/` (URLs absolutas, JSON válido). Trilhas sem conteúdo continuam
 `noindex` e fora do sitemap — nada nesta mudança alterou esse comportamento.
+
+---
+
+## Auditoria 2 — Preview de compartilhamento social sem imagem (2026-08-17)
+
+Motivada por um bug relatado: compartilhar `/pt/home` no WhatsApp mostrava título/descrição mas nenhuma
+imagem. A investigação (comparando o HTML real gerado em `out/` entre páginas, não assumindo) revelou dois
+problemas reais, mais sérios do que o sintoma relatado sozinho sugeria.
+
+| Severidade | Problema | Impacto | Solução | Arquivos |
+| --- | --- | --- | --- | --- |
+| CRITICAL | `openGraph` não é deep-merged pelo Next entre `layout`/`page` — qualquer página que definisse `openGraph` parcialmente (só `title`/`description`) apagava `images`/`siteName`/`locale`/`type`/`url` herdados. Afetava `perguntas/[slug]`, `livro/[...slug]`, `glossario/[slug]` (sem imagem) e **todas as outras páginas** de conteúdo, que mostravam `og:title`/`og:description` genéricos do site ("interviewroadmap.dev") em vez do título real da página, mesmo com a `<title>` do navegador correta | Cards de compartilhamento errados/incompletos em praticamente toda página do site, não só `/pt/home` | `buildOpenGraph()` centralizado em `src/lib/seo.ts` — monta o objeto `openGraph` inteiro (nunca parcial) em todo `generateMetadata` que precisa de título/descrição/URL específicos da página | `src/lib/seo.ts` + 12 `page.tsx`/`layout.tsx` (ver `SEO.md` § Open Graph) |
+| CRITICAL | `og:locale` usava o formato errado (`pt-BR`/`en-US`, com hífen — formato BCP-47 de `<html lang>`) em vez do formato exigido pelo protocolo Open Graph (`pt_BR`/`en_US`, com underscore) | Alguns parsers de crawler são estritos quanto a esse formato | Mapeamento `OG_LOCALE` dedicado em `buildOpenGraph()`, não reusa `SiteConfig.locale` | `src/lib/seo.ts` |
+| CRITICAL | `og:url` nunca era definido em lugar nenhum do site | Falta um campo obrigatório do protocolo OG; alguns crawlers rejeitam o card sem ele | `buildOpenGraph()` sempre inclui `url` absoluto específico da página | `src/lib/seo.ts` |
+| **CRITICAL — causa raiz mais provável do bug relatado** | As imagens OG (`/opengraph-image`, `/icon` e todas as variantes por locale/trilha) são rotas **sem extensão** no path. Confirmado em produção com `curl -sD -`: o Cloudflare Workers responde `HTTP 200` com os bytes corretos do PNG, mas **sem header `Content-Type`** — porque infere o tipo pela extensão do arquivo, e essas rotas não têm uma. Crawlers de redes sociais descartam a imagem mesmo com body válido | Nenhuma imagem aparece em nenhum preview social, em nenhuma página do site — não só `/pt/home` | `public/_headers` declarando `Content-Type: image/png` explicitamente pras 16 rotas de imagem sem extensão | `public/_headers`, `docs/adding-a-tech.md` (manutenção ao adicionar trilha) |
+| — | `/pt/kafka` (home da trilha) tinha o `og:image` correto mas sem `og:image:alt`, porque sem `generateMetadata` própria a página caía no arquivo de convenção do Next (`opengraph-image.tsx`) em vez do `openGraph.images` explícito do layout | Card levemente inconsistente com as demais páginas | `generateMetadata` própria em `[locale]/[tech]/page.tsx`, mesmo padrão `buildOpenGraph` das outras páginas | `src/app/[locale]/[tech]/page.tsx` |
+
+### Por que o sintoma relatado ("só `/pt/home` sem imagem") não contava a história toda
+
+`/pt/home` foi o único caso em que a imagem estava **totalmente ausente** do HTML (nenhum `og:image` sequer
+era emitido, por causa do bug de merge). Em todas as outras páginas o `og:image` existia no HTML — mas o
+arquivo por trás dele respondia sem `Content-Type`, então o crawler do WhatsApp provavelmente também
+falhava em renderizar essas imagens, só que sem um sintoma tão óbvio quanto "a tag nem existe". Os dois
+problemas são independentes e ambos precisavam ser corrigidos.
+
+### Validação desta auditoria
+
+`npm run typecheck`, `npm run lint` e `npm run build` rodados depois de cada rodada de mudanças — todos
+passando. Conferido manualmente no HTML de `out/` para 14 tipos de página (home pt/en, trilha, pergunta,
+capítulo, termo, caso, 6 páginas de índice) que existe exatamente **uma** ocorrência de `og:title`/
+`og:image`/`og:url` (zero duplicata) e que os valores são específicos da página, não genéricos. Confirmado
+com `curl -sD -` contra `https://interviewroadmap.dev/opengraph-image` (produção, antes do deploy desta
+correção) que o `Content-Type` realmente estava ausente, e que arquivos com extensão (`/favicon.svg`,
+`/manifest.webmanifest`) já respondiam corretamente — isolando o problema à ausência de extensão, não a uma
+falha geral do Cloudflare.

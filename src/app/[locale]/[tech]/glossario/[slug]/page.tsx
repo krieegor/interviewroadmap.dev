@@ -4,12 +4,13 @@ import { notFound } from "next/navigation";
 import { getAllTerms, getTermBySlug } from "@/lib/content/glossary";
 import { Breadcrumbs } from "@/components/navigation/Breadcrumbs";
 import { CopyLinkButton } from "@/components/ui/CopyLinkButton";
+import { getSiteConfig } from "@/config/site";
 import { getTechConfig } from "@/config/tech";
 import { getTechBreadcrumb } from "@/config/navigation";
 import { isLocale, locales, type Locale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/get-dictionary";
 import { isTech, techsWithContent, type Tech } from "@/lib/tech/config";
-import { buildAlternates } from "@/lib/seo";
+import { buildAlternates, buildOpenGraph, techOpengraphImageUrl } from "@/lib/seo";
 
 // Gera a tupla completa (locale+tech+slug) "de baixo pra cima" — ver nota em casos/[slug]/page.tsx
 // e specs/architecture.md seção 14 sobre o bug do Next 16 com retorno vazio por combinação de pai.
@@ -38,14 +39,20 @@ export async function generateMetadata({
   if (!isLocale(rawLocale) || !isTech(rawTech)) return {};
   const term = await getTermBySlug(rawTech, slug, rawLocale);
   if (!term) return {};
+  const siteConfig = getSiteConfig(rawLocale);
+  const path = `/${rawTech}/glossario/${slug}`;
   return {
     title: term.frontmatter.term,
     description: term.frontmatter.shortDefinition,
-    alternates: buildAlternates(rawLocale, `/${rawTech}/glossario/${slug}`),
-    openGraph: {
+    alternates: buildAlternates(rawLocale, path),
+    openGraph: buildOpenGraph({
+      siteConfig,
+      locale: rawLocale,
+      pathWithoutLocale: path,
       title: term.frontmatter.term,
       description: term.frontmatter.shortDefinition,
-    },
+      imageUrl: techOpengraphImageUrl(siteConfig, rawLocale, rawTech),
+    }),
   };
 }
 

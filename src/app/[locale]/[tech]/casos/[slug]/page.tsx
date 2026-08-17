@@ -4,12 +4,13 @@ import { notFound } from "next/navigation";
 import { getAllCaseStudies, getCaseStudyBySlug } from "@/lib/content/case-studies";
 import { Breadcrumbs } from "@/components/navigation/Breadcrumbs";
 import { CopyLinkButton } from "@/components/ui/CopyLinkButton";
+import { getSiteConfig } from "@/config/site";
 import { getTechConfig } from "@/config/tech";
 import { getTechBreadcrumb } from "@/config/navigation";
 import { isLocale, locales, type Locale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/get-dictionary";
 import { isTech, techsWithContent, type Tech } from "@/lib/tech/config";
-import { buildAlternates } from "@/lib/seo";
+import { buildAlternates, buildOpenGraph, techOpengraphImageUrl } from "@/lib/seo";
 
 // Gera a tupla completa (locale+tech+slug) "de baixo pra cima", em vez de depender dos params do
 // segmento pai — quando o retorno varia entre vazio (techs sem conteúdo) e não-vazio (kafka) por
@@ -41,10 +42,20 @@ export async function generateMetadata({
   if (!isLocale(rawLocale) || !isTech(rawTech)) return {};
   const caseStudy = await getCaseStudyBySlug(rawTech, slug, rawLocale);
   if (!caseStudy) return {};
+  const siteConfig = getSiteConfig(rawLocale);
+  const path = `/${rawTech}/casos/${slug}`;
   return {
     title: caseStudy.frontmatter.title,
     description: caseStudy.frontmatter.description,
-    alternates: buildAlternates(rawLocale, `/${rawTech}/casos/${slug}`),
+    alternates: buildAlternates(rawLocale, path),
+    openGraph: buildOpenGraph({
+      siteConfig,
+      locale: rawLocale,
+      pathWithoutLocale: path,
+      title: caseStudy.frontmatter.title,
+      description: caseStudy.frontmatter.description,
+      imageUrl: techOpengraphImageUrl(siteConfig, rawLocale, rawTech),
+    }),
   };
 }
 

@@ -5,7 +5,13 @@ import { themeInitScript } from "@/lib/theme-script";
 import { getSiteConfig } from "@/config/site";
 import { locales, isLocale, type Locale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/get-dictionary";
-import { buildAlternates, buildOrganizationJsonLd, buildWebSiteJsonLd } from "@/lib/seo";
+import {
+  buildAlternates,
+  buildOpenGraph,
+  buildOrganizationJsonLd,
+  buildWebSiteJsonLd,
+  localeOpengraphImageUrl,
+} from "@/lib/seo";
 import { JsonLdScript } from "@/components/seo/JsonLdScript";
 
 export function generateStaticParams() {
@@ -39,13 +45,14 @@ export async function generateMetadata({
     icons: {
       icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
     },
-    openGraph: {
-      type: "website",
-      locale: siteConfig.locale,
-      siteName: siteConfig.name,
+    openGraph: buildOpenGraph({
+      siteConfig,
+      locale: rawLocale,
+      pathWithoutLocale: "/home",
       title: siteConfig.name,
       description: siteConfig.description,
-    },
+      imageUrl: localeOpengraphImageUrl(siteConfig, rawLocale),
+    }),
     // Sem `title`/`description` fixos aqui: a maioria dos leitores de card (incluindo X/Twitter) cai
     // de volta pro `openGraph.title`/`description` quando o campo `twitter` não os define — e esse OG
     // já é correto por página (pergunta, capítulo etc.). Definir um valor fixo aqui bloquearia esse

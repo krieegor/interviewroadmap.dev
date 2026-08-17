@@ -1,12 +1,13 @@
 import type { InterviewLevel } from "@/types/content";
 import type { Dictionary } from "@/lib/i18n/get-dictionary";
 import { formatTemplate } from "@/lib/i18n/format";
-import type { Mode } from "@/lib/simulator/session";
+import { formatDuration, type Mode } from "@/lib/simulator/session";
 
 export function SimulatorResult({
   total,
   level,
   mode,
+  totalTimeMs,
   correct,
   partial,
   unknown,
@@ -16,6 +17,7 @@ export function SimulatorResult({
   total: number;
   level: InterviewLevel | "todos";
   mode: Mode;
+  totalTimeMs: number;
   correct: number;
   partial: number;
   unknown: number;
@@ -32,6 +34,8 @@ export function SimulatorResult({
         {level === "todos" ? dict.simulator.allLevelsResult : dict.simulator.levelLabels[level]}
         {" · "}
         {dict.simulator.modeLabels[mode]}
+        {" · "}
+        {formatTemplate(dict.simulator.totalTime, { time: formatDuration(totalTimeMs) })}
       </p>
       <div className={`mt-4 grid gap-3 text-center ${showPartial ? "grid-cols-3" : "grid-cols-2"}`}>
         <div className="rounded-md bg-[var(--color-surface)] p-3">

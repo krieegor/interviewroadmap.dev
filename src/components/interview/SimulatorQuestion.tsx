@@ -1,16 +1,29 @@
 import * as Dialog from "@radix-ui/react-dialog";
+import { useEffect, useState } from "react";
 import type { QuestionFrontmatter } from "@/types/content";
 import type { Locale } from "@/lib/i18n/config";
 import type { Dictionary } from "@/lib/i18n/get-dictionary";
 import type { Tech } from "@/lib/tech/config";
 import { formatTemplate } from "@/lib/i18n/format";
-import type { Answer, Mode, ShuffledQuiz } from "@/lib/simulator/session";
+import { formatDuration, type Answer, type Mode, type ShuffledQuiz } from "@/lib/simulator/session";
+
+function useElapsedMs(startedAt: number): number {
+  const [now, setNow] = useState(() => Date.now());
+
+  useEffect(() => {
+    const interval = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(interval);
+  }, [startedAt]);
+
+  return Math.max(0, now - startedAt);
+}
 
 export function SimulatorQuestion({
   current,
   index,
   total,
   mode,
+  questionStartedAt,
   revealed,
   onReveal,
   onAnswer,
@@ -28,6 +41,7 @@ export function SimulatorQuestion({
   index: number;
   total: number;
   mode: Mode;
+  questionStartedAt: number;
   revealed: boolean;
   onReveal: () => void;
   onAnswer: (value: Answer) => void;
@@ -41,10 +55,14 @@ export function SimulatorQuestion({
   tech: Tech;
   dict: Dictionary;
 }) {
+  const elapsedMs = useElapsedMs(questionStartedAt);
+
   return (
     <div className="rounded-md border border-[var(--color-border)] p-6">
       <p className="text-xs font-medium text-[var(--color-text-muted)]">
         {formatTemplate(dict.simulator.questionOf, { index: index + 1, total })}
+        {" · "}
+        {formatDuration(elapsedMs)}
       </p>
       <h2 className="mt-2 text-lg font-semibold text-[var(--color-text)]">{current.title}</h2>
 
