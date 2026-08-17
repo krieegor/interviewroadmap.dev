@@ -44,6 +44,7 @@ export const en: Dictionary = {
       "is free, open source material. It has no official affiliation with Apache Kafka, Confluent, the Apache Software Foundation, Elastic NV, Oracle, Amazon Web Services (AWS), or Google Cloud.",
     sobre: "About",
     github: "GitHub",
+    viewRelease: "View {tag} on GitHub",
   },
   copyLink: {
     copy: "Copy link",

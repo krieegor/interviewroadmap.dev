@@ -42,6 +42,7 @@ export const pt = {
       "é um material gratuito e open source. Não possui vínculo oficial com Apache Kafka, Confluent, Apache Software Foundation, Elastic NV, Oracle, Amazon Web Services (AWS) ou Google Cloud.",
     sobre: "Sobre",
     github: "GitHub",
+    viewRelease: "Ver {tag} no GitHub",
   },
   copyLink: {
     copy: "Copiar link",

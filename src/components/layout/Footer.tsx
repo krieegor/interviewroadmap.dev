@@ -2,7 +2,9 @@ import Link from "next/link";
 import { getSiteConfig } from "@/config/site";
 import type { Locale } from "@/lib/i18n/config";
 import type { Dictionary } from "@/lib/i18n/get-dictionary";
+import { formatTemplate } from "@/lib/i18n/format";
 import type { Tech } from "@/lib/tech/config";
+import { getSiteVersion } from "@/lib/version";
 
 export function Footer({
   locale,
@@ -14,6 +16,14 @@ export function Footer({
   dict: Dictionary;
 }) {
   const siteConfig = getSiteConfig(locale);
+  const version = getSiteVersion();
+  const publishedAt = version
+    ? new Date(version.publishedAt).toLocaleDateString(locale === "pt" ? "pt-BR" : "en-US", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+      })
+    : null;
 
   return (
     <footer className="border-t border-[var(--color-border)] py-10">
@@ -22,6 +32,17 @@ export function Footer({
           {siteConfig.shortName} {dict.footer.disclaimer}
         </p>
         <div className="flex items-center gap-4">
+          {version && publishedAt ? (
+            <a
+              href={version.url}
+              target="_blank"
+              rel="noreferrer"
+              title={formatTemplate(dict.footer.viewRelease, { tag: version.tag })}
+              className="hover:text-[var(--color-accent)]"
+            >
+              {version.tag} · {publishedAt}
+            </a>
+          ) : null}
           <Link href={`/${locale}/${tech}/sobre`} className="hover:text-[var(--color-accent)]">
             {dict.footer.sobre}
           </Link>

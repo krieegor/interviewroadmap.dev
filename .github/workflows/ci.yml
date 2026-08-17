@@ -34,3 +34,32 @@ jobs:
 
       - name: Build
         run: npm run build
+
+  tag:
+    needs: build
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Compute next patch version
+        id: bump
+        run: |
+          git fetch --tags
+          latest=$(git tag -l 'v*.*.*' | sort -V | tail -n1)
+          latest=${latest:-v0.0.0}
+          IFS=. read -r major minor patch <<< "${latest#v}"
+          echo "next=v${major}.${minor}.$((patch + 1))" >> "$GITHUB_OUTPUT"
+
+      - name: Create tag and release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "${{ steps.bump.outputs.next }}" \
+            --target "${{ github.sha }}" \
+            --title "${{ steps.bump.outputs.next }}" \
+            --generate-notes

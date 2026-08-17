@@ -22,14 +22,14 @@ const shared = {
 const localizedSiteConfig = {
   pt: {
     ...shared,
-    name: "InterviewRoadmap.dev — Prepare-se para entrevistas técnicas",
+    name: "InterviewRoadmap.dev - Prepare-se para entrevistas técnicas",
     shortName: "interviewroadmap.dev",
     description: "Plataforma gratuita e open source de preparação para entrevistas técnicas, com trilhas por tecnologia.",
     locale: "pt-BR",
   },
   en: {
     ...shared,
-    name: "InterviewRoadmap.dev — Prepare for Technical Interviews",
+    name: "InterviewRoadmap.dev - Prepare for Technical Interviews",
     shortName: "interviewroadmap.dev",
     description: "A free, open-source technical interview prep platform, with tracks per technology.",
     locale: "en-US",
