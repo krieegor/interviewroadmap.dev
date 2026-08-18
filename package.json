@@ -6,7 +6,7 @@
   "license": "MIT",
   "scripts": {
     "dev": "next dev",
-    "prebuild": "tsx scripts/build-search-index.ts && tsx scripts/fetch-release-version.ts",
+    "prebuild": "tsx scripts/build-search-index.ts && tsx scripts/fetch-release-version.ts && tsx scripts/generate-headers.ts",
     "build": "next build",
     "postbuild": "tsx scripts/generate-pdf.ts",
     "start": "serve out",
@@ -16,6 +16,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "validate-content": "tsx scripts/validate-content.ts",
+    "check-dashes": "tsx scripts/check-no-dashes.ts",
     "typecheck": "tsc --noEmit",
     "postinstall": "playwright install chromium"
   },

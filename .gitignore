@@ -23,6 +23,9 @@
 /public/search-index/
 # gerado por scripts/fetch-release-version.ts (prebuild): busca a última release na GitHub API.
 /public/version.json
+# gerado por scripts/generate-headers.ts (prebuild): rotas de imagem OG (Content-Type) + CSP, a partir
+# de src/lib/i18n/config.ts e src/lib/tech/config.ts. Não edite à mão (ver docs/adding-a-tech.md §6).
+/public/_headers
 
 # env
 .env

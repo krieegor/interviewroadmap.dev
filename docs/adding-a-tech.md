@@ -85,16 +85,13 @@ só estenda a lista.
 (`/pt/sua-trilha/opengraph-image`). O Cloudflare Workers (hosting atual, ver
 [`deployment.md`](./deployment.md)) infere `Content-Type` pela extensão do arquivo: sem extensão, ele serve
 o PNG com `HTTP 200` mas **sem** header `Content-Type`, e crawlers de redes sociais (WhatsApp, Twitter,
-etc.) descartam a imagem silenciosamente mesmo com o body correto. Adicione as duas linhas novas (pt + en)
-em `public/_headers`:
+etc.) descartam a imagem silenciosamente mesmo com o body correto.
 
-```
-/pt/sua-trilha/opengraph-image
-  Content-Type: image/png
-
-/en/sua-trilha/opengraph-image
-  Content-Type: image/png
-```
+`public/_headers` é **gerado automaticamente** por `scripts/generate-headers.ts` (roda no `prebuild`, ver
+`package.json`) a partir de `locales` (`src/lib/i18n/config.ts`) × `techs` (`src/lib/tech/config.ts`): ao
+declarar a trilha em `techs` (passo 1 acima), as duas entradas (pt + en) de `Content-Type: image/png` da
+imagem OG dessa trilha aparecem no próximo build, sem editar `public/_headers` à mão. O arquivo é
+gitignored (mesmo tratamento de `public/version.json`); não commite uma versão dele.
 
 Depois do deploy, confirme com `curl -sD - https://interviewroadmap.dev/pt/sua-trilha/opengraph-image -o /dev/null`: a resposta precisa ter `Content-Type: image/png` na lista de headers.
 
@@ -123,5 +120,6 @@ Siga [`docs/content-authoring.md`](./content-authoring.md) para criar os arquivo
 - [ ] Ícone em `src/components/icons/TechIcon.tsx`
 - [ ] Cor `[data-tech]` em `src/app/globals.css` (light + dark, validada AA)
 - [ ] Disclaimer de marca em `footer.disclaimer`/`sobre.trademarkDisclaimer` (pt + en), se aplicável
-- [ ] Entradas `Content-Type: image/png` (pt + en) em `public/_headers` para a imagem OG da trilha
+- [ ] Nada a fazer em `public/_headers`: as entradas `Content-Type: image/png` (pt + en) da imagem OG são
+  geradas automaticamente a partir de `techs` (`scripts/generate-headers.ts`)
 - [ ] `npm run lint && npm run test && npm run validate-content && npm run build`

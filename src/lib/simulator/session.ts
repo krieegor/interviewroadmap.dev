@@ -18,6 +18,23 @@ export function shuffle<T>(items: T[]): T[] {
   return copy;
 }
 
+// Agrupa por peso (maior primeiro) e embaralha dentro de cada grupo, em vez de embaralhar tudo junto:
+// dá pra priorizar perguntas nunca vistas/erradas (peso maior) sem excluir as demais nem perder a
+// aleatoriedade entre perguntas do mesmo peso. Usado pela seleção do simulado (ver getQuestionWeight em
+// src/lib/progress/question-progress.ts).
+export function selectByWeight<T>(items: T[], getWeight: (item: T) => number, count: number): T[] {
+  const groups = new Map<number, T[]>();
+  for (const item of items) {
+    const weight = getWeight(item);
+    const group = groups.get(weight) ?? [];
+    group.push(item);
+    groups.set(weight, group);
+  }
+  const orderedWeights = Array.from(groups.keys()).sort((a, b) => b - a);
+  const ordered = orderedWeights.flatMap((weight) => shuffle(groups.get(weight)!));
+  return ordered.slice(0, count);
+}
+
 export function shuffleQuiz(question: QuestionFrontmatter): ShuffledQuiz {
   const order = shuffle(question.quiz.options.map((_, i) => i));
   return {

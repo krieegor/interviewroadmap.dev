@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import type { InterviewLevel, QuestionFrontmatter } from "@/types/content";
 import { saveSimulatorResult } from "@/lib/progress/simulator-progress";
+import { getQuestionWeight, readQuestionProgress, recordQuestionAnswer } from "@/lib/progress/question-progress";
 import type { Locale } from "@/lib/i18n/config";
 import type { Dictionary } from "@/lib/i18n/get-dictionary";
 import type { Tech } from "@/lib/tech/config";
@@ -12,7 +13,7 @@ import {
   type QuestionCount,
   type ShuffledQuiz,
   scoreAnswers,
-  shuffle,
+  selectByWeight,
   shuffleQuiz,
 } from "@/lib/simulator/session";
 import { SimulatorConfig } from "./SimulatorConfig";
@@ -55,9 +56,17 @@ export function Simulator({
         (level === "todos" || q.level.includes(level)) &&
         (topic === "todos" || q.topics.includes(topic)),
     );
-    const shuffled = shuffle(filtered).slice(0, questionCount);
-    setSession(shuffled);
-    setQuizByIndex(shuffled.map(shuffleQuiz));
+    // Prioriza perguntas nunca vistas ou erradas nas rodadas anteriores (ver
+    // src/lib/progress/question-progress.ts), sem excluir as demais nem perder aleatoriedade dentro do
+    // mesmo nível de prioridade.
+    const progress = readQuestionProgress();
+    const selected = selectByWeight(
+      filtered,
+      (q) => getQuestionWeight(progress, tech, q.slug),
+      questionCount,
+    );
+    setSession(selected);
+    setQuizByIndex(selected.map(shuffleQuiz));
     setIndex(0);
     setRevealed(false);
     setAnswerPanelOpen(false);
@@ -78,6 +87,8 @@ export function Simulator({
     setTimes(nextTimes);
 
     if (!session) return;
+    const current = session[index];
+    if (current) recordQuestionAnswer(tech, current.slug, value);
     if (index + 1 < session.length) {
       setIndex(index + 1);
       setQuestionStartedAt(Date.now());

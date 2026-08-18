@@ -100,6 +100,8 @@ npm run validate-content                # valida frontmatter e links internos do
 - [`docs/adding-a-tech.md`](./docs/adding-a-tech.md): pré-requisitos e passo a passo para adicionar uma trilha (`tech`) nova.
 - [`docs/deployment.md`](./docs/deployment.md): como publicar em Vercel, Cloudflare (Workers ou Pages),
   Netlify ou GitHub Pages.
+- [`docs/security.md`](./docs/security.md): headers de segurança e Content-Security-Policy geradas em
+  `public/_headers`, e o porquê do trade-off de `'unsafe-inline'`.
 
 ## Contribuindo
 

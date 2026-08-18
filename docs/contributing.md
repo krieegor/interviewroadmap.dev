@@ -37,6 +37,7 @@ Rode a suíte completa localmente:
 
 ```bash
 npm run lint
+npm run check-dashes
 npm run typecheck
 npm run validate-content
 npm run test
@@ -44,6 +45,20 @@ npm run build
 ```
 
 Um Pull Request só deve ser aberto depois que todos esses comandos passarem sem erro.
+
+`npm run check-dashes` (também roda no CI) falha se algum travessão aparecer em prosa fora da allowlist
+fixa de exceções técnicas legítimas em `scripts/check-no-dashes.ts`: ver a regra completa em
+[`CLAUDE.md`](../CLAUDE.md) "Regras de ouro" §1.
+
+## Preview do seu Pull Request
+
+O deploy de produção (Cloudflare Workers, ver [`docs/deployment.md`](./deployment.md)) usa git
+integration: qualquer branch/PR aberto contra `main` também gera automaticamente uma build de preview
+("Version" do Cloudflare Workers), com URL própria, sem precisar de nenhuma configuração adicional no PR.
+Pra achar a URL do seu preview: painel da Cloudflare → **Workers & Pages** → projeto do site → aba
+**Deployments**, filtrando pela branch do seu PR. Não há (ainda) um bot comentando essa URL diretamente no
+PR do GitHub, porque isso exigiria um token/API da Cloudflare que este projeto não automatiza hoje; quem
+revisa o PR deve consultar o painel manualmente.
 
 `npm run build` regenera `public/livro.pdf` automaticamente (via `postbuild`) sempre que roda num ambiente
 com Chromium completo; se a mudança alterou algum capítulo do livro, inclua o `public/livro.pdf`

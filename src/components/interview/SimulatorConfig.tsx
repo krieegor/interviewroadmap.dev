@@ -80,7 +80,7 @@ export function SimulatorConfig({
           {(["aberta", "multipla-escolha"] as const).map((m) => (
             <label
               key={m}
-              className={`cursor-pointer rounded-md border p-3 text-sm ${
+              className={`cursor-pointer rounded-md border p-3 text-sm has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-[var(--color-accent)] ${
                 mode === m ? "border-[var(--color-accent)]" : "border-[var(--color-border)]"
               }`}
             >

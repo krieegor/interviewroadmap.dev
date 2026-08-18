@@ -23,6 +23,9 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      - name: Check for em/en dashes in prose
+        run: npm run check-dashes
+
       - name: Type check
         run: npm run typecheck
 
