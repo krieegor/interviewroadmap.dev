@@ -253,8 +253,8 @@ export const pt = {
     message: "Essa trilha ainda não tem conteúdo publicado. Volte em breve.",
     backToSelector: "← Escolher outra trilha",
   },
-  trackSwitcher: {
-    backToSelector: "← Trocar trilha",
+  techPill: {
+    ariaLabel: "Ir para a home de {tech}",
   },
 };
 

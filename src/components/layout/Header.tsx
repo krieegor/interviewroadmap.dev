@@ -9,6 +9,7 @@ import { LocaleSwitcher } from "@/components/layout/LocaleSwitcher";
 import { Logo } from "@/components/icons/Logo";
 import { Wordmark } from "@/components/icons/Wordmark";
 import { getEnAvailability } from "@/lib/i18n/en-availability";
+import { formatTemplate } from "@/lib/i18n/format";
 import type { Locale } from "@/lib/i18n/config";
 import type { Dictionary } from "@/lib/i18n/get-dictionary";
 import type { Tech } from "@/lib/tech/config";
@@ -43,8 +44,8 @@ export async function Header({
             </span>
           </Link>
           <Link
-            href={`/${locale}/home`}
-            aria-label={dict.trackSwitcher.backToSelector}
+            href={`/${locale}/${tech}`}
+            aria-label={formatTemplate(dict.techPill.ariaLabel, { tech: techConfig.shortName })}
             className="rounded-full border border-[var(--color-border)] px-2 py-0.5 text-xs text-[var(--color-text-muted)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]"
           >
             {techConfig.shortName}

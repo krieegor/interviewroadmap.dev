@@ -254,7 +254,7 @@ export const en: Dictionary = {
     message: "This track doesn't have published content yet. Check back soon.",
     backToSelector: "← Choose another track",
   },
-  trackSwitcher: {
-    backToSelector: "← Switch track",
+  techPill: {
+    ariaLabel: "Go to {tech} home",
   },
 };

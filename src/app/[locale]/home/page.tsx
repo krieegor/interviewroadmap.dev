@@ -252,7 +252,7 @@ export default async function LocaleHome({
           </div>
 
           {version && publishedAt ? (
-            <div className="mt-6 border-t border-[var(--color-border)] pt-4 text-xs text-[var(--color-text-muted)]">
+            <div className="mt-6 border-t border-[var(--color-border)] pt-4 text-center text-xs text-[var(--color-text-muted)]">
               <a
                 href={version.url}
                 target="_blank"
