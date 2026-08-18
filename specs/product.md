@@ -1,16 +1,16 @@
-# Product Spec — interviewroadmap.dev
+# Product Spec: interviewroadmap.dev
 
 ## 1. O que é
 
 **interviewroadmap.dev** é uma plataforma interativa, gratuita e open source, publicada como site estático, de
-preparação para entrevistas técnicas — organizada por trilhas de tecnologia. Cada trilha é um e-book
+preparação para entrevistas técnicas, organizada por trilhas de tecnologia. Cada trilha é um e-book
 navegável com a mesma estrutura de estudo (capítulos, perguntas de entrevista, glossário, estudos de caso,
 simulador).
 
 A trilha **Apache Kafka para Entrevistas Java Sênior** está completa hoje, ensinando Kafka para
 desenvolvedores Java Backend (Pleno, Sênior, Tech Lead). **Java**, **Elastic Search**, **SQL**, **AWS** e
 **GCP** são trilhas futuras, hoje "em construção" (página própria, sem conteúdo publicado). O restante deste
-documento descreve a trilha Kafka em detalhe — o mesmo padrão editorial e estrutural se aplica a qualquer
+documento descreve a trilha Kafka em detalhe; o mesmo padrão editorial e estrutural se aplica a qualquer
 trilha nova.
 
 Não é uma landing page, não é um curso pago, não é documentação oficial. É um livro técnico navegável na web,
@@ -19,7 +19,7 @@ com estrutura de estudo (capítulos, perguntas de entrevista, glossário, estudo
 ## 2. Problema que resolve
 
 Desenvolvedores Java que já usam Kafka em produção frequentemente conseguem "fazer funcionar", mas travam em
-entrevistas quando precisam explicar _por que_ o Kafka se comporta de determinada forma — ordenação, rebalance,
+entrevistas quando precisam explicar _por que_ o Kafka se comporta de determinada forma: ordenação, rebalance,
 exactly-once, idempotência. A documentação oficial é referência de configuração, não material de estudo para
 entrevista. Cursos existentes cobram por esse recorte. Este projeto fecha essa lacuna de forma gratuita.
 

@@ -16,8 +16,10 @@ import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
 import { HoverLift } from "@/components/motion/HoverLift";
 import { isLocale, locales, type Locale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/get-dictionary";
+import { formatTemplate } from "@/lib/i18n/format";
 import { techs, techsWithContent } from "@/lib/tech/config";
 import { buildAlternates } from "@/lib/seo";
+import { getSiteVersion } from "@/lib/version";
 
 export async function generateMetadata({
   params,
@@ -38,6 +40,14 @@ export default async function LocaleHome({
   if (!isLocale(rawLocale)) notFound();
   const locale: Locale = rawLocale;
   const dict = getDictionary(locale);
+  const version = getSiteVersion();
+  const publishedAt = version
+    ? new Date(version.publishedAt).toLocaleDateString(locale === "pt" ? "pt-BR" : "en-US", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+      })
+    : null;
 
   const features = [
     { title: dict.trackSelector.featureBookTitle, description: dict.trackSelector.featureBookDescription },
@@ -240,6 +250,20 @@ export default async function LocaleHome({
               </div>
             </div>
           </div>
+
+          {version && publishedAt ? (
+            <div className="mt-6 border-t border-[var(--color-border)] pt-4 text-xs text-[var(--color-text-muted)]">
+              <a
+                href={version.url}
+                target="_blank"
+                rel="noreferrer"
+                title={formatTemplate(dict.footer.viewRelease, { tag: version.tag })}
+                className="hover:text-[var(--color-accent)]"
+              >
+                {version.tag} · {formatTemplate(dict.footer.publishedOn, { date: publishedAt })}
+              </a>
+            </div>
+          ) : null}
         </div>
       </footer>
     </div>

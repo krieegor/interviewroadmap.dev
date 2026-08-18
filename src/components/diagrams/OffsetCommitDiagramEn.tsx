@@ -101,7 +101,7 @@ export function OffsetCommitDiagramEnSvg() {
         textAnchor="middle"
         className="fill-[var(--color-text-muted)] text-[11px]"
       >
-        offsets 4-6: already processed, not yet committed — reprocessed if the consumer crashes now
+        offsets 4-6: already processed, not yet committed; reprocessed if the consumer crashes now
       </text>
     </svg>
   );

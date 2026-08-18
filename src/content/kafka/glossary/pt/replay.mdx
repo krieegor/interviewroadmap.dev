@@ -7,7 +7,7 @@ relatedChapters: ["o-que-e-apache-kafka", "retention-e-replay"]
 ---
 
 Replay é a capacidade de reler eventos já retidos no log, movendo o offset de um Consumer Group (ou de uma
-nova instância dele) para uma posição anterior — ou para o início da retenção disponível. É usado para
+nova instância dele) para uma posição anterior, ou para o início da retenção disponível. É usado para
 corrigir bugs de processamento, popular um novo sistema com histórico existente ou reconstruir um estado
 derivado (como um índice de busca). Depende diretamente da política de retenção do tópico: só é possível
 reler o que ainda não expirou.

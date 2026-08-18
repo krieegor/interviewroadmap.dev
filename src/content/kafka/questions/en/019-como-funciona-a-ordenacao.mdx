@@ -21,7 +21,7 @@ quiz:
 
 ## What the interviewer wants to assess
 
-A correct, complete understanding of the ordering mechanism — not a vague "yes, Kafka is ordered" answer,
+A correct, complete understanding of the ordering mechanism, not a vague "yes, Kafka is ordered" answer,
 but an explanation of *where* that guarantee actually lives.
 
 <RespostaCurta>
@@ -32,7 +32,7 @@ by construction, read order.
 
 <RespostaSenior>
 Ordering in Kafka is a property of the partition, not the topic. Each partition is an append-only log,
-where every record gets an increasing sequential offset — since the structure is strictly sequential,
+where every record gets an increasing sequential offset: since the structure is strictly sequential,
 reading from start to end exactly reproduces write order. A topic with multiple partitions, though, isn't
 a single sequence: it's a set of independent sequences, each with its own offset clock. Two messages in
 different partitions have no defined ordering relationship between them. It's the key (Chapter 4) that
@@ -42,18 +42,18 @@ relative to each other.
 
 ## In-depth explanation
 
-See "Ordering within a partition — and the absence of global ordering" in
+See "Ordering within a partition, and the absence of global ordering" in
 [Chapter 4](/en/kafka/livro/partitions-e-ordenacao).
 
 <ExemploFinanceiro>
-Two events for the same `contaId` — "PIX received" followed by "balance debited due to chargeback" —
+Two events for the same `contaId` ("PIX received" followed by "balance debited due to chargeback")
 reach the consumer in the correct order because they share the same key and, therefore, the same
 partition. Events for different accounts, on different partitions, have no ordering relationship between
-them — which is acceptable, because there's no real dependency between them.
+them, which is acceptable, because there's no real dependency between them.
 </ExemploFinanceiro>
 
 <Pegadinha title='"Kafka processes everything in the order it was published"'>
-That statement ignores that a topic with multiple partitions spreads messages across them — global order
+That statement ignores that a topic with multiple partitions spreads messages across them: global order
 across different partitions isn't guaranteed, even if the events were published very close together in
 real time.
 </Pegadinha>

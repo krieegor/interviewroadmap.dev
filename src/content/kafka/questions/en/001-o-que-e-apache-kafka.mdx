@@ -21,14 +21,14 @@ quiz:
 
 ## What the interviewer wants to assess
 
-Whether you understand Kafka as a concept — a distributed event log — or just memorized that "it's a
+Whether you understand Kafka as a concept (a distributed event log) or just memorized that "it's a
 messaging tool." It also assesses whether you can explain complex technology clearly, a core skill for
 senior roles.
 
 <RespostaCurta>
   Kafka is an event streaming platform: a distributed, partitioned, and replicated log where
   producers publish events and multiple independent consumers read those events at their own pace.
-  Unlike a traditional queue, the event doesn't disappear once read — it stays retained for a
+  Unlike a traditional queue, the event doesn't disappear once read: it stays retained for a
   configurable period, enabling replay.
 </RespostaCurta>
 
@@ -38,26 +38,26 @@ senior roles.
   publishes an event to a topic; Kafka stores that event in a distributed log, partitioned across
   multiple brokers for scale and replicated for fault tolerance. Any number of consumers can read the
   same event independently, each keeping its own read position. This is fundamentally different from
-  a queue — the message isn't removed once consumed, which enables multiple consumers of the same
+  a queue: the message isn't removed once consumed, which enables multiple consumers of the same
   data and historical reprocessing (replay).
 </RespostaSenior>
 
 ## In-depth explanation
 
-See Chapter 1 — [What is Apache Kafka?](/en/kafka/livro/o-que-e-apache-kafka) — for the full explanation of the
+See Chapter 1 ([What is Apache Kafka?](/en/kafka/livro/o-que-e-apache-kafka)) for the full explanation of the
 coupling problem that motivated Kafka's creation, the structural difference between an event log and a work
 queue, and the retention model that enables replay.
 
 <ExemploFinanceiro>
   A digital bank publishes the `PixRecebido` event only once to a Kafka topic. The balance service,
   the push notification service, the statement service, and the antifraud service all read that same
-  event independently — none of them needs to be called directly by the service that received the
+  event independently; none of them needs to be called directly by the service that received the
   PIX.
 </ExemploFinanceiro>
 
 <Pegadinha title='"Kafka is just another messaging tool"'>
   This answer is too vague and doesn't show understanding of what makes Kafka different. A senior
-  interviewer will push back: "different how?" — and the generic answer doesn't survive the
+  interviewer will push back: "different how?" The generic answer doesn't survive the
   follow-up.
 </Pegadinha>
 

@@ -13,7 +13,7 @@ export const CUBES_PER_LANE_MOBILE = 3;
 export const STEP_COUNT = 3;
 export const AUTOPLAY_INTERVAL_MS = 4500;
 
-// Um enquadramento de câmera por etapa (Producer / Partitions / Consumer Group) — a câmera se move
+// Um enquadramento de câmera por etapa (Producer / Partitions / Consumer Group): a câmera se move
 // suavemente até o alvo da etapa atual (ver StepCameraRig), nunca em resposta a scroll da página.
 export const CAMERA_STEPS: { position: THREE.Vector3; lookAt: THREE.Vector3 }[] = [
   { position: new THREE.Vector3(-3, 3.2, 11), lookAt: new THREE.Vector3(-4, 0, 0) },

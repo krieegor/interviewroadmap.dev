@@ -21,14 +21,14 @@ quiz:
 
 ## O que o entrevistador quer avaliar
 
-Se você entende Kafka como conceito — log distribuído de eventos — ou só decorou que "é uma ferramenta de
+Se você entende Kafka como conceito (log distribuído de eventos) ou só decorou que "é uma ferramenta de
 mensageria". Também avalia se você consegue explicar tecnologia complexa de forma clara, uma habilidade
 central em posições sênior.
 
 <RespostaCurta>
   Kafka é uma plataforma de event streaming: um log distribuído, particionado e replicado, onde
   produtores publicam eventos e múltiplos consumidores independentes leem esses eventos no seu
-  próprio ritmo. Diferente de uma fila tradicional, o evento não desaparece ao ser lido — ele fica
+  próprio ritmo. Diferente de uma fila tradicional, o evento não desaparece ao ser lido: ele fica
   retido por um período configurável, permitindo replay.
 </RespostaCurta>
 
@@ -38,26 +38,26 @@ central em posições sênior.
   ele publica um evento em um tópico; o Kafka armazena esse evento em um log distribuído,
   particionado entre múltiplos brokers para escala e replicado para tolerância a falhas. Qualquer
   número de consumidores pode ler o mesmo evento de forma independente, cada um mantendo sua própria
-  posição de leitura. Isso é fundamentalmente diferente de uma fila — a mensagem não é removida ao
+  posição de leitura. Isso é fundamentalmente diferente de uma fila: a mensagem não é removida ao
   ser consumida, o que viabiliza múltiplos consumidores do mesmo dado e reprocessamento histórico
   (replay).
 </RespostaSenior>
 
 ## Explicação aprofundada
 
-Veja o Capítulo 1 — [O que é Apache Kafka?](/pt/kafka/livro/o-que-e-apache-kafka) — para a explicação completa do
+Veja o Capítulo 1, [O que é Apache Kafka?](/pt/kafka/livro/o-que-e-apache-kafka), para a explicação completa do
 problema de acoplamento que motivou a criação do Kafka, a diferença estrutural entre log de eventos e fila
 de trabalho, e o modelo de retenção que viabiliza replay.
 
 <ExemploFinanceiro>
   Um banco digital publica o evento `PixRecebido` uma única vez em um tópico Kafka. O serviço de
   saldo, o de notificação push, o de extrato e o de antifraude leem esse mesmo evento de forma
-  independente — nenhum deles precisa ser chamado diretamente pelo serviço que recebeu o PIX.
+  independente; nenhum deles precisa ser chamado diretamente pelo serviço que recebeu o PIX.
 </ExemploFinanceiro>
 
 <Pegadinha title='"Kafka é uma ferramenta de mensageria como outra qualquer"'>
   Essa resposta é vaga demais e não demonstra entendimento do que torna o Kafka diferente. Um
-  entrevistador sênior vai insistir: "diferente como?" — e a resposta genérica não sobrevive ao
+  entrevistador sênior vai insistir: "diferente como?", e a resposta genérica não sobrevive ao
   follow-up.
 </Pegadinha>
 

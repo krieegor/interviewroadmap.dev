@@ -12,13 +12,13 @@ consomem de forma completamente independente, cada um preocupado com uma respons
 
 ## O evento de domínio
 
-A autorização em si — aprovar ou negar a compra no momento em que o cartão é passado — **não** é feita via
+A autorização em si (aprovar ou negar a compra no momento em que o cartão é passado) **não** é feita via
 Kafka. É uma chamada síncrona, com resposta em milissegundos, entre a maquininha (ou gateway de pagamento) e
 o `autorizacao-service`, que decide com base em saldo/limite disponível. Isso é intencional: o Capítulo 1
 já explicou que comunicação request/response com resposta imediata não é o caso de uso do Kafka.
 
 O que acontece **depois** da decisão síncrona é onde o Kafka entra: assim que a compra é aprovada, o
-`autorizacao-service` publica um evento `CompraAutorizada` — um fato que já aconteceu — e segue em frente,
+`autorizacao-service` publica um evento `CompraAutorizada` (um fato que já aconteceu) e segue em frente,
 sem saber (nem precisar saber) quem vai reagir a isso.
 
 ```json
@@ -52,7 +52,7 @@ A escolha entre `cartaoId` e `clienteId` como key é um ótimo teste de entendim
 (Capítulo 4). Se um cliente tem múltiplos cartões e o requisito é apenas "processar compras do mesmo cartão
 em ordem" (ex.: para detectar uma sequência suspeita de compras no mesmo cartão em curto intervalo), a key
 correta é `cartaoId`. Se o requisito fosse consolidar comportamento do cliente como um todo, independente do
-cartão usado, `clienteId` seria a escolha — trocando ordenação por cartão por ordenação por cliente. Não
+cartão usado, `clienteId` seria a escolha, trocando ordenação por cartão por ordenação por cliente. Não
 existe resposta certa universal; depende de qual relação de ordem o domínio realmente precisa.
 </DicaEntrevista>
 
@@ -76,7 +76,7 @@ precisa ser quase instantânea para uma boa experiência do cliente.
 ## Idempotência: nem todo consumer precisa do mesmo rigor
 
 <Atencao title="O nível de proteção contra duplicidade varia por consumer">
-Os quatro consumers deste evento têm exigências de idempotência muito diferentes entre si — um erro comum é
+Os quatro consumers deste evento têm exigências de idempotência muito diferentes entre si: um erro comum é
 aplicar o mesmo padrão de proteção (tabela de eventos processados) em todos, quando alguns já são
 naturalmente tolerantes à duplicidade.
 </Atencao>
@@ -84,10 +84,10 @@ naturalmente tolerantes à duplicidade.
 <Comparacao title="Exigência de idempotência por consumer">
 | Consumer | Efeito de duplicidade | Proteção necessária |
 |---|---|---|
-| `cashback-service` | Cashback creditado duas vezes — perda financeira direta | `eventId` + constraint de unicidade, obrigatório |
-| `notificacao-service` | Cliente recebe duas notificações — irritante, não crítico | Nenhuma proteção especial necessária |
-| `antifraude-service` | Reavalia a mesma compra duas vezes — trabalho redundante, não incorreto | Opcional, por eficiência, não por correção |
-| `analytics-service` | Compra contada duas vezes na agregação — métricas infladas | Depende da consulta: agregações via upsert por `eventId` resolvem naturalmente |
+| `cashback-service` | Cashback creditado duas vezes (perda financeira direta) | `eventId` + constraint de unicidade, obrigatório |
+| `notificacao-service` | Cliente recebe duas notificações (irritante, não crítico) | Nenhuma proteção especial necessária |
+| `antifraude-service` | Reavalia a mesma compra duas vezes (trabalho redundante, não incorreto) | Opcional, por eficiência, não por correção |
+| `analytics-service` | Compra contada duas vezes na agregação (métricas infladas) | Depende da consulta: agregações via upsert por `eventId` resolvem naturalmente |
 </Comparacao>
 
 ## Retry e DLQ
@@ -101,7 +101,7 @@ seguintes.
 
 Se a tabela de categorias de cashback for corrigida retroativamente (uma categoria que deveria dar 2% e
 estava configurada com 1%), o `cashback-service` pode fazer replay dos últimos 15 dias (dentro da retenção)
-para recalcular e creditar a diferença — desde que a lógica de crédito seja um upsert por `eventId`, evitando
+para recalcular e creditar a diferença, desde que a lógica de crédito seja um upsert por `eventId`, evitando
 duplicar o cashback já creditado corretamente.
 
 ## Observabilidade
@@ -109,16 +109,16 @@ duplicar o cashback já creditado corretamente.
 <Comparacao title="O que cada time monitora">
 | Time | Métrica prioritária |
 |---|---|
-| Cashback | Consumer lag e taxa de erro — atraso aqui vira reclamação de cliente sobre cashback não creditado |
-| Notificação | Latência producer → consumer — o push precisa chegar em segundos para ter valor |
-| Antifraude | Taxa de mensagens na DLQ — falhas de avaliação de risco não podem passar despercebidas |
-| Analytics | Consumer lag agregado ao longo do dia — atraso aqui é tolerável em minutos, não segundos |
+| Cashback | Consumer lag e taxa de erro (atraso aqui vira reclamação de cliente sobre cashback não creditado) |
+| Notificação | Latência producer → consumer (o push precisa chegar em segundos para ter valor) |
+| Antifraude | Taxa de mensagens na DLQ (falhas de avaliação de risco não podem passar despercebidas) |
+| Analytics | Consumer lag agregado ao longo do dia (atraso aqui é tolerável em minutos, não segundos) |
 </Comparacao>
 
 <Resumo>
 Este caso ilustra a diferença entre comunicação síncrona (a autorização em si, fora do Kafka) e assíncrona
 (tudo que reage à compra já aprovada). Um único evento, `CompraAutorizada`, é consumido por quatro sistemas
-com necessidades completamente diferentes de latência, idempotência e tolerância a falha — cada um
+com necessidades completamente diferentes de latência, idempotência e tolerância a falha, cada um
 configurado de acordo com sua própria criticidade, não com um padrão único aplicado indiscriminadamente a
 todos.
 </Resumo>

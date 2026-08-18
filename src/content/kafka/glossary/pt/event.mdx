@@ -1,14 +1,14 @@
 ---
 term: "Event"
 slug: "event"
-shortDefinition: "Registro imutável que representa um fato que já aconteceu — a unidade de dado que trafega em um tópico Kafka."
+shortDefinition: "Registro imutável que representa um fato que já aconteceu: a unidade de dado que trafega em um tópico Kafka."
 relatedTerms: ["topic", "producer", "consumer"]
 relatedChapters: ["o-que-e-apache-kafka"]
 ---
 
 Um event (evento) é a unidade fundamental de dado no Kafka: um registro imutável, publicado em um tópico,
-representando um fato de negócio que já ocorreu — "pagamento aprovado", "PIX recebido", "conta bloqueada".
+representando um fato de negócio que já ocorreu: "pagamento aprovado", "PIX recebido", "conta bloqueada".
 Diferente de um comando (que instrui uma ação futura), um evento apenas relata algo que já aconteceu; quem o
-consome decide, de forma independente, o que fazer com essa informação. É essa natureza — fato passado, não
-instrução — que permite que múltiplos consumidores reajam ao mesmo evento de formas completamente diferentes,
+consome decide, de forma independente, o que fazer com essa informação. É essa natureza (fato passado, não
+instrução) que permite que múltiplos consumidores reajam ao mesmo evento de formas completamente diferentes,
 sem que o producer precise conhecer nenhum deles.

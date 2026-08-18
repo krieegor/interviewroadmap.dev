@@ -6,7 +6,7 @@ export type CameraStep = { position: THREE.Vector3; lookAt: THREE.Vector3 };
 
 const DAMPING = 3.5;
 
-// `step`/`steps` são fechados pelo closure do callback — @react-three/fiber sempre chama a versão
+// `step`/`steps` são fechados pelo closure do callback: @react-three/fiber sempre chama a versão
 // mais recente do callback passado a cada render, então não precisa de ref pra ler o valor atual.
 // Funciona também para cenas de 1 passo só: a câmera some suavemente até a posição única no mount.
 export function StepCameraRig({ step, steps }: { step: number; steps: CameraStep[] }) {

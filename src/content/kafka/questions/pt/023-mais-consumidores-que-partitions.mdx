@@ -5,7 +5,7 @@ slug: "mais-consumidores-que-partitions"
 level: ["pleno", "senior"]
 topics: ["arquitetura"]
 relatedChapters: ["consumer-groups-e-rebalance"]
-shortAnswer: "Os consumers excedentes ficam ociosos — não há partition sobrando para atribuir a eles. Eles só passam a processar se outro consumer do grupo cair."
+shortAnswer: "Os consumers excedentes ficam ociosos: não há partition sobrando para atribuir a eles. Eles só passam a processar se outro consumer do grupo cair."
 quiz:
   options:
     - "Os consumers excedentes ficam ociosos, sem partition atribuída, porque o número de partitions é o teto real de paralelismo do grupo."
@@ -21,7 +21,7 @@ quiz:
 
 ## O que o entrevistador quer avaliar
 
-Se você entende o limite real de paralelismo imposto pelas partitions — um erro comum é assumir que
+Se você entende o limite real de paralelismo imposto pelas partitions: um erro comum é assumir que
 adicionar consumers sempre aumenta throughput.
 
 <RespostaCurta>
@@ -30,11 +30,11 @@ a eles. Eles só passam a receber partitions se algum outro consumer do grupo ca
 </RespostaCurta>
 
 <RespostaSenior>
-A regra é uma partition, um consumer, por Consumer Group — nunca duas instâncias do mesmo grupo lendo a
+A regra é uma partition, um consumer, por Consumer Group: nunca duas instâncias do mesmo grupo lendo a
 mesma partition ao mesmo tempo. Se o tópico tem 4 partitions e o grupo escala para 6 instâncias, 2 delas
 ficam completamente ociosas, sem receber nenhuma atribuição. Isso surpreende times que escalam consumers via
 Kubernetes/HPA esperando ganho de throughput proporcional, sem considerar que o número de partitions é o
-teto real de paralelismo — escalar além desse número não aumenta capacidade de processamento nenhuma, só
+teto real de paralelismo: escalar além desse número não aumenta capacidade de processamento nenhuma, só
 desperdiça recursos.
 </RespostaSenior>
 
@@ -45,7 +45,7 @@ Veja "O que acontece com números diferentes de consumers" no
 
 <ExemploFinanceiro>
 O `antifraude-service` roda com 4 partitions no tópico e escala para 6 réplicas no Black Friday esperando
-mais throughput — mas 2 réplicas ficam ociosas, porque não há partitions sobrando, e o throughput real não
+mais throughput, mas 2 réplicas ficam ociosas, porque não há partitions sobrando, e o throughput real não
 muda.
 </ExemploFinanceiro>
 

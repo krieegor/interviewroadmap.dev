@@ -15,7 +15,7 @@ import { formatTemplate } from "@/lib/i18n/format";
 import { isTech, techsWithContent, type Tech } from "@/lib/tech/config";
 import { buildAlternates, buildOpenGraph, techOpengraphImageUrl } from "@/lib/seo";
 
-// Gera a tupla completa (locale+tech+slug) "de baixo pra cima" — ver nota em casos/[slug]/page.tsx
+// Gera a tupla completa (locale+tech+slug) "de baixo pra cima": ver nota em casos/[slug]/page.tsx
 // e specs/architecture.md seção 14 sobre o bug do Next 16 com retorno vazio por combinação de pai.
 export async function generateStaticParams() {
   const params: Array<{ locale: Locale; tech: Tech; slug: string }> = [];
@@ -30,7 +30,7 @@ export async function generateStaticParams() {
   return params;
 }
 
-// Conjunto fechado — ver nota em src/app/[locale]/layout.tsx.
+// Conjunto fechado, ver nota em src/app/[locale]/layout.tsx.
 export const dynamicParams = false;
 
 export async function generateMetadata({

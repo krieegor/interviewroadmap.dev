@@ -5,11 +5,11 @@ slug: "o-que-e-commit"
 level: ["pleno", "senior"]
 topics: ["consumo"]
 relatedChapters: ["offset-e-commit"]
-shortAnswer: "Commit is the operation that records, for a Consumer Group, up to which offset of a partition has already been successfully processed — making that progress official and surviving restarts."
+shortAnswer: "Commit is the operation that records, for a Consumer Group, up to which offset of a partition has already been successfully processed, making that progress official and surviving restarts."
 quiz:
   options:
     - "Commit is the operation that records, for a Consumer Group, up to which offset of a partition has already been successfully processed."
-    - "Commit and reading are the same operation — reading a message automatically records the consumer's processing progress."
+    - "Commit and reading are the same operation: reading a message automatically records the consumer's processing progress."
     - "Commit is the acknowledgment sent by the broker to the producer confirming a message was persisted and replicated successfully."
     - "Commit deletes the processed message from the partition, freeing up disk space for new records."
   correctIndex: 0
@@ -21,7 +21,7 @@ quiz:
 
 ## What the interviewer wants to assess
 
-Whether you understand commit as the act that officializes read progress — and its implications when the
+Whether you understand commit as the act that officializes read progress, and its implications when the
 commit's timing is wrong relative to actual processing.
 
 <RespostaCurta>
@@ -35,7 +35,7 @@ Commit is what separates "the client already delivered this message to the appli
 considers this message processed for this Consumer Group." Between the moment a message is delivered and
 the moment its offset is committed, there's a window where, if the consumer crashes, that message can
 either be reprocessed (if not yet committed) or lost (if committed before processing finished). It's that
-timing — not the existence of the commit itself — that determines whether the consumer tends to lose or
+timing (not the existence of the commit itself) that determines whether the consumer tends to lose or
 duplicate messages under failure.
 </RespostaSenior>
 
@@ -45,12 +45,12 @@ See "Auto Commit" and "Manual Commit" in [Chapter 7](/en/kafka/livro/offset-e-co
 
 <ExemploFinanceiro>
 The `cobranca-service` only calls `acknowledgment.acknowledge()` (commits the offset) after confirming the
-collection notification was sent and recorded in the database — guaranteeing that a failure mid-process
+collection notification was sent and recorded in the database, guaranteeing that a failure mid-process
 results in reprocessing, never a silent loss of the invoice.
 </ExemploFinanceiro>
 
 <Pegadinha title='"Commit and reading are the same thing"'>
-No — a consumer can read (and even process) a message without ever committing its offset, if it crashes
+No: a consumer can read (and even process) a message without ever committing its offset, if it crashes
 first. In that case, the consumer's next startup will reread the same message, because the commit never
 happened.
 </Pegadinha>

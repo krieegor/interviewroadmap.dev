@@ -21,20 +21,20 @@ quiz:
 
 ## What the interviewer wants to assess
 
-Comparative knowledge across ecosystems — common at companies with AWS infrastructure that also use Kafka.
+Comparative knowledge across ecosystems, common at companies with AWS infrastructure that also use Kafka.
 Tests whether you understand these are reprocessing mechanisms with different scopes, not synonyms.
 
 <RespostaCurta>
-Replay in Kafka reprocesses any range of events still retained on the topic, processed or not — just
+Replay in Kafka reprocesses any range of events still retained on the topic, processed or not: just
 reset the Consumer Group's offset. DLQ Redrive in SQS only reroutes messages that had already failed and
 been moved to the DLQ, sending them back to the original queue.
 </RespostaCurta>
 
 <RespostaSenior>
-The scope difference is key: replay operates on the topic's full history, within the retention window —
+The scope difference is key: replay operates on the topic's full history, within the retention window;
 it even includes messages that were processed successfully, if you want to reprocess them (for example, to
 rebuild derived state). SQS redrive only solves the subset of messages that were already isolated by
-failure — it has no way to reroute a message that was processed "successfully," but incorrectly, because
+failure: it has no way to reroute a message that was processed "successfully," but incorrectly, because
 SQS doesn't retain history for already-acknowledged messages. This reflects the model difference: Kafka is
 a retained log; SQS is a queue that removes the message once processing is confirmed.
 </RespostaSenior>
@@ -47,13 +47,13 @@ in [Chapter 2](/en/kafka/livro/kafka-versus-outras-ferramentas).
 <ExemploFinanceiro>
 If a calculation bug affected the cashback amount on purchases already successfully processed over the
 last 2 days, Kafka lets you replay that entire range to recalculate. On SQS, that wouldn't be possible via
-redrive — only the messages that were already in the DLQ (i.e., that had already failed) could be
+redrive; only the messages that were already in the DLQ (i.e., that had already failed) could be
 rerouted.
 </ExemploFinanceiro>
 
 <Pegadinha title='"They are the same thing with different names"'>
 Treating the two as equivalent ignores that redrive only solves messages that already failed, while replay
-solves reprocessing any part of the retained history — correctly processed or not.
+solves reprocessing any part of the retained history, whether correctly processed or not.
 </Pegadinha>
 
 <PerguntaDerivada>

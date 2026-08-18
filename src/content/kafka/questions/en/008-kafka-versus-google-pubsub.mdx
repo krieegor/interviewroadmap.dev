@@ -28,17 +28,17 @@ semantics diverge.
 <RespostaCurta>
   Google Pub/Sub is a fully managed pub/sub service, with configurable retention (up to 31 days) and
   replay support via *seek*. The key difference is that it has no equivalent to Kafka's
-  partition/offset concept — ordering is optional, via an *ordering key*, and comes at a throughput
+  partition/offset concept: ordering is optional, via an *ordering key*, and comes at a throughput
   cost when enabled. Operationally, it's the closest thing to "Kafka without running a cluster," but
   with different semantics.
 </RespostaCurta>
 
 <RespostaSenior>
-  Pub/Sub solves much of what Kafka solves — multiple independent subscribers to the same topic,
-  configurable retention, the ability to reread messages — but with a different data model. There's no
+  Pub/Sub solves much of what Kafka solves (multiple independent subscribers to the same topic,
+  configurable retention, the ability to reread messages) but with a different data model. There's no
   partition as a unit of parallelism and ordering; instead, there's an optional *ordering key* that
   guarantees order for messages with the same key, at the cost of lower throughput on that flow.
-  Operations are zero for the team — there's no cluster to manage, unlike self-hosted Kafka. In
+  Operations are zero for the team: there's no cluster to manage, unlike self-hosted Kafka. In
   practice, for teams already committed to Java/Spring and Kafka's client ecosystem (Spring Kafka,
   Kafka Streams), migrating to Pub/Sub has a rewrite cost; for GCP-native teams with no prior Kafka
   investment, Pub/Sub removes the operational complexity of a cluster, at the cost of less control over
@@ -51,13 +51,13 @@ See the full comparison in [Chapter 2](/en/kafka/livro/kafka-versus-outras-ferra
 
 <ExemploFinanceiro>
   A bank reconciliation system that needs to guarantee strict event ordering per account would pay the
-  cost of an *ordering key* per `accountId` in Pub/Sub — conceptually equivalent to partitioning by key
+  cost of an *ordering key* per `accountId` in Pub/Sub, conceptually equivalent to partitioning by key
   in Kafka, but with a different, explicit throughput penalty in Pub/Sub.
 </ExemploFinanceiro>
 
 <Pegadinha title='"Pub/Sub and Kafka are interchangeable, just swap the client"'>
   The absence of the partition/offset concept changes the semantics of ordering and consumption
-  parallelism. Migrating between them isn't a trivial library swap — it requires redesigning the
+  parallelism. Migrating between them isn't a trivial library swap: it requires redesigning the
   partitioning/ordering strategy.
 </Pegadinha>
 

@@ -6,7 +6,7 @@ import { useTypewriter } from "@/lib/hooks/useTypewriter";
 const FULL_TEXT = "InterviewRoadmap.dev";
 const SPLIT = "InterviewRoadmap".length;
 
-// Versão animada do Wordmark, só pro H1 do hero da home — digita o nome uma vez ao montar (não cicla
+// Versão animada do Wordmark, só pro H1 do hero da home: digita o nome uma vez ao montar (não cicla
 // como o typewriter de "Trilhas: X" logo abaixo) e desliza um traço sob ".dev" ao terminar. O texto
 // completo vive sempre em `sr-only` (não depende do estado da animação nem de JS ter rodado); a versão
 // visível/animada é `aria-hidden`.

@@ -1,6 +1,6 @@
----
+﻿---
 title: "What is Apache Kafka?"
-part: "Part I — Fundamentals"
+part: "Part I: Fundamentals"
 partOrder: 1
 chapterOrder: 1
 slug: "o-que-e-apache-kafka"
@@ -9,7 +9,7 @@ description: "Origin, context, the problem Kafka solves, and why it isn't just a
 
 Before getting into Producer, Broker, or Partition, it's worth answering a question most developers never
 stop to answer precisely: **why does Kafka exist?** If you can't justify why a piece of infrastructure
-exists, you also can't justify when to use it — and that's exactly the kind of judgment a senior interview
+exists, you also can't justify when to use it, and that's exactly the kind of judgment a senior interview
 tries to measure.
 
 ## The problem before Kafka
@@ -21,11 +21,11 @@ point of failure, and a new direct coupling between teams.
 
 Picture a "payment approved" event in a digital bank. Today it might interest: push notifications,
 antifraud, cashback, accounting, analytics, and credit limit updates. If the payments service calls each of
-these synchronously over HTTP, it becomes dependent on the availability of all of them — and adding a
+these synchronously over HTTP, it becomes dependent on the availability of all of them, and adding a
 seventh consumer requires changing the payments service's code again.
 
 <Atencao title="It's not only about performance">
-  The core problem isn't request volume — it's **coupling**. A system where the producer of an event
+  The core problem isn't request volume: it's **coupling**. A system where the producer of an event
   needs to know all of its consumers doesn't scale organizationally, even if it scales in throughput.
 </Atencao>
 
@@ -43,7 +43,7 @@ shared distributed log.
 </Definicao>
 
 This is different from simply "sending a message." An event isn't a command ("process this invoice"); it's
-a statement about something that already happened. The producer doesn't know — and doesn't need to know —
+a statement about something that already happened. The producer doesn't know (and doesn't need to know)
 who will consume the event or what each consumer will do with it. That inversion is the foundation of
 event-driven architecture: the payments system publishes "payment approved" and moves on; antifraud,
 notifications, and accounting discover that fact asynchronously, each at its own pace.
@@ -51,7 +51,7 @@ notifications, and accounting discover that fact asynchronously, each at its own
 ## Kafka as a distributed log
 
 Technically, Kafka is implemented as a **distributed, partitioned, and replicated log**. "Log" here isn't an
-application log — it's the data structure: an ordered, immutable sequence of records, each identified by an
+application log; it's the data structure: an ordered, immutable sequence of records, each identified by an
 increasing position (the _offset_). New events are always appended at the end; nothing is modified in place.
 
 <Diagrama legenda="A Producer publishes to a Topic; the Topic is split into Partitions; multiple Consumers read independently.">
@@ -63,23 +63,23 @@ traditional queue:
 
 1. **Multiple independent consumers** can read the same set of events, each keeping its own read position
    (offset), without one consumer's reading affecting another's.
-2. **Configurable retention** means the event stays available in the log after being consumed — a new
+2. **Configurable retention** means the event stays available in the log after being consumed: a new
    service can be born tomorrow and read the full "payment approved" history from the last 7 days without
    the payments system needing to resend anything.
 
 ## Kafka is not just a queue
 
-This is probably the most repeated — and most incomplete — comparison about Kafka.
+This is probably the most repeated (and most incomplete) comparison about Kafka.
 
 <Pegadinha title='"Kafka is just a faster queue"'>
   This statement ignores the most important structural difference: in a classic queue (RabbitMQ,
-  SQS), a consumed message normally **leaves the queue** — it exists to be delivered once and
+  SQS), a consumed message normally **leaves the queue**: it exists to be delivered once and
   disappear. In Kafka, consuming an event doesn't remove it from the log; it stays there until the
   retention policy expires it, regardless of how many consumers have already read it.
 </Pegadinha>
 
-A queue models **work to be distributed** — each item should be processed by exactly one worker. Kafka
-models **facts to be shared** — the same event can (and usually should) be read by several different
+A queue models **work to be distributed**: each item should be processed by exactly one worker. Kafka
+models **facts to be shared**: the same event can (and usually should) be read by several different
 systems, each with its own interpretation of the fact. It's possible to use Kafka to distribute work (that's
 what a Consumer Group does within a partition), but reducing Kafka to that misses half the reason it was
 designed the way it was.
@@ -91,22 +91,22 @@ designed the way it was.
   reindexing an Elasticsearch cluster from an event history).
 - Volume and event rate are high enough that synchronous coupling becomes an availability risk (one service
   being down shouldn't block the others).
-- You want to decouple producers from consumers at the organizational level — different teams evolving their
+- You want to decouple producers from consumers at the organizational level: different teams evolving their
   services without coordinating deploys.
 
 ## When not to use it
 
 - Strictly request/response communication, where the caller needs an immediate answer (e.g., authorizing a
-  card transaction end-to-end in real time) — that's the job of a synchronous call (HTTP/gRPC), not an
+  card transaction end-to-end in real time): that's the job of a synchronous call (HTTP/gRPC), not an
   asynchronous event.
 - Small systems, with few services and low volume, where the operational complexity of a Kafka cluster
   doesn't pay off. A simple queue or even direct calls solve it with less effort.
-- When the team doesn't have — and isn't going to build — the minimum operational maturity to run a
+- When the team doesn't have (and isn't going to build) the minimum operational maturity to run a
   stateful distributed system (lag monitoring, partition management, cluster upgrades).
 
 ## Limitations
 
-- Kafka **does not guarantee global ordering** across partitions — only within a single partition (we come
+- Kafka **does not guarantee global ordering** across partitions, only within a single partition (we come
   back to this in Chapter 4).
 - It's not a transactional database; although it supports transactions (Chapter 12), it doesn't replace a
   relational database for ad-hoc queries over current state.
@@ -116,15 +116,15 @@ designed the way it was.
 ## How this shows up in interviews
 
 Practically every Kafka interview starts with some variation of "what is Kafka" or "why use Kafka instead of
-a queue." The interviewer doesn't want the dictionary definition — they want to see whether you understand
+a queue." The interviewer doesn't want the dictionary definition; they want to see whether you understand
 the coupling problem that motivated the tool's creation, and whether you can tell a "work queue" apart from
 a "shared event log." Answers that only cite "high performance" or "processes lots of data" sound rehearsed
 and rarely convince.
 
 <DicaEntrevista>
-  Structure the answer in three steps: (1) the problem — coupling between a producer and multiple
-  consumers; (2) the solution — a distributed, immutable log with multiple independent consumers; (3)
-  the consequence — replay, organizational decoupling, and the fundamental difference from a queue.
+  Structure the answer in three steps: (1) the problem: coupling between a producer and multiple
+  consumers; (2) the solution: a distributed, immutable log with multiple independent consumers; (3)
+  the consequence: replay, organizational decoupling, and the fundamental difference from a queue.
 </DicaEntrevista>
 
 ## Relation to Java and Spring Boot
@@ -140,7 +140,7 @@ accounting.
 
 <ExemploFinanceiro title="PIX received, without Kafka vs. with Kafka">
   Without an event log, the service that receives a PIX confirmation would need to call the balance
-  service, the push notification service, the statement service, and the antifraud service directly —
+  service, the push notification service, the statement service, and the antifraud service directly,
   either synchronously or with a dedicated queue for each. With Kafka, it publishes a single
   `PixRecebido` event to a topic; balance, notifications, statement, and antifraud consume that same
   event independently, each in its own Consumer Group, without the PIX-receiving service knowing they
@@ -150,7 +150,7 @@ accounting.
 <Resumo>
   Kafka solves the coupling problem between an event producer and multiple independent consumers,
   through a distributed, partitioned, and replicated log where events are appended and retained for a
-  configurable period — not removed once consumed. That makes it structurally different from a
+  configurable period, not removed once consumed. That makes it structurally different from a
   traditional queue, which models work distribution, not fact sharing.
 </Resumo>
 

@@ -45,6 +45,7 @@ export const en: Dictionary = {
     sobre: "About",
     github: "GitHub",
     viewRelease: "View {tag} on GitHub",
+    publishedOn: "published on {date}",
   },
   copyLink: {
     copy: "Copy link",
@@ -83,7 +84,7 @@ export const en: Dictionary = {
     seeSummary: "See full contents →",
     conceptsTitle: "Core concepts",
     openSourceText:
-      "This material is 100% free, with no signup and no paywall. The source code is open — content contributions and fixes are welcome.",
+      "This material is 100% free, with no signup and no paywall. The source code is open: content contributions and fixes are welcome.",
     githubCta: "See on GitHub →",
   },
   livroIndex: {
@@ -97,7 +98,7 @@ export const en: Dictionary = {
   perguntasIndex: {
     title: "Interview questions",
     description:
-      "The most common Apache Kafka interview questions for Java developers, with a quick answer and a senior-level answer — {siteName}.",
+      "The most common Apache Kafka interview questions for Java developers, with a quick answer and a senior-level answer · {siteName}.",
     intro:
       "50 real Kafka interview questions, each with the interviewer's goal, a quick answer, a senior-level answer, an in-depth explanation, a financial example, and common pitfalls.",
     empty: "Questions are still being published.",
@@ -113,7 +114,7 @@ export const en: Dictionary = {
   casosIndex: {
     title: "Case studies",
     description:
-      "Real-world case studies of event-driven financial systems built with Apache Kafka — {siteName}.",
+      "Real-world case studies of event-driven financial systems built with Apache Kafka · {siteName}.",
     intro:
       "End-to-end financial system scenarios, tying together topic topology, key choice, idempotency, retry, DLQ, replay, and observability.",
     empty: "Case studies are still being published.",
@@ -124,8 +125,8 @@ export const en: Dictionary = {
   glossarioIndex: {
     title: "Glossary",
     description:
-      "Essential Apache Kafka terms, with short and detailed definitions and how they relate to other concepts — {siteName}.",
-    intro: "Essential Kafka terms. The glossary doesn't replace the chapters — it points to them.",
+      "Essential Apache Kafka terms, with short and detailed definitions and how they relate to other concepts · {siteName}.",
+    intro: "Essential Kafka terms. The glossary doesn't replace the chapters: it points to them.",
     indexAriaLabel: "Term index",
     empty: "The glossary is still being published.",
     relatedLabel: "Related:",
@@ -164,7 +165,7 @@ export const en: Dictionary = {
     noQuestionsFound: "No questions found for this filter.",
     back: "Back",
     resultTitle: "Result",
-    questionsCount: "{count} question(s) —",
+    questionsCount: "{count} question(s) ·",
     allLevelsResult: "all levels",
     totalTime: "total time {time}",
     correct: "Got it",
@@ -197,9 +198,9 @@ export const en: Dictionary = {
   sobre: {
     title: "About the project",
     intro1:
-      "is free, open source material created to help Java Backend developers prepare for Apache Kafka technical interviews — from architecture fundamentals to delivery guarantees, idempotency, and observability.",
+      "is free, open source material created to help Java Backend developers prepare for Apache Kafka technical interviews: from architecture fundamentals to delivery guarantees, idempotency, and observability.",
     intro2:
-      "This content doesn't replace the official Apache Kafka documentation or the hands-on experience of running the system in production. It exists to consolidate and organize the knowledge needed to explain these concepts confidently in an interview — and, as a result, in the day-to-day work of anyone already using the tool.",
+      "This content doesn't replace the official Apache Kafka documentation or the hands-on experience of running the system in production. It exists to consolidate and organize the knowledge needed to explain these concepts confidently in an interview and, as a result, in the day-to-day work of anyone already using the tool.",
     intro3:
       "Contributions are welcome: technical corrections, new chapters, new interview questions, or accessibility and design improvements can be proposed directly in the project's repository.",
     trademarkDisclaimer:
@@ -219,7 +220,7 @@ export const en: Dictionary = {
   trackSelector: {
     badge: "Free & open source",
     heroIntro:
-      "A free, open-source technical interview prep platform. Every technology track follows the same format: a navigable book, real interview questions, a glossary, and a practice simulator — no paid course, no sign-up, no ads.",
+      "A free, open-source technical interview prep platform. Every technology track follows the same format: a navigable book, real interview questions, a glossary, and a practice simulator, no paid course, no sign-up, no ads.",
     tracksLabel: "Tracks",
     heroCaptionProducer: "Producer",
     heroCaptionPartitions: "Partitions keep the order",
@@ -239,7 +240,7 @@ export const en: Dictionary = {
       "Essential terms with short and detailed definitions, linked back to the chapters where they appear.",
     featureSimulatorTitle: "Simulator",
     featureSimulatorDescription:
-      "Practice at your own pace — open-ended mode (explain out loud) or multiple choice, everything saved only in your browser.",
+      "Practice at your own pace: open-ended mode (explain out loud) or multiple choice, everything saved only in your browser.",
     title: "Choose your track",
     intro: "interviewroadmap.dev is a free, open-source technical interview prep platform, organized by technology.",
     availableBadge: "Available - Access now!",

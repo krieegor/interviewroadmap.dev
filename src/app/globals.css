@@ -27,7 +27,7 @@
 }
 
 /* Cor de destaque por trilha (`data-tech` em src/app/[locale]/[tech]/layout.tsx e nos cards do
-   seletor em src/app/[locale]/page.tsx) — Kafka mantém o laranja acima como default; as demais
+   seletor em src/app/[locale]/page.tsx): Kafka mantém o laranja acima como default; as demais
    trilhas usam uma cor que remete à identidade visual de cada tecnologia, sempre validada para
    contraste AA (4.5:1) contra --color-bg. */
 [data-tech="java"] {
@@ -225,7 +225,7 @@ button:not(:disabled) {
   background-color: var(--color-bg-subtle);
 }
 
-/* Versão para impressão (src/app/livro/impressao) — sempre em tema claro,
+/* Versão para impressão (src/app/livro/impressao): sempre em tema claro,
    independente do tema salvo pelo visitante, porque vira um PDF estático. */
 .pdf-book {
   --color-bg: #ffffff;
@@ -278,7 +278,7 @@ body.pdf-render-content-only .pdf-cover {
 
 /* Empurra o par heading+primeiro parágrafo inteiro pra próxima página quando não cabem
    juntos, em vez de deixar o título perto do fim da página com o parágrafo cortado logo
-   depois — ver src/lib/mdx/rehype-keep-heading-with-next.mjs */
+   depois (ver src/lib/mdx/rehype-keep-heading-with-next.mjs) */
 .pdf-book .pdf-keep-with-heading {
   break-inside: avoid-page;
 }

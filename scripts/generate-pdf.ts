@@ -7,7 +7,7 @@ import { PDFDocument } from "pdf-lib";
 
 const ROOT = process.cwd();
 const OUTPUT_PATH = path.join(ROOT, "public", "livro.pdf");
-// `next build` (output: "export") já copiou public/** para out/ antes do postbuild rodar — escrever
+// `next build` (output: "export") já copiou public/** para out/ antes do postbuild rodar: escrever
 // só em public/livro.pdf não afeta o export já gerado, então o PDF final também precisa ir pra lá.
 const EXPORT_OUTPUT_PATH = path.join(ROOT, "out", "livro.pdf");
 const PRINT_ROUTE = "/pt/kafka/livro/impressao";
@@ -32,7 +32,7 @@ function getFreePort(): Promise<number> {
 }
 
 function startServer(port: number): ChildProcess {
-  // Com `output: "export"` não existe mais `next start` (o build é HTML estático em out/) — serve
+  // Com `output: "export"` não existe mais `next start` (o build é HTML estático em out/): serve
   // esse diretório com o `serve` (mesmo pacote usado no script "start" do package.json).
   const serveBin = path.join(
     ROOT,
@@ -92,7 +92,7 @@ async function main() {
       browser = await chromium.launch();
     } catch (error) {
       console.warn(
-        "Não foi possível iniciar o Chromium (ambiente sem as bibliotecas gráficas necessárias — " +
+        "Não foi possível iniciar o Chromium (ambiente sem as bibliotecas gráficas necessárias, " +
           "ex.: o build container da Cloudflare Workers Builds). Pulando a geração do PDF nesta " +
           "execução; public/livro.pdf não será atualizado.",
       );
@@ -115,7 +115,7 @@ async function main() {
 
       // A capa é gerada isoladamente e sem rodapé, para não entrar na contagem de páginas do
       // livro. As duas passadas usam a mesma página já carregada (só alternando uma classe no
-      // <body> que esconde/mostra seções via CSS — ver globals.css).
+      // <body> que esconde/mostra seções via CSS, ver globals.css).
       await page.evaluate(() => document.body.classList.add("pdf-render-cover-only"));
       const coverBuffer = await page.pdf({
         format: "A4",

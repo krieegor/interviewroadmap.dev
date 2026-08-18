@@ -5,10 +5,10 @@ slug: "o-que-e-consumer-lag"
 level: ["pleno", "senior"]
 topics: ["observabilidade"]
 relatedChapters: ["observabilidade"]
-shortAnswer: "Consumer Lag é a diferença entre o offset mais recente produzido em uma partition e o offset commitado pelo consumer — quantas mensagens já existem no tópico mas ainda não foram processadas."
+shortAnswer: "Consumer Lag é a diferença entre o offset mais recente produzido em uma partition e o offset commitado pelo consumer: quantas mensagens já existem no tópico mas ainda não foram processadas."
 quiz:
   options:
-    - "Diferença entre o offset mais recente produzido em uma partition e o offset commitado pelo consumer — quantas mensagens existem mas ainda não foram processadas."
+    - "Diferença entre o offset mais recente produzido em uma partition e o offset commitado pelo consumer: quantas mensagens existem mas ainda não foram processadas."
     - "Qualquer valor de lag maior que zero já indica um problema no consumer, independentemente da tendência ao longo do tempo."
     - "Diferença entre os dados já replicados pelo leader e os replicados pelos followers de uma partition."
     - "Tempo médio, em milissegundos, que uma mensagem leva entre ser produzida e ser consumida."
@@ -21,21 +21,21 @@ quiz:
 
 ## O que o entrevistador quer avaliar
 
-Se você conecta a métrica ao sintoma de negócio que ela antecipa — não apenas a definição técnica isolada.
+Se você conecta a métrica ao sintoma de negócio que ela antecipa, não apenas a definição técnica isolada.
 
 <RespostaCurta>
 Consumer Lag é a diferença entre o offset mais recente já produzido em uma partition (log end offset) e o
-offset commitado pelo Consumer Group — representa quantas mensagens já existem mas ainda não foram
+offset commitado pelo Consumer Group: representa quantas mensagens já existem mas ainda não foram
 processadas.
 </RespostaCurta>
 
 <RespostaSenior>
 Lag zero (ou oscilando perto de zero com o tráfego normal) indica um consumer saudável, acompanhando o
-ritmo de produção. O sinal de alerta real não é um pico momentâneo de lag durante um aumento de tráfego —
-isso é esperado e geralmente se resolve sozinho — mas lag que cresce de forma sustentada ao longo do tempo,
+ritmo de produção. O sinal de alerta real não é um pico momentâneo de lag durante um aumento de tráfego
+(isso é esperado e geralmente se resolve sozinho), mas lag que cresce de forma sustentada ao longo do tempo,
 o que indica que o throughput de consumo é estruturalmente menor que o de produção. É a métrica mais
 importante justamente porque antecipa um problema de negócio (atraso de processamento) antes que o usuário
-final o perceba — diferente de uma taxa de erro, que só aparece depois que algo já deu errado.
+final o perceba, diferente de uma taxa de erro, que só aparece depois que algo já deu errado.
 </RespostaSenior>
 
 ## Explicação aprofundada
@@ -44,13 +44,13 @@ Veja "Consumer Lag: o sinal vital mais importante" no [Capítulo 15](/pt/kafka/l
 
 <ExemploFinanceiro>
 Um alerta configurado no Grafana dispara se o consumer lag do `saldo-service` no tópico `pix.recebido`
-ultrapassar 1000 mensagens por mais de 2 minutos — porque, para esse fluxo, poucos segundos de atraso entre
+ultrapassar 1000 mensagens por mais de 2 minutos, porque, para esse fluxo, poucos segundos de atraso entre
 o recebimento do PIX e o crédito do saldo já é perceptível para o cliente.
 </ExemploFinanceiro>
 
 <Pegadinha title='"Qualquer lag maior que zero já é um problema"'>
 Lag pontual durante picos de tráfego é normal e esperado. O problema real é a tendência: lag que não volta
-a cair depois que o pico passa, ou que cresce continuamente — não um valor instantâneo isolado.
+a cair depois que o pico passa, ou que cresce continuamente, não um valor instantâneo isolado.
 </Pegadinha>
 
 <PerguntaDerivada>

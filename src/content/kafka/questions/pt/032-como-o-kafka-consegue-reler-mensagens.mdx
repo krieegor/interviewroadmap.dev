@@ -5,10 +5,10 @@ slug: "como-o-kafka-consegue-reler-mensagens"
 level: ["senior"]
 topics: ["consumo"]
 relatedChapters: ["retention-e-replay"]
-shortAnswer: "Porque consumir uma mensagem não a remove do log — ela permanece retida até expirar pela política de retenção. Reler é apenas mover (resetar) o offset commitado do Consumer Group para uma posição anterior."
+shortAnswer: "Porque consumir uma mensagem não a remove do log: ela permanece retida até expirar pela política de retenção. Reler é apenas mover (resetar) o offset commitado do Consumer Group para uma posição anterior."
 quiz:
   options:
-    - "Porque consumir não remove a mensagem do log — ela fica retida até expirar pela política de retenção, e reler é só mover o offset commitado para trás."
+    - "Porque consumir não remove a mensagem do log: ela fica retida até expirar pela política de retenção, e reler é só mover o offset commitado para trás."
     - "Porque o Kafka guarda uma cópia separada de cada mensagem consumida especificamente para permitir replay futuro."
     - "Porque o broker republica automaticamente mensagens antigas no tópico sempre que um novo Consumer Group é criado."
     - "Porque o consumer mantém um cache local das mensagens lidas e as reenvia a partir desse cache quando solicitado."
@@ -21,22 +21,22 @@ quiz:
 
 ## O que o entrevistador quer avaliar
 
-Se você entende o mecanismo real por trás do replay — a resposta correta é sobre a natureza do log, não
+Se você entende o mecanismo real por trás do replay: a resposta correta é sobre a natureza do log, não
 sobre um recurso "mágico" separado.
 
 <RespostaCurta>
-Porque consumir uma mensagem não a remove do log — diferente de uma fila tradicional, o Kafka mantém a
+Porque consumir uma mensagem não a remove do log: diferente de uma fila tradicional, o Kafka mantém a
 mensagem retida (até expirar pela política de retenção) independentemente de ter sido lida. Reler é apenas
 mover o offset commitado do Consumer Group de volta para uma posição anterior.
 </RespostaCurta>
 
 <RespostaSenior>
-Não existe um mecanismo separado de "replay" no Kafka — ele é uma consequência direta de como o log
+Não existe um mecanismo separado de "replay" no Kafka: ele é uma consequência direta de como o log
 funciona. Uma partition é uma sequência imutável de registros identificados por offset; consumir uma
 mensagem só avança a posição de leitura do consumer (e, se commitado, a posição oficial do Consumer Group).
 A mensagem em si continua no disco do broker, disponível para qualquer leitura futura, até a política de
 retenção descartá-la. Portanto, "reler" é simplesmente instruir o consumer (ou um novo Consumer Group) a
-buscar a partir de um offset anterior — o client Kafka então volta a ler exatamente a partir dali, como se
+buscar a partir de um offset anterior: o client Kafka então volta a ler exatamente a partir dali, como se
 nunca tivesse avançado.
 </RespostaSenior>
 
@@ -46,12 +46,12 @@ Veja "Replay: reprocessando o que já foi lido" no [Capítulo 8](/pt/kafka/livro
 
 <ExemploFinanceiro>
 Reconstruir o índice do Elasticsearch usado para busca de transações é feito criando um novo Consumer Group
-com `auto.offset.reset=earliest` — ele lê o tópico inteiro desde o início da retenção disponível,
+com `auto.offset.reset=earliest`: ele lê o tópico inteiro desde o início da retenção disponível,
 reconstruindo o índice do zero, sem nenhuma ação especial do lado do producer.
 </ExemploFinanceiro>
 
 <Pegadinha title='"O Kafka guarda uma cópia separada para permitir replay"'>
-Não existe cópia separada — é a mesma partition, o mesmo log. Replay não duplica dados nem usa um mecanismo
+Não existe cópia separada: é a mesma partition, o mesmo log. Replay não duplica dados nem usa um mecanismo
 paralelo; ele só reposiciona onde o consumer começa a ler dentro do log que já existe.
 </Pegadinha>
 

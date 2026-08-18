@@ -18,10 +18,10 @@
 
 # production
 /build
-# gerado por scripts/build-search-index.ts (prebuild) — ao contrário de public/livro.pdf, não depende
+# gerado por scripts/build-search-index.ts (prebuild): ao contrário de public/livro.pdf, não depende
 # de Chromium, então qualquer ambiente de build regenera sem problema.
 /public/search-index/
-# gerado por scripts/fetch-release-version.ts (prebuild) — busca a última release na GitHub API.
+# gerado por scripts/fetch-release-version.ts (prebuild): busca a última release na GitHub API.
 /public/version.json
 
 # env
@@ -71,7 +71,7 @@ Desktop.ini
 *.tmp
 .tmp-*
 
-# Agent Skills instalados via `npx skills add` (ex.: remotion-dev/skills) — conteúdo de terceiros
+# Agent Skills instalados via `npx skills add` (ex.: remotion-dev/skills): conteúdo de terceiros
 # gerenciado pela ferramenta, regenerável a qualquer momento, não é código do projeto. Ver
 # docs/contributing.md.
 /.agents/

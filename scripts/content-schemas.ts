@@ -1,9 +1,9 @@
 import { z } from "zod";
 
-// Fonte única de verdade pro formato de frontmatter — usado tanto por validate-content.ts (valida
+// Fonte única de verdade pro formato de frontmatter: usado tanto por validate-content.ts (valida
 // todo o conteúdo) quanto por build-search-index.ts (extrai campos pro índice de busca). Os dois
 // scripts leem .mdx fora do pipeline de build do Next (não podem reaproveitar src/lib/content/**,
-// que faz import() dinâmico — só funciona com o loader MDX do Next).
+// que faz import() dinâmico, só funciona com o loader MDX do Next).
 export const chapterSchema = z.object({
   title: z.string().min(1),
   part: z.string().min(1),

@@ -5,7 +5,7 @@ slug: "o-que-e-um-consumer-group"
 level: ["pleno", "senior"]
 topics: ["arquitetura"]
 relatedChapters: ["consumer-groups-e-rebalance"]
-shortAnswer: "Consumer Group é um conjunto de consumers com o mesmo group.id que dividem entre si as partitions de um tópico — cada partition vai para exatamente um consumer do grupo por vez."
+shortAnswer: "Consumer Group é um conjunto de consumers com o mesmo group.id que dividem entre si as partitions de um tópico: cada partition vai para exatamente um consumer do grupo por vez."
 quiz:
   options:
     - "Consumer Group é o conjunto de consumers com o mesmo group.id que dividem entre si as partitions de um tópico, uma partition por consumer por vez."
@@ -22,11 +22,11 @@ quiz:
 ## O que o entrevistador quer avaliar
 
 Se você entende o Consumer Group como o mecanismo que permite ao Kafka tanto distribuir trabalho quanto
-compartilhar dados entre sistemas independentes — a peça central para explicar escalabilidade de consumo.
+compartilhar dados entre sistemas independentes: a peça central para explicar escalabilidade de consumo.
 
 <RespostaCurta>
 Consumer Group é um conjunto de instâncias de consumer identificadas pelo mesmo `group.id`. O Kafka garante
-que cada partition de um tópico assinado é atribuída a exatamente um consumer do grupo por vez — nunca dois
+que cada partition de um tópico assinado é atribuída a exatamente um consumer do grupo por vez, nunca dois
 consumers do mesmo grupo lendo a mesma partition simultaneamente.
 </RespostaCurta>
 
@@ -35,7 +35,7 @@ Consumer Group é o que torna o Kafka capaz de fazer duas coisas ao mesmo tempo:
 de um grupo, cada partition vai para um único consumer, similar ao que uma fila faz) e compartilhar dados
 (grupos diferentes lendo o mesmo tópico são totalmente independentes entre si, cada um com seu próprio
 conjunto de offsets commitados). O número de partitions do tópico define o paralelismo máximo de consumo
-dentro de um único grupo — não existe forma de um grupo processar com mais paralelismo do que partitions
+dentro de um único grupo: não existe forma de um grupo processar com mais paralelismo do que partitions
 disponíveis.
 </RespostaSenior>
 
@@ -45,12 +45,12 @@ Veja "Como um Consumer Group divide o trabalho" no [Capítulo 6](/pt/kafka/livro
 
 <ExemploFinanceiro>
 O tópico `pix.recebido` pode ter dois Consumer Groups lendo simultaneamente: `saldo-service` (credita o
-valor) e `antifraude-service` (avalia risco) — cada um com seu próprio grupo, avançando offsets de forma
+valor) e `antifraude-service` (avalia risco), cada um com seu próprio grupo, avançando offsets de forma
 totalmente independente, sem que um afete o outro.
 </ExemploFinanceiro>
 
 <Pegadinha title='"Dois Consumer Groups diferentes competem pelas mesmas mensagens"'>
-Não — essa é justamente a confusão mais comum. Consumer Groups diferentes são completamente independentes;
+Não. Essa é justamente a confusão mais comum: Consumer Groups diferentes são completamente independentes;
 cada um lê o tópico do seu próprio jeito. A competição por partitions só acontece **dentro** do mesmo grupo,
 entre suas próprias instâncias.
 </Pegadinha>

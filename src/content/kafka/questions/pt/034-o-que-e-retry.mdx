@@ -21,21 +21,21 @@ quiz:
 
 ## O que o entrevistador quer avaliar
 
-Se você diferencia erro transitório de permanente — a base para saber quando retry ajuda e quando é
+Se você diferencia erro transitório de permanente, que é a base para saber quando retry ajuda e quando é
 desperdício de tentativas.
 
 <RespostaCurta>
 Retry é tentar processar novamente uma mensagem que falhou, na expectativa de que o erro seja transitório
-(timeout de rede, banco momentaneamente indisponível). Geralmente combinado com backoff — um intervalo
-crescente entre tentativas — para não sobrecarregar um sistema já instável.
+(timeout de rede, banco momentaneamente indisponível). Geralmente combinado com backoff (um intervalo
+crescente entre tentativas) para não sobrecarregar um sistema já instável.
 </RespostaCurta>
 
 <RespostaSenior>
-Retry só faz sentido para erros transitórios — falhas com chance real de não se repetir em uma nova
+Retry só faz sentido para erros transitórios, falhas com chance real de não se repetir em uma nova
 tentativa. Para erros permanentes (payload malformado, regra de negócio que sempre rejeita aquele dado),
 retry é inútil: vai falhar da mesma forma indefinidamente, a menos que exista um limite de tentativas,
 depois do qual a mensagem segue para uma DLQ. No Kafka, a implementação mais robusta usa um tópico de retry
-dedicado — a mensagem que falha é republicada nele com um cabeçalho indicando quantas tentativas já
+dedicado: a mensagem que falha é republicada nele com um cabeçalho indicando quantas tentativas já
 ocorreram, e um listener separado a reprocessa após o backoff, sem bloquear o tópico principal (evitando o
 efeito poison pill).
 </RespostaSenior>

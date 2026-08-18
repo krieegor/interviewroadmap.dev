@@ -26,7 +26,7 @@ mecanismo de detecção de falha e redistribuição, não apenas o resultado fin
 
 <RespostaCurta>
 O coordenador do grupo detecta a ausência de heartbeat dentro do `session.timeout.ms` configurado, declara o
-consumer morto, e dispara um rebalance — as partitions que estavam atribuídas a ele são redistribuídas entre
+consumer morto, e dispara um rebalance: as partitions que estavam atribuídas a ele são redistribuídas entre
 os consumers restantes do grupo.
 </RespostaCurta>
 
@@ -35,7 +35,7 @@ Cada consumer envia heartbeats periódicos ao coordenador do grupo (um dos broke
 recebe um heartbeat dentro do `session.timeout.ms`, ele considera o consumer morto e inicia um rebalance,
 redistribuindo as partitions órfãs entre os consumers ativos. Um ponto sutil: se o processamento de uma
 mensagem demorar mais que `max.poll.interval.ms`, o consumer é considerado morto mesmo que a thread de
-heartbeat continue respondendo — porque o poll loop, não o heartbeat isoladamente, é o sinal real de que o
+heartbeat continue respondendo, porque o poll loop, não o heartbeat isoladamente, é o sinal real de que o
 consumer está processando normalmente. Isso é uma causa comum de rebalances "falsos", onde um consumer
 saudável mas lento é expulso do grupo.
 </RespostaSenior>
@@ -46,12 +46,12 @@ Veja "O que dispara um rebalance" no [Capítulo 6](/pt/kafka/livro/consumer-grou
 
 <ExemploFinanceiro>
 Se uma das 4 réplicas do `notificacao-service` cair por falta de memória, suas partitions são redistribuídas
-entre as 3 réplicas restantes em segundos — sem intervenção manual, mas com uma pequena pausa de
+entre as 3 réplicas restantes em segundos, sem intervenção manual, mas com uma pequena pausa de
 processamento durante a transição.
 </ExemploFinanceiro>
 
 <Pegadinha title='"O consumer só é considerado morto se o processo realmente cair"'>
-Não — um consumer vivo, mas que demora demais para processar uma mensagem (excedendo
+Não, um consumer vivo, mas que demora demais para processar uma mensagem (excedendo
 `max.poll.interval.ms`), também é expulso do grupo, mesmo sem nenhuma falha de infraestrutura real.
 </Pegadinha>
 

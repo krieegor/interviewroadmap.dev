@@ -5,7 +5,7 @@ slug: "o-que-e-replay"
 level: ["pleno", "senior"]
 topics: ["consumo"]
 relatedChapters: ["retention-e-replay"]
-shortAnswer: "Replay é reprocessar eventos já retidos no log, movendo o offset commitado de um Consumer Group para um ponto anterior — usado para corrigir bugs, popular sistemas novos ou reconstruir estado."
+shortAnswer: "Replay é reprocessar eventos já retidos no log, movendo o offset commitado de um Consumer Group para um ponto anterior: usado para corrigir bugs, popular sistemas novos ou reconstruir estado."
 quiz:
   options:
     - "Reprocessar eventos ainda retidos no log, movendo o offset commitado de um Consumer Group para um ponto anterior, dentro da janela de retenção."
@@ -26,7 +26,7 @@ retenção.
 
 <RespostaCurta>
 Replay é mover a posição de leitura de um Consumer Group para um ponto anterior no log, reprocessando
-eventos que já haviam sido consumidos — ou lendo pela primeira vez eventos antigos, no caso de um Consumer
+eventos que já haviam sido consumidos, ou lendo pela primeira vez eventos antigos, no caso de um Consumer
 Group novo.
 </RespostaCurta>
 
@@ -36,7 +36,7 @@ ferramenta equivalente) e deixar o consumer avançar normalmente a partir dali. 
 corrigir um bug de processamento (corrigir o código e reprocessar o intervalo afetado), popular um sistema
 novo com histórico existente (um Consumer Group novo lendo desde o início da retenção), e reconstruir um
 estado derivado, como um índice de busca. O requisito não óbvio é que replay só funciona dentro da janela de
-retenção — e que, em produção, exige que o consumer seja idempotente, porque ele vai reprocessar eventos
+retenção, e que, em produção, exige que o consumer seja idempotente, porque ele vai reprocessar eventos
 que já geraram efeitos colaterais na primeira vez.
 </RespostaSenior>
 
@@ -46,13 +46,13 @@ Veja "Replay: reprocessando o que já foi lido" no [Capítulo 8](/pt/kafka/livro
 
 <ExemploFinanceiro>
 Um bug no `extrato-service` gerou lançamentos incorretos nos últimos 3 dias. Depois de corrigir o bug, o
-time reseta o offset do Consumer Group para 3 dias atrás — o serviço reconstrói os lançamentos corretamente,
+time reseta o offset do Consumer Group para 3 dias atrás; o serviço reconstrói os lançamentos corretamente,
 assumindo que a operação seja idempotente (um upsert por lançamento, não um incremento).
 </ExemploFinanceiro>
 
 <Pegadinha title='"Replay é só resetar o offset, sem mais consequências"'>
 Resetar o offset é a parte fácil. Replay reprocessa eventos que já geraram efeitos colaterais na primeira
-vez — se o consumer não for idempotente, ele duplica esses efeitos (notificações, créditos, e-mails).
+vez: se o consumer não for idempotente, ele duplica esses efeitos (notificações, créditos, e-mails).
 </Pegadinha>
 
 <PerguntaDerivada>

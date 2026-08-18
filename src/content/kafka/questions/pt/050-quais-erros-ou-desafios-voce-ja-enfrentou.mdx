@@ -5,10 +5,10 @@ slug: "quais-erros-ou-desafios-voce-ja-enfrentou"
 level: ["senior", "tech-lead"]
 topics: ["experiencia"]
 relatedChapters: ["consumer-groups-e-rebalance", "retry-e-dlq"]
-shortAnswer: "Escolha um desafio real e específico — rebalance excessivo, mensagem duplicada, poison pill, partitioning mal dimensionado — e estruture a resposta como causa raiz, diagnóstico e correção, não apenas 'o que deu errado'."
+shortAnswer: "Escolha um desafio real e específico (rebalance excessivo, mensagem duplicada, poison pill, partitioning mal dimensionado) e estruture a resposta como causa raiz, diagnóstico e correção, não apenas 'o que deu errado'."
 quiz:
   options:
-    - "Uma resposta forte segue a lógica de um post-mortem — causa raiz, diagnóstico e correção — terminando com o que mudou no sistema ou processo após o incidente."
+    - "Uma resposta forte segue a lógica de um post-mortem: causa raiz, diagnóstico e correção, terminando com o que mudou no sistema ou processo após o incidente."
     - "Afirmar que nunca enfrentou nenhum problema com Kafka em produção, sem detalhar o nível de experiência real com o sistema sob carga."
     - "Descrever apenas o sintoma do incidente, sem explicar a causa raiz nem a correção aplicada depois."
     - "Atribuir o problema a uma limitação genérica do Kafka em si, sem investigar a configuração ou o código da aplicação envolvida."
@@ -21,11 +21,11 @@ quiz:
 
 ## O que o entrevistador quer avaliar
 
-Maturidade operacional e capacidade de diagnóstico — a pergunta que mais diferencia quem só programa contra
+Maturidade operacional e capacidade de diagnóstico: a pergunta que mais diferencia quem só programa contra
 Kafka de quem já operou Kafka sob pressão real, em um incidente de produção.
 
 <Atencao title="Esta pergunta também não tem resposta genérica">
-Assim como a pergunta anterior, esta exige uma experiência real sua. Não force um desafio inventado — se
+Assim como a pergunta anterior, esta exige uma experiência real sua. Não force um desafio inventado: se
 você ainda não enfrentou um incidente de produção com Kafka, é honesto dizer isso e falar sobre um desafio
 de estudo ou de ambiente de teste, ou sobre um cenário que você sabe que é comum (citando as fontes desse
 conhecimento, como este livro ou a documentação).
@@ -34,7 +34,7 @@ conhecimento, como este livro ou a documentação).
 ## Como estruturar a resposta
 
 Uma resposta forte segue a lógica de um post-mortem, não apenas uma queixa: causa raiz, diagnóstico e
-correção. Desafios reais e comuns que costumam aparecer nesse tipo de resposta — descritos neste livro caso
+correção. Desafios reais e comuns que costumam aparecer nesse tipo de resposta, descritos neste livro caso
 você precise se refrescar sobre a causa técnica de cada um:
 
 - **Rebalances excessivos** por `max.poll.interval.ms` mal configurado, expulsando consumers saudáveis mas
@@ -49,19 +49,19 @@ você precise se refrescar sobre a causa técnica de cada um:
   ([Capítulo 15](/pt/kafka/livro/observabilidade)).
 
 <DicaEntrevista>
-Termine sempre explicando o que mudou depois do incidente — um alerta novo, uma mudança de configuração, uma
+Termine sempre explicando o que mudou depois do incidente: um alerta novo, uma mudança de configuração, uma
 revisão de código. Isso demonstra que você não só resolveu o problema pontual, mas melhorou o sistema (ou o
 processo do time) para que ele não se repita.
 </DicaEntrevista>
 
 <Pegadinha title='"Nunca tive nenhum problema com Kafka"'>
 Essa resposta, mesmo se verdadeira, tende a soar como falta de experiência real com o sistema em produção
-sob carga — a maioria dos times que opera Kafka por tempo suficiente já enfrentou pelo menos um dos desafios
+sob carga: a maioria dos times que opera Kafka por tempo suficiente já enfrentou pelo menos um dos desafios
 listados acima. Se sua experiência é limitada, é mais honesto (e mais convincente) admitir isso e mostrar
 que você entende teoricamente onde esses problemas costumam aparecer.
 </Pegadinha>
 
 <PerguntaDerivada>
-Esta é tipicamente a última pergunta técnica de uma entrevista sobre Kafka — a partir daqui, a conversa
+Esta é tipicamente a última pergunta técnica de uma entrevista sobre Kafka: a partir daqui, a conversa
 costuma migrar para fit cultural ou para outras tecnologias do stack.
 </PerguntaDerivada>

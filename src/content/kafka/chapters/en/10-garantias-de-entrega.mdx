@@ -1,14 +1,14 @@
----
+﻿---
 title: "Delivery guarantees"
-part: "Part IV — Reliability"
+part: "Part IV: Reliability"
 partOrder: 4
 chapterOrder: 1
 slug: "garantias-de-entrega"
-description: "At Most Once, At Least Once, and Exactly Once — what each guarantee actually promises, and where exactly-once stops applying."
+description: "At Most Once, At Least Once, and Exactly Once: what each guarantee actually promises, and where exactly-once stops applying."
 ---
 
 Chapters 7 and 9 already touched on message loss and duplication, each from its own angle (commit, retry).
-This chapter formally names the three contracts that summarize that behavior — and clears up a common
+This chapter formally names the three contracts that summarize that behavior, and clears up a common
 misunderstanding about what "exactly-once" actually covers.
 
 ## The three guarantees
@@ -18,19 +18,19 @@ misunderstanding about what "exactly-once" actually covers.
 </Diagrama>
 
 <Definicao title="At Most Once">
-The message is delivered at most once — never duplicated, but it can be lost. This happens when the commit
+The message is delivered at most once: never duplicated, but it can be lost. This happens when the commit
 (or the producer's ack) occurs before any confirmation that the next step succeeded.
 </Definicao>
 
 <Definicao title="At Least Once">
-The message is delivered at least once — never lost, but it can be duplicated. This happens when the commit
+The message is delivered at least once: never lost, but it can be duplicated. This happens when the commit
 (or the producer's retry) only occurs after the previous step has been confirmed, accepting reprocessing in
 case of a failure between the confirmation and recording it.
 </Definicao>
 
 <Definicao title="Exactly Once">
-The message is processed exactly once from the point of view of the observable effect — neither lost nor
-duplicated — through a combination of an idempotent producer, transactions, and an idempotent consumer, not
+The message is processed exactly once from the point of view of the observable effect (neither lost nor
+duplicated), through a combination of an idempotent producer, transactions, and an idempotent consumer, not
 some magic single-delivery guarantee.
 </Definicao>
 
@@ -52,21 +52,21 @@ duplication (commit after processing, but with a risk of failure in between).
 ## Why At Least Once is the practical default
 
 <Atencao title="At Most Once is rarely acceptable in financial systems">
-Silently losing a message — a payment event that's never processed — is generally worse than processing it
+Silently losing a message (a payment event that's never processed) is generally worse than processing it
 twice, because duplication is at least detectable and fixable with idempotency, while loss doesn't even
 leave a trace. That's why the most common configuration in financial systems is At Least Once, combined
 with idempotent processing in the consumer.
 </Atencao>
 
-That's why idempotency (Chapter 11) isn't a "quality extra" — it's the necessary complement to At Least
+That's why idempotency (Chapter 11) isn't a "quality extra": it's the necessary complement to At Least
 Once, which is the guarantee most used in practice.
 
 ## Exactly Once: what it covers and what it doesn't
 
 <Pegadinha title='"Exactly Once means the message is never processed twice, full stop"'>
-Kafka's exactly-once semantics (EOS) guarantees single processing **within the Kafka ecosystem** — between
+Kafka's exactly-once semantics (EOS) guarantees single processing **within the Kafka ecosystem**: between
 an input topic, processing, and writing to another Kafka topic, using transactions. The moment the effect
-leaves Kafka — an HTTP call, a write to an external database, an email sent — that guarantee automatically
+leaves Kafka (an HTTP call, a write to an external database, an email sent), that guarantee automatically
 stops applying, because those external systems don't participate in Kafka's transaction.
 </Pegadinha>
 
@@ -96,19 +96,19 @@ In Spring Kafka, `acks=all` and `enable.idempotence=true` on the producer (the d
 versions) avoid message duplication caused by the producer's own automatic retries. For full exactly-once
 semantics across topics, `KafkaTransactionManager` is used, wrapping reads and writes in the same Kafka
 transaction. But as soon as the listener calls an external HTTP service or writes to a relational database
-outside that transaction, the responsibility for avoiding duplication falls back on the developer —
-typically via a uniqueness constraint and an idempotency check (Chapter 11).
+outside that transaction, the responsibility for avoiding duplication falls back on the developer: typically
+via a uniqueness constraint and an idempotency check (Chapter 11).
 
 <ExemploFinanceiro title="PIX received notification">
 The `notificacao-service` runs with At Least Once: if it crashes after sending the push notification but
 before committing the offset, the event will be reprocessed and a second notification may be sent. That's
 acceptable for a notification (the worst case is the customer getting two alerts), but it would be
-unacceptable for the `saldo-service`, which needs explicit protection against a duplicate credit — hence the
+unacceptable for the `saldo-service`, which needs explicit protection against a duplicate credit; hence the
 difference in idempotency rigor between the two consumers of the same event.
 </ExemploFinanceiro>
 
 <Resumo>
-At Most Once never duplicates, but it can lose. At Least Once never loses, but it can duplicate — and it's
+At Most Once never duplicates, but it can lose. At Least Once never loses, but it can duplicate, and it's
 the practical default in financial systems, combined with idempotency. Exactly Once, via Kafka
 transactions, guarantees single processing only within the Kafka ecosystem; any external side effect
 (database, API, email) still requires its own idempotency, regardless of the guarantee configured

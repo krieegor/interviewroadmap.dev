@@ -17,7 +17,7 @@ quiz:
 
 ## Pergunta
 
-"Você mencionou Kafka como boa escolha em vários cenários — quando você não usaria?"
+"Você mencionou Kafka como boa escolha em vários cenários. Quando você não usaria?"
 
 ## O que o entrevistador quer avaliar
 
@@ -25,20 +25,20 @@ Maturidade arquitetural. Candidatos que só sabem defender a ferramenta que domi
 arquitetos. Saber articular os limites do Kafka é tão importante quanto saber seus benefícios.
 
 <RespostaCurta>
-  Não uso Kafka para comunicação request/response onde preciso de uma resposta imediata — isso é
+  Não uso Kafka para comunicação request/response onde preciso de uma resposta imediata: isso é
   papel de chamada síncrona. Também evito em sistemas pequenos, com baixo volume, onde a
   complexidade operacional de um cluster não se paga, e quando o time não tem maturidade para operar
   um sistema distribuído com estado.
 </RespostaCurta>
 
 <RespostaSenior>
-  Três cenários principais. Primeiro, comunicação síncrona genuína — se preciso autorizar uma
+  Três cenários principais. Primeiro, comunicação síncrona genuína: se preciso autorizar uma
   transação de cartão e retornar aprovado/negado na mesma requisição HTTP, um evento assíncrono não
   serve; isso é papel de uma chamada direta (REST/gRPC) com timeout curto. Segundo, sistemas
-  pequenos — um serviço com dois ou três consumidores de baixo volume raramente justifica o custo
+  pequenos: um serviço com dois ou três consumidores de baixo volume raramente justifica o custo
   operacional de manter partições, réplicas e monitoramento de um cluster; uma fila simples ou até
   uma tabela de outbox processada por cron resolve com menos esforço. Terceiro, maturidade
-  operacional — Kafka introduz falhas que uma equipe sem experiência em sistemas distribuídos vai
+  operacional: Kafka introduz falhas que uma equipe sem experiência em sistemas distribuídos vai
   levar tempo para diagnosticar: rebalance mal compreendido, partição mal dimensionada, lag
   crescendo sem alerta. Introduzir Kafka sem essa maturidade tende a criar mais incidentes do que
   resolve.
@@ -49,7 +49,7 @@ arquitetos. Saber articular os limites do Kafka é tão importante quanto saber 
 Veja "Quando não utilizar" e "Limitações" no [Capítulo 1](/pt/kafka/livro/o-que-e-apache-kafka).
 
 <ExemploFinanceiro>
-  Autorizar uma compra no ponto de venda (POS) precisa de resposta em milissegundos — o fluxo
+  Autorizar uma compra no ponto de venda (POS) precisa de resposta em milissegundos; o fluxo
   síncrono de autorização não deve depender de Kafka. Mas, depois da autorização aprovada, o evento
   resultante ("compra autorizada") pode perfeitamente ser publicado no Kafka para notificação,
   cashback e antifraude assíncronos.

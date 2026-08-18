@@ -102,7 +102,7 @@ export async function getAdjacentChapters(tech: Tech, slug: string, locale: Loca
 
 export type ChapterHeading = { depth: 2 | 3; text: string; id: string };
 
-// Assume plain-text headings (no inline `code`/**bold**/links) — rehype-slug in next.config.ts
+// Assume plain-text headings (no inline `code`/**bold**/links): rehype-slug in next.config.ts
 // slugifies the rendered text, so markdown syntax here would desync the ids from the DOM anchors.
 const headingLinePattern = /^(#{2,3})\s+(.+)$/;
 

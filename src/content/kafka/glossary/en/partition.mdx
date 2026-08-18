@@ -1,13 +1,13 @@
 ---
 term: "Partition"
 slug: "partition"
-shortDefinition: "An ordered, immutable subdivision of a topic — the physical log where records are stored sequentially."
+shortDefinition: "An ordered, immutable subdivision of a topic: the physical log where records are stored sequentially."
 relatedTerms: ["topic", "offset", "key", "broker"]
 relatedChapters: ["arquitetura-interna", "partitions-e-ordenacao"]
 ---
 
 A partition is the real unit of storage and parallelism in Kafka. Each partition is an append-only log:
 new records are always added at the end, identified by an increasing offset. Partitions exist for two
-reasons — parallelism (multiple consumers can process different partitions at the same time) and
+reasons: parallelism (multiple consumers can process different partitions at the same time) and
 scalability (a topic grows by spreading its partitions across more brokers). The message's key determines
 which partition it's stored in.

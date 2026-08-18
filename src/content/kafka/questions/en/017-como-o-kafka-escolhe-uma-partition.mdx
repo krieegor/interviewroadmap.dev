@@ -21,11 +21,11 @@ quiz:
 
 ## What the interviewer wants to assess
 
-Whether you understand the partitioning mechanism as deterministic and tied to the key — the basis for the
+Whether you understand the partitioning mechanism as deterministic and tied to the key: the basis for the
 almost inevitable next question about ordering.
 
 <RespostaCurta>
-If the message has a key, the default partitioner computes `hash(key) % number_of_partitions` — since the
+If the message has a key, the default partitioner computes `hash(key) % number_of_partitions`, since the
 hash of the same key is always the same, it consistently lands on the same partition. Without a key, Kafka
 distributes messages across partitions in an approximately uniform way.
 </RespostaCurta>
@@ -33,7 +33,7 @@ distributes messages across partitions in an approximately uniform way.
 <RespostaSenior>
 The producer's partitioner decides this at send time. With a key set, the computation is deterministic:
 `hash(key) % number_of_partitions`, guaranteeing every message with that key always goes to the same
-partition — which preserves relative ordering among messages with the same key. Without a key, recent
+partition, which preserves relative ordering among messages with the same key. Without a key, recent
 versions of the Java client use a *sticky* strategy, grouping batches of messages into one partition at a
 time before rotating, optimizing network batching without compromising overall distribution across
 partitions. You can also provide a custom `Partitioner` for cases where the default distribution logic
@@ -46,12 +46,12 @@ See "Message key and the partitioning decision" in [Chapter 4](/en/kafka/livro/p
 
 <ExemploFinanceiro>
 When publishing events to the `pix.recebido` topic using `contaId` as the key, every event for the same
-account is deterministically routed to the same partition — letting the `saldo-service` process that
+account is deterministically routed to the same partition, letting the `saldo-service` process that
 account's events strictly in the order they occurred.
 </ExemploFinanceiro>
 
 <Pegadinha title='"The partition is chosen randomly on every send"'>
-Even without a key, distribution isn't "purely" random per message — modern client versions use a sticky
+Even without a key, distribution isn't "purely" random per message: modern client versions use a sticky
 strategy that groups messages by batch before rotating partitions, optimizing network throughput. And with
 a key, the choice is always deterministic, never random.
 </Pegadinha>

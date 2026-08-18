@@ -1,13 +1,13 @@
----
+﻿---
 title: "Consumer com Spring Kafka"
-part: "Parte V — Java e Spring Boot"
+part: "Parte V: Java e Spring Boot"
 partOrder: 5
 chapterOrder: 2
 slug: "consumer-com-spring-kafka"
-description: "@KafkaListener na prática — groupId, concurrency, Acknowledgment, desserialização e tratamento de exceções com retry e DLQ."
+description: "@KafkaListener na prática: groupId, concurrency, Acknowledgment, desserialização e tratamento de exceções com retry e DLQ."
 ---
 
-O Capítulo 13 mostrou o lado que publica. Este capítulo mostra o lado que consome — onde a maioria dos
+O Capítulo 13 mostrou o lado que publica. Este capítulo mostra o lado que consome, onde a maioria dos
 conceitos das Partes II a IV (Consumer Group, offset/commit, retry/DLQ, idempotência) se materializa em
 código real.
 
@@ -15,7 +15,7 @@ código real.
 
 <Definicao title="@KafkaListener">
 `@KafkaListener` é a anotação do Spring Kafka que registra um método como consumer de um ou mais tópicos.
-Por trás dela, o Spring Kafka gerencia o ciclo de vida completo do `KafkaConsumer` nativo — poll loop,
+Por trás dela, o Spring Kafka gerencia o ciclo de vida completo do `KafkaConsumer` nativo: poll loop,
 deserialização, e (dependendo da configuração) commit de offset.
 </Definicao>
 
@@ -30,12 +30,12 @@ public class PagamentoEventListener {
 }
 ```
 
-`groupId` define o Consumer Group (Capítulo 6) — se omitido no método, cai no valor padrão de
+`groupId` define o Consumer Group (Capítulo 6); se omitido no método, cai no valor padrão de
 `spring.kafka.consumer.group-id` da aplicação.
 
 ## Concurrency
 
-<Diagrama legenda="Cada partition do tópico é atribuída a exatamente um consumer do Consumer Group — concurrency define quantas threads a própria instância da aplicação registra como consumers adicionais.">
+<Diagrama legenda="Cada partition do tópico é atribuída a exatamente um consumer do Consumer Group; concurrency define quantas threads a própria instância da aplicação registra como consumers adicionais.">
   <ProducerConsumerFlow />
 </Diagrama>
 
@@ -51,7 +51,7 @@ public void processar(PagamentoAprovadoEvent evento) { /* ... */ }
 <Atencao title="Concurrency não ultrapassa o número de partitions">
 `concurrency = "3"` cria 3 threads consumidoras dentro da mesma instância da aplicação, cada uma se
 comportando como um membro adicional do Consumer Group. Configurar `concurrency` maior que o número de
-partitions disponíveis para essa instância cria threads ociosas — o mesmo limite do Capítulo 6 se aplica
+partitions disponíveis para essa instância cria threads ociosas; o mesmo limite do Capítulo 6 se aplica
 aqui, só que dentro de um único processo em vez de entre múltiplos pods.
 </Atencao>
 
@@ -71,15 +71,15 @@ public void processar(PagamentoAprovadoEvent evento, Acknowledgment ack) {
 ```
 
 Isso exige, na configuração do `ContainerFactory`, `enable.auto.commit=false` e `AckMode.MANUAL` (ou
-`MANUAL_IMMEDIATE`) — o padrão discutido no Capítulo 7, aqui aplicado em código: `ack.acknowledge()` só é
+`MANUAL_IMMEDIATE`), o padrão discutido no Capítulo 7, aqui aplicado em código: `ack.acknowledge()` só é
 chamado depois que a lógica de negócio (aqui, o envio da notificação) termina com sucesso.
 
 ## Desserialização
 
-O `value-deserializer` configurado (JSON, Avro, Protobuf — espelhando a escolha do producer no
+O `value-deserializer` configurado (JSON, Avro, Protobuf, espelhando a escolha do producer no
 Capítulo 13) converte o payload bruto de volta para o tipo Java esperado pelo método do listener. Uma
 incompatibilidade de schema entre o que o producer serializou e o que o consumer espera desserializar é uma
-fonte comum de erro **permanente** (Capítulo 9) — a mensagem nunca vai desserializar corretamente, não
+fonte comum de erro **permanente** (Capítulo 9): a mensagem nunca vai desserializar corretamente, não
 importa quantas vezes seja tentada.
 
 ## Tratamento de exceções: retry e DLQ na prática
@@ -96,11 +96,11 @@ public DefaultErrorHandler errorHandler(KafkaTemplate<Object, Object> template) 
 
 Esse `DefaultErrorHandler`, registrado no `ContainerFactory`, implementa exatamente o padrão do Capítulo 9:
 tentativas com backoff exponencial e, ao esgotá-las, publicação automática no tópico de DLQ (por convenção,
-`<topico>.DLT`) via `DeadLetterPublishingRecoverer` — sem que o método do listener precise tratar isso
+`<topico>.DLT`) via `DeadLetterPublishingRecoverer`, sem que o método do listener precise tratar isso
 manualmente.
 
 <Pegadinha title='"Uma exceção não tratada no listener derruba a aplicação"'>
-Uma exceção lançada dentro do método `@KafkaListener` não derruba a aplicação — ela é capturada pelo
+Uma exceção lançada dentro do método `@KafkaListener` não derruba a aplicação: ela é capturada pelo
 container do Spring Kafka e encaminhada ao `ErrorHandler` configurado (retry, depois DLQ). O erro real de
 não configurar um `ErrorHandler` adequado não é a aplicação cair, é o comportamento padrão (retry
 indefinido, ou log genérico) não ser o que o time espera para aquele fluxo de negócio.
@@ -108,7 +108,7 @@ indefinido, ou log genérico) não ser o que o time espera para aquele fluxo de 
 
 ## Idempotência no consumer
 
-Todo o cuidado de commit manual e retry não substitui a idempotência (Capítulo 11) — eles resolvem
+Todo o cuidado de commit manual e retry não substitui a idempotência (Capítulo 11): eles resolvem
 *quando* o offset avança e *o que fazer* quando o processamento falha, não *o que acontece* se a mesma
 mensagem for entregue duas vezes.
 
@@ -137,7 +137,7 @@ com `groupId` explícito, `AckMode.MANUAL` com `Acknowledgment.acknowledge()` ap
 <DicaEntrevista>
 Se o entrevistador pedir para "desenhar" um consumer completo, monte a resposta nessa ordem: listener e
 group, ack manual, error handler com retry/DLQ, idempotência. Essa sequência espelha exatamente a jornada
-dos Capítulos 6 a 11 — e mostra que os conceitos se conectam, não são tópicos isolados.
+dos Capítulos 6 a 11, e mostra que os conceitos se conectam, não são tópicos isolados.
 </DicaEntrevista>
 
 ## Relação com sistemas reais
@@ -154,7 +154,7 @@ transação do crédito. O resultado: nenhuma mensagem perdida (at-least-once), 
 adicionais dentro da instância, limitadas pelo número de partitions disponíveis. `Acknowledgment` viabiliza
 commit manual após o processamento. `DefaultErrorHandler` com `DeadLetterPublishingRecoverer` implementa
 retry com backoff e DLQ declarativamente. Nenhum desses mecanismos substitui a checagem de idempotência via
-`eventId` na mesma transação do efeito de negócio — eles são complementares, não alternativos.
+`eventId` na mesma transação do efeito de negócio: eles são complementares, não alternativos.
 </Resumo>
 
 <PerguntaDerivada>

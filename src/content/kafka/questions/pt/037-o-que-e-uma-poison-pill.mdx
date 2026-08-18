@@ -21,7 +21,7 @@ quiz:
 
 ## O que o entrevistador quer avaliar
 
-Se você entende a consequência prática de não ter uma estratégia de retry limitado + DLQ — o cenário real
+Se você entende a consequência prática de não ter uma estratégia de retry limitado + DLQ: o cenário real
 que esses mecanismos existem para prevenir.
 
 <RespostaCurta>
@@ -34,9 +34,9 @@ para as seguintes.
 O efeito poison pill acontece quando um consumer trata todo erro como transitório e tenta reprocessar
 indefinidamente, sem limite de tentativas nem estratégia de isolamento. Como o consumer não avança o offset
 enquanto a mensagem não é processada com sucesso, todas as mensagens seguintes daquela partition ficam
-paradas atrás dela — mesmo sendo mensagens completamente saudáveis e não relacionadas ao problema. A
+paradas atrás dela, mesmo sendo mensagens completamente saudáveis e não relacionadas ao problema. A
 prevenção é exatamente o padrão do Capítulo 9: distinguir erro transitório de permanente, limitar o número
-de tentativas de retry, e mover a mensagem para uma DLQ quando esse limite é atingido — permitindo que o
+de tentativas de retry, e mover a mensagem para uma DLQ quando esse limite é atingido, permitindo que o
 consumer avance e continue processando as mensagens seguintes.
 </RespostaSenior>
 
@@ -52,7 +52,7 @@ partition, mesmo que eles estivessem perfeitamente válidos.
 
 <Pegadinha title='"Poison pill é um problema raro que não vale a pena prevenir"'>
 Basta um bug de serialização, um campo nulo inesperado, ou uma regra de negócio mal tratada para criar esse
-cenário — é comum o suficiente para justificar sempre configurar limite de retry e DLQ em qualquer consumer
+cenário: é comum o suficiente para justificar sempre configurar limite de retry e DLQ em qualquer consumer
 de produção, não apenas nos "críticos".
 </Pegadinha>
 

@@ -91,7 +91,7 @@ function validateContentType(tech: ContentTech, { label, dirName, schema }: Cont
       if (slugsSeen.has(slug)) {
         hasErrors = true;
         console.error(
-          `\n[SLUG DUPLICADO] ${relDir}/${locale}/${file} — slug "${slug}" já usado por outro arquivo.`,
+          `\n[SLUG DUPLICADO] ${relDir}/${locale}/${file}: slug "${slug}" já usado por outro arquivo.`,
         );
       }
       slugsSeen.add(slug);
@@ -101,7 +101,7 @@ function validateContentType(tech: ContentTech, { label, dirName, schema }: Cont
         if (!knownChapterSlugs[tech][locale].has(chapterSlug)) {
           hasErrors = true;
           console.error(
-            `\n[LINK QUEBRADO] ${relDir}/${locale}/${file} — relatedChapters aponta para capítulo inexistente: "${chapterSlug}"`,
+            `\n[LINK QUEBRADO] ${relDir}/${locale}/${file}: relatedChapters aponta para capítulo inexistente: "${chapterSlug}"`,
           );
         }
       }
@@ -120,7 +120,7 @@ function validateContentType(tech: ContentTech, { label, dirName, schema }: Cont
         if ((section === "livro" || section === "glossario") && !locSlugs.has(targetSlug!)) {
           hasErrors = true;
           console.error(
-            `\n[LINK QUEBRADO] ${relDir}/${locale}/${file} — link para "${section}" inexistente: "/${linkLocale}/${linkTech}/${section}/${targetSlug}"`,
+            `\n[LINK QUEBRADO] ${relDir}/${locale}/${file}: link para "${section}" inexistente: "/${linkLocale}/${linkTech}/${section}/${targetSlug}"`,
           );
         }
       }

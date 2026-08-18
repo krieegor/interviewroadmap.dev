@@ -1,20 +1,20 @@
----
+﻿---
 title: "Producer com Spring Kafka"
-part: "Parte V — Java e Spring Boot"
+part: "Parte V: Java e Spring Boot"
 partOrder: 5
 chapterOrder: 1
 slug: "producer-com-spring-kafka"
-description: "KafkaTemplate na prática — topic, key, value, serialização, callbacks, headers e correlationId."
+description: "KafkaTemplate na prática: topic, key, value, serialização, callbacks, headers e correlationId."
 ---
 
 Os capítulos anteriores explicaram conceitos que valem para qualquer client Kafka. A partir daqui, a Parte V
-mostra como esses conceitos aparecem em código Java real, usando Spring Kafka — começando pelo lado que
+mostra como esses conceitos aparecem em código Java real, usando Spring Kafka, começando pelo lado que
 publica eventos.
 
 ## KafkaTemplate
 
 <Definicao title="KafkaTemplate">
-`KafkaTemplate<K, V>` é a abstração do Spring Kafka para publicar mensagens — o equivalente, para produção
+`KafkaTemplate<K, V>` é a abstração do Spring Kafka para publicar mensagens: o equivalente, para produção
 de eventos, do `JdbcTemplate` para acesso a banco. Ele encapsula o `KafkaProducer` nativo do client Java,
 expondo uma API mais simples e integrada ao restante do Spring (injeção de dependência, propriedades de
 configuração, métricas).
@@ -38,14 +38,14 @@ public class PagamentoEventPublisher {
 
 ## Topic, Key e Value
 
-O `send` mais comum recebe três argumentos: o tópico, a key (Capítulo 4 — decide a partition de destino e a
+O `send` mais comum recebe três argumentos: o tópico, a key (Capítulo 4, que decide a partition de destino e a
 ordenação relativa) e o value (o payload do evento). Overloads com dois argumentos (`send(topic, value)`)
 publicam sem key, sujeitos à distribuição aproximadamente uniforme entre partitions.
 
 <Atencao title="Nunca esqueça a key em eventos que exigem ordenação">
 Um refactor que remove a key "para simplificar o código" silenciosamente destrói a ordenação relativa entre
 eventos da mesma entidade (Capítulo 4). Trate a key como parte do contrato do tópico, documentada junto com
-ele — não como um detalhe implícito do código do producer.
+ele, não como um detalhe implícito do código do producer.
 </Atencao>
 
 ## Serialização
@@ -56,7 +56,7 @@ O Spring Kafka delega a serialização de key e value a classes `Serializer<T>` 
 <Comparacao title="Estratégias de serialização">
 | Formato | Característica |
 |---|---|
-| JSON (`JsonSerializer`) | Simples, legível, mas sem verificação de schema — mudanças incompatíveis só quebram em runtime |
+| JSON (`JsonSerializer`) | Simples, legível, mas sem verificação de schema; mudanças incompatíveis só quebram em runtime |
 | Avro (com Schema Registry) | Schema versionado e compatibilidade verificada em build/publish time; payload binário compacto |
 | Protobuf | Similar ao Avro em garantias de schema, com forte tipagem no Java gerado a partir do `.proto` |
 </Comparacao>
@@ -67,7 +67,7 @@ real de quebra entre serviços de times diferentes.
 
 ## Callbacks: tratando o resultado do envio
 
-`send()` é assíncrono — retorna um `CompletableFuture<SendResult<K, V>>` imediatamente, sem esperar a
+`send()` é assíncrono: retorna um `CompletableFuture<SendResult<K, V>>` imediatamente, sem esperar a
 confirmação do broker. Ignorar esse retorno significa não saber se a publicação teve sucesso.
 
 <Diagrama legenda="KafkaTemplate.send() é assíncrono; o resultado chega via callback, onSuccess com o SendResult ou onFailure com a exceção.">
@@ -86,7 +86,7 @@ kafkaTemplate.send("pagamentos.aprovados", evento.getContaId(), evento)
 ```
 
 <Pegadinha title='"Chamei o send(), então o evento foi publicado"'>
-Chamar `send()` apenas enfileira a mensagem para envio assíncrono — não garante que ela chegou ao broker.
+Chamar `send()` apenas enfileira a mensagem para envio assíncrono; não garante que ela chegou ao broker.
 Sem tratar o callback (ou usar `.get()` de forma síncrona, com o custo de latência que isso implica), falhas
 de publicação passam silenciosamente despercebidas, exatamente o cenário de dual write discutido no
 Capítulo 12.
@@ -94,7 +94,7 @@ Capítulo 12.
 
 ## Headers e correlationId
 
-Além de key e value, uma mensagem Kafka carrega **headers** — metadados arbitrários, tipicamente usados para
+Além de key e value, uma mensagem Kafka carrega **headers**: metadados arbitrários, tipicamente usados para
 rastreabilidade e integração entre serviços, sem poluir o payload de negócio.
 
 ```java
@@ -108,23 +108,23 @@ kafkaTemplate.send(record);
 <DicaEntrevista>
 Mencionar `correlationId` propagado via headers demonstra conhecimento prático de observabilidade em
 sistemas distribuídos: ele permite rastrear uma requisição desde a chamada HTTP original, passando pelo
-evento Kafka, até os consumers que o processam — essencial para debugar um fluxo que atravessa múltiplos
+evento Kafka, até os consumers que o processam, essencial para debugar um fluxo que atravessa múltiplos
 serviços (aprofundado no Capítulo 15).
 </DicaEntrevista>
 
 ## Tratamento de falhas do producer
 
 Falhas de publicação se dividem nas mesmas categorias do Capítulo 9: transitórias (broker temporariamente
-indisponível — o client Kafka já faz retry automático internamente, configurável via `retries` e
+indisponível; o client Kafka já faz retry automático internamente, configurável via `retries` e
 `delivery.timeout.ms`) e permanentes (mensagem maior que `max.request.size`, serialização que lança
-exceção). O callback `onFailure` é o lugar certo para logar, alertar, ou — em casos críticos — persistir a
+exceção). O callback `onFailure` é o lugar certo para logar, alertar, ou (em casos críticos) persistir a
 mensagem falha para reenvio manual, já que o `send()` não bloqueia a aplicação esperando esse resultado.
 
 ## Como aparece em entrevistas
 
 "Como você garantiria que um evento foi publicado com sucesso no Kafka?" é a pergunta prática mais comum
 sobre producer. A resposta esperada cita o retorno assíncrono do `send()`, o tratamento do callback (não
-apenas chamar e seguir em frente), e — para o cenário de consistência com banco de dados — o outbox pattern
+apenas chamar e seguir em frente), e (para o cenário de consistência com banco de dados) o outbox pattern
 do Capítulo 12, já que nenhum callback de producer resolve o problema de dual write sozinho.
 
 ## Relação com sistemas reais
@@ -132,7 +132,7 @@ do Capítulo 12, já que nenhum callback de producer resolve o problema de dual 
 <ExemploFinanceiro title="Publicando compra autorizada com rastreabilidade">
 O `autorizacao-service`, ao aprovar uma compra no cartão, publica o evento `CompraAutorizada` usando
 `cartaoId` como key (ordenação por cartão, Capítulo 4), propaga o `correlationId` da requisição HTTP
-original via header, e trata o callback do `send()` registrando uma métrica de falha de publicação — que
+original via header, e trata o callback do `send()` registrando uma métrica de falha de publicação, que
 alimenta um alerta se a taxa de falha ultrapassar um limiar (Capítulo 15).
 </ExemploFinanceiro>
 
@@ -141,7 +141,7 @@ alimenta um alerta se a taxa de falha ultrapassar um limiar (Capítulo 15).
 assíncrona, retornando um `CompletableFuture` que deve ser tratado via callback para saber se a publicação
 teve sucesso. Serialização (JSON, Avro, Protobuf) e headers (como `correlationId`, para rastreabilidade)
 completam o contrato de uma publicação bem-feita. Nenhum desses mecanismos, isoladamente, resolve
-consistência com o banco de dados — para isso, o padrão é o outbox (Capítulo 12).
+consistência com o banco de dados; para isso, o padrão é o outbox (Capítulo 12).
 </Resumo>
 
 <PerguntaDerivada>

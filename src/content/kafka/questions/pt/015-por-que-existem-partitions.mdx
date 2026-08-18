@@ -21,7 +21,7 @@ quiz:
 
 ## O que o entrevistador quer avaliar
 
-Se você entende a motivação por trás das partitions, não só a definição — essa pergunta costuma vir logo
+Se você entende a motivação por trás das partitions, não só a definição; essa pergunta costuma vir logo
 depois de "o que é uma partition", testando se o candidato entende o "porquê", não decorou o "o quê".
 
 <RespostaCurta>
@@ -31,7 +31,7 @@ significa mais consumers processando em paralelo dentro de um Consumer Group) e 
 </RespostaCurta>
 
 <RespostaSenior>
-Um tópico poderia, em princípio, ser um único log gigante — mas isso limitaria o paralelismo de consumo a
+Um tópico poderia, em princípio, ser um único log gigante, mas isso limitaria o paralelismo de consumo a
 um único fluxo sequencial, não importa quantos consumers fossem adicionados ao grupo. Partitions resolvem
 isso dividindo o tópico em unidades independentes: dentro de um Consumer Group, cada partition é atribuída a
 exatamente um consumer por vez, então o paralelismo de consumo escala com o número de partitions. Do lado da
@@ -45,13 +45,13 @@ Veja "Por que partitions existem" no [Capítulo 4](/pt/kafka/livro/partitions-e-
 
 <ExemploFinanceiro>
 Um tópico de transações de cartão com 1 única partition limitaria o processamento a um único consumer por
-vez, mesmo que o time escalasse o serviço para 10 réplicas — 9 delas ficariam ociosas. Com 10 partitions, as
+vez, mesmo que o time escalasse o serviço para 10 réplicas: 9 delas ficariam ociosas. Com 10 partitions, as
 10 réplicas processam em paralelo de verdade.
 </ExemploFinanceiro>
 
 <Pegadinha title='"Partitions existem só para performance de escrita"'>
-Performance de escrita é metade da resposta. A outra metade — igualmente importante e frequentemente
-esquecida — é paralelismo de consumo: sem partitions, adicionar mais consumers a um Consumer Group não
+Performance de escrita é metade da resposta. A outra metade (igualmente importante e frequentemente
+esquecida) é paralelismo de consumo: sem partitions, adicionar mais consumers a um Consumer Group não
 aumentaria throughput de processamento algum.
 </Pegadinha>
 

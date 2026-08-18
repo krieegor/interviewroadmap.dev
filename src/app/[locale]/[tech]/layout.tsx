@@ -14,7 +14,7 @@ export function generateStaticParams({ params }: { params: { locale: string } })
   return techs.map((tech) => ({ tech }));
 }
 
-// `techs` é um conjunto fechado — ver nota em src/app/[locale]/layout.tsx.
+// `techs` é um conjunto fechado, ver nota em src/app/[locale]/layout.tsx.
 export const dynamicParams = false;
 
 export async function generateMetadata({
@@ -39,13 +39,13 @@ export async function generateMetadata({
       description: techConfig.description,
       imageUrl: techOpengraphImageUrl(siteConfig, rawLocale, rawTech),
     }),
-    // Trilhas "em construção" (ComingSoon) têm conteúdo raso/quase idêntico entre si — não vale a
+    // Trilhas "em construção" (ComingSoon) têm conteúdo raso/quase idêntico entre si: não vale a
     // pena competir por índice de busca até terem conteúdo real (ver techsWithContent).
     ...(!techsWithContent.includes(rawTech) ? { robots: { index: false, follow: true } } : {}),
   };
 }
 
-// Não faz `await params` aqui — fazer isso no corpo do layout impede a pré-renderização estática
+// Não faz `await params` aqui: fazer isso no corpo do layout impede a pré-renderização estática
 // das rotas abaixo dele (segmentos [slug] mais profundos ficam de fora do build). A Promise é
 // repassada intacta pro TechChrome, que é quem de fato precisa dos valores resolvidos.
 export default function TechLayout({

@@ -21,19 +21,19 @@ quiz:
 
 ## O que o entrevistador quer avaliar
 
-Conhecimento fundamental de replicação — geralmente a porta de entrada para perguntas sobre failover e ISR.
+Conhecimento fundamental de replicação: geralmente a porta de entrada para perguntas sobre failover e ISR.
 
 <RespostaCurta>
-O leader de uma partition é o broker que serve todas as leituras e escritas dela — producers e consumers só
+O leader de uma partition é o broker que serve todas as leituras e escritas dela: producers e consumers só
 interagem com o leader. O follower replica continuamente os dados do leader, sem servir clientes
 diretamente, mantendo-se pronto para assumir como novo leader se o atual falhar.
 </RespostaCurta>
 
 <RespostaSenior>
 Cada partition tem exatamente um leader e zero ou mais followers, dependendo do replication factor
-configurado — nunca duas réplicas da mesma partition no mesmo broker, o que anularia a proteção contra a
+configurado; nunca duas réplicas da mesma partition no mesmo broker, o que anularia a proteção contra a
 perda desse broker. Nem todo follower está necessariamente pronto para virar leader a qualquer momento: só
-os que estão no ISR (In-Sync Replicas) — réplicas suficientemente atualizadas com os dados confirmados — são
+os que estão no ISR (In-Sync Replicas), réplicas suficientemente atualizadas com os dados confirmados, são
 elegíveis. Um follower atrasado (por rede lenta, por exemplo) é removido do ISR até se atualizar de novo,
 evitando que uma réplica desatualizada assuma e "esqueça" mensagens já confirmadas a producers.
 </RespostaSenior>
@@ -50,7 +50,7 @@ assumir em caso de falha do broker leader.
 
 <Pegadinha title='"Followers também respondem a requisições de leitura, para balancear carga"'>
 Na configuração padrão do Kafka, apenas o leader serve leituras e escritas de clientes. Followers existem
-exclusivamente para replicação e failover — não é um mecanismo de leitura distribuída como em alguns bancos
+exclusivamente para replicação e failover: não é um mecanismo de leitura distribuída como em alguns bancos
 de dados.
 </Pegadinha>
 

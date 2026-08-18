@@ -5,10 +5,10 @@ slug: "como-monitorar-kafka"
 level: ["senior", "tech-lead"]
 topics: ["observabilidade"]
 relatedChapters: ["observabilidade"]
-shortAnswer: "Combine consumer lag and throughput (capacity), DLQ message rate and error rate (quality), rebalance rate (stability), and structured logs with correlationId (traceability) — never a single isolated metric."
+shortAnswer: "Combine consumer lag and throughput (capacity), DLQ message rate and error rate (quality), rebalance rate (stability), and structured logs with correlationId (traceability), never a single isolated metric."
 quiz:
   options:
-    - "Combine consumer lag and throughput, DLQ message rate and error rate, rebalance rate, and structured logs with correlationId — never a single isolated metric."
+    - "Combine consumer lag and throughput, DLQ message rate and error rate, rebalance rate, and structured logs with correlationId, never a single isolated metric."
     - "Installing Prometheus and Grafana and monitoring the brokers' standard infrastructure metrics is already enough."
     - "Track only the consumers' error rate, since it anticipates any capacity problem before it happens."
     - "A high rebalance rate is always expected in production and usually doesn't indicate a configuration problem."
@@ -21,7 +21,7 @@ quiz:
 
 ## What the interviewer wants to assess
 
-The typical last technical question in a Kafka interview — tests whether the candidate thinks about real
+The typical last technical question in a Kafka interview: it tests whether the candidate thinks about real
 operations, connecting metrics to decisions, not just naming tools.
 
 <RespostaCurta>
@@ -33,7 +33,7 @@ instability), and structured logs with correlationId for cross-service traceabil
 <RespostaSenior>
 No single metric tells the whole story. Growing consumer lag anticipates processing delay before the user
 feels it; low throughput, combined with growing lag, points to consumption capacity being the bottleneck,
-not abnormal production volume. DLQ message rate signals persistent failures that already got past retry —
+not abnormal production volume. DLQ message rate signals persistent failures that already got past retry:
 a quality symptom, not a capacity one. Frequent rebalance rate usually indicates a misconfigured
 `max.poll.interval.ms` or infrastructure instability, not Kafka itself. And structured logs with
 `correlationId`, aggregated in a tool like Kibana or Datadog, let you reconstruct a specific transaction's
@@ -43,11 +43,11 @@ commercial Datadog/New Relic) is an infrastructure decision independent of this 
 
 ## In-depth explanation
 
-See the full chapter — [Observability](/en/kafka/livro/observabilidade).
+See the full chapter: [Observability](/en/kafka/livro/observabilidade).
 
 <ExemploFinanceiro>
 The payments team monitors the `saldo-service`'s consumer lag, the DLQ message rate on the `pix.recebido`
-topic, and propagates `correlationId` from the original HTTP call to every consumer — letting them find,
+topic, and propagates `correlationId` from the original HTTP call to every consumer, letting them find,
 within seconds during an incident, every service that processed a specific PIX.
 </ExemploFinanceiro>
 

@@ -22,7 +22,7 @@ export function setTheme(dark: boolean) {
   try {
     localStorage.setItem(THEME_STORAGE_KEY, dark ? "dark" : "light");
   } catch {
-    // localStorage indisponível — o tema muda apenas para a sessão atual, sem persistência.
+    // localStorage indisponível: o tema muda apenas para a sessão atual, sem persistência.
   }
   for (const listener of listeners) listener();
 }

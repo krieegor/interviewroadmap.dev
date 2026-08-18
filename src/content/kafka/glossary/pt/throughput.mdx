@@ -1,7 +1,7 @@
 ---
 term: "Throughput"
 slug: "throughput"
-shortDefinition: "Volume de mensagens processadas (ou produzidas) por unidade de tempo — a métrica central de capacidade de um pipeline Kafka."
+shortDefinition: "Volume de mensagens processadas (ou produzidas) por unidade de tempo: a métrica central de capacidade de um pipeline Kafka."
 relatedTerms: ["consumer-lag", "partition", "consumer-group"]
 relatedChapters: ["observabilidade"]
 ---
@@ -10,5 +10,5 @@ Throughput mede quantas mensagens um producer consegue publicar, ou um consumer 
 segundo. É a métrica de capacidade que, combinada com consumer lag, diagnostica se um pipeline está saudável:
 throughput de consumo menor que throughput de produção, sustentado ao longo do tempo, é exatamente o que
 faz o consumer lag crescer indefinidamente. Aumentar throughput de consumo geralmente significa aumentar
-paralelismo (mais partitions e consumers, Capítulo 6) ou reduzir o custo de processamento por mensagem —
+paralelismo (mais partitions e consumers, Capítulo 6) ou reduzir o custo de processamento por mensagem;
 raramente ajustar throughput sem entender qual dos dois lados está gargalando.

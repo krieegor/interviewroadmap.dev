@@ -59,7 +59,7 @@ describe("useShouldRender3D", () => {
   it("retorna false sob @media print, mesmo com WebGL disponível e sem reduced motion", () => {
     // Regressão: scripts/generate-pdf.ts gera o PDF do livro via Playwright/Chromium com
     // `page.emulateMedia({ media: "print" })`. O canvas WebGL dos diagramas 3D não sobrevive a essa
-    // captura de impressão (sai em branco, rótulos <Html> do drei somem) — sob @media print o
+    // captura de impressão (sai em branco, rótulos <Html> do drei somem); sob @media print o
     // fallback SVG precisa ser usado mesmo quando o navegador tem WebGL de sobra.
     vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockReturnValue({} as RenderingContext);
     useReducedMotionMock.mockReturnValue(false);

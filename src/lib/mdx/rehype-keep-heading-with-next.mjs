@@ -1,12 +1,12 @@
 // Agrupa cada <h2>/<h3> com o parágrafo <p> imediatamente seguinte num <div> wrapper.
 // Sem esse agrupamento, `break-after: avoid-page` no heading (globals.css) só impede um
-// page-break exatamente entre o heading e o próximo bloco — mas não impede que esse bloco
+// page-break exatamente entre o heading e o próximo bloco, mas não impede que esse bloco
 // comece a ser cortado poucas linhas depois, deixando o título "sozinho" perto do fim da
 // página impressa. O wrapper com `break-inside: avoid-page` (também em globals.css, escopado
 // a `.pdf-book`) faz o Chromium empurrar o par heading+parágrafo inteiro para a página seguinte
 // quando não cabem juntos. Não tem efeito na leitura normal do site (div sem estilo próprio).
 //
-// Só agrupa quando o próximo irmão é um <p> simples — evita empurrar blocos grandes
+// Só agrupa quando o próximo irmão é um <p> simples: evita empurrar blocos grandes
 // (diagramas, listas, componentes MDX customizados) que poderiam deixar buracos em branco
 // piores do que o problema original.
 export default function rehypeKeepHeadingWithNext() {
@@ -37,7 +37,7 @@ function isOwnWrapper(node) {
 
 function visit(node) {
   if (!node || !Array.isArray(node.children)) return;
-  // O wrapper já contém exatamente [heading, parágrafo] adjacentes, sem texto entre eles —
+  // O wrapper já contém exatamente [heading, parágrafo] adjacentes, sem texto entre eles:
   // reprocessar esses filhos recriaria o mesmo wrapper dentro dele mesmo, infinitamente.
   if (isOwnWrapper(node)) return;
 

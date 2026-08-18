@@ -14,14 +14,14 @@ function parseGithubRepo(githubUrl: string): { owner: string; repo: string } | n
 
 // Busca a release mais recente na GitHub API em vez de ler tags via `git` local: builds em provedores
 // de hosting (Vercel/Cloudflare) costumam fazer clone raso sem tags, então `git describe` não é
-// confiável ali. A API não depende da profundidade do clone. Falha "suave" de propósito — network
+// confiável ali. A API não depende da profundidade do clone. Falha "suave" de propósito: network
 // indisponível, API fora do ar ou nenhuma release ainda não deve derrubar o build (mesmo espírito de
 // scripts/generate-pdf.ts pulando o Chromium quando indisponível): o rodapé simplesmente não mostra a
 // versão nessa build.
 async function main() {
   const repo = parseGithubRepo(siteConfig.githubUrl);
   if (!repo) {
-    console.warn(`Não foi possível extrair owner/repo de "${siteConfig.githubUrl}" — pulando versão.`);
+    console.warn(`Não foi possível extrair owner/repo de "${siteConfig.githubUrl}", pulando versão.`);
     return;
   }
 
@@ -31,7 +31,7 @@ async function main() {
       { headers: { Accept: "application/vnd.github+json" }, signal: AbortSignal.timeout(10_000) },
     );
     if (!response.ok) {
-      console.warn(`GitHub API respondeu ${response.status} — pulando versão no rodapé nesta build.`);
+      console.warn(`GitHub API respondeu ${response.status}, pulando versão no rodapé nesta build.`);
       return;
     }
     const data = (await response.json()) as {
@@ -40,7 +40,7 @@ async function main() {
       published_at?: string;
     };
     if (!data.tag_name || !data.html_url || !data.published_at) {
-      console.warn("Resposta da GitHub API sem os campos esperados — pulando versão no rodapé.");
+      console.warn("Resposta da GitHub API sem os campos esperados, pulando versão no rodapé.");
       return;
     }
 
@@ -51,16 +51,16 @@ async function main() {
     );
     console.log(`Versão do site: ${data.tag_name} (public/version.json).`);
   } catch (error) {
-    console.warn("Falha ao buscar a última release no GitHub — pulando versão no rodapé nesta build.");
+    console.warn("Falha ao buscar a última release no GitHub, pulando versão no rodapé nesta build.");
     console.warn(String(error));
   }
 }
 
-// Sem `process.exit()` de propósito — ao contrário de scripts/generate-pdf.ts (que precisa forçar saída
+// Sem `process.exit()` de propósito: ao contrário de scripts/generate-pdf.ts (que precisa forçar saída
 // pra matar o processo filho `serve`), este script não deixa nenhum handle pendente: o Node encerra
 // sozinho assim que a Promise de `main()` resolve. Chamar `process.exit()` logo depois do `fetch` com
 // `AbortSignal.timeout()` derruba o build inteiro no Windows (crash de libuv fechando o timer do
-// AbortSignal no meio do shutdown forçado — confirmado empiricamente).
+// AbortSignal no meio do shutdown forçado, confirmado empiricamente).
 const isMainModule = process.argv[1] ? import.meta.url === pathToFileURL(process.argv[1]).href : false;
 if (isMainModule) {
   void main();

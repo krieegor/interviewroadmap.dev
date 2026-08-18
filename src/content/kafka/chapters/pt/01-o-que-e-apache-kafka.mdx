@@ -1,6 +1,6 @@
----
+﻿---
 title: "O que é Apache Kafka?"
-part: "Parte I — Fundamentos"
+part: "Parte I: Fundamentos"
 partOrder: 1
 chapterOrder: 1
 slug: "o-que-e-apache-kafka"
@@ -9,7 +9,7 @@ description: "Origem, contexto, o problema que o Kafka resolve e por que ele nã
 
 Antes de entrar em Producer, Broker ou Partition, vale resolver uma pergunta que a maioria dos
 desenvolvedores nunca para para responder com precisão: **por que o Kafka existe?** Se você não consegue
-justificar a existência de uma peça de infraestrutura, também não consegue justificar quando usá-la — e é
+justificar a existência de uma peça de infraestrutura, também não consegue justificar quando usá-la, e é
 exatamente esse tipo de julgamento que uma entrevista sênior tenta medir.
 
 ## O problema antes do Kafka
@@ -21,11 +21,11 @@ uma nova chamada síncrona, um novo ponto de falha e um novo acoplamento direto 
 
 Imagine um evento de "pagamento aprovado" em um banco digital. Hoje ele pode interessar a: notificação push,
 antifraude, cashback, contabilidade, analytics e atualização de limite de crédito. Se o serviço de pagamentos
-chamar cada um desses via HTTP síncrono, ele passa a depender da disponibilidade de todos eles — e a
+chamar cada um desses via HTTP síncrono, ele passa a depender da disponibilidade de todos eles, e
 adicionar um sétimo consumidor exige alterar o código do serviço de pagamentos novamente.
 
 <Atencao title="Não é só sobre performance">
-  O problema central não é volume de requisições — é **acoplamento**. Um sistema em que o produtor
+  O problema central não é volume de requisições: é **acoplamento**. Um sistema em que o produtor
   de um evento precisa conhecer todos os seus consumidores não escala organizacionalmente, mesmo que
   escale em throughput.
 </Atencao>
@@ -45,7 +45,7 @@ consomem **eventos** através de um log distribuído compartilhado.
 </Definicao>
 
 Isso é diferente de simplesmente "enviar uma mensagem". Um evento não é um comando ("processe este boleto");
-é uma afirmação sobre algo que já ocorreu. O produtor não sabe — e não precisa saber — quem vai consumir o
+é uma afirmação sobre algo que já ocorreu. O produtor não sabe (e não precisa saber) quem vai consumir o
 evento nem o que cada consumidor vai fazer com ele. Essa inversão é a base da arquitetura orientada a
 eventos (_event-driven architecture_): o sistema de pagamentos publica "pagamento aprovado" e segue em
 frente; antifraude, notificação e contabilidade descobrem esse fato de forma assíncrona, cada um na sua
@@ -54,7 +54,7 @@ velocidade.
 ## Kafka como log distribuído
 
 Tecnicamente, o Kafka é implementado como um **log distribuído, particionado e replicado**. "Log" aqui não é
-log de aplicação — é a estrutura de dados: uma sequência ordenada e imutável de registros, cada um
+log de aplicação, é a estrutura de dados: uma sequência ordenada e imutável de registros, cada um
 identificado por uma posição crescente (o _offset_). Novos eventos são sempre anexados ao final; nada é
 alterado in-place.
 
@@ -67,23 +67,23 @@ uma fila tradicional:
 
 1. **Múltiplos consumidores independentes** podem ler o mesmo conjunto de eventos, cada um mantendo sua
    própria posição de leitura (offset), sem que a leitura de um afete a do outro.
-2. **Retenção configurável** significa que o evento continua disponível no log depois de consumido — um novo
+2. **Retenção configurável** significa que o evento continua disponível no log depois de consumido. Um novo
    serviço pode nascer amanhã e ler o histórico completo de "pagamento aprovado" dos últimos 7 dias sem que
    o sistema de pagamentos precise reenviar nada.
 
 ## Kafka não é apenas uma fila
 
-Essa é provavelmente a comparação mais repetida — e mais incompleta — sobre Kafka.
+Essa é provavelmente a comparação mais repetida (e mais incompleta) sobre Kafka.
 
 <Pegadinha title='"Kafka é uma fila só que mais rápida"'>
   Essa afirmação ignora a diferença estrutural mais importante: em uma fila clássica (RabbitMQ,
-  SQS), uma mensagem consumida normalmente **sai da fila** — ela existe para ser entregue uma vez e
+  SQS), uma mensagem consumida normalmente **sai da fila**: ela existe para ser entregue uma vez e
   desaparecer. No Kafka, consumir um evento não o remove do log; ele continua lá até a política de
   retenção expirá-lo, independentemente de quantos consumidores já o leram.
 </Pegadinha>
 
-Uma fila modela **trabalho a ser distribuído** — cada item deve ser processado por exatamente um worker. O
-Kafka modela **fatos a serem compartilhados** — o mesmo evento pode (e geralmente deve) ser lido por vários
+Uma fila modela **trabalho a ser distribuído**: cada item deve ser processado por exatamente um worker. O
+Kafka modela **fatos a serem compartilhados**: o mesmo evento pode (e geralmente deve) ser lido por vários
 sistemas diferentes, cada um com sua própria interpretação do fato. É possível usar Kafka para distribuir
 trabalho (é isso que um Consumer Group faz dentro de uma partition), mas reduzir o Kafka a isso é perder a
 metade do motivo pelo qual ele foi desenhado.
@@ -95,22 +95,22 @@ metade do motivo pelo qual ele foi desenhado.
   reconstruir um estado (ex.: reindexar um Elasticsearch a partir do histórico de eventos).
 - O volume e a taxa de eventos são altos o suficiente para que acoplamento síncrono se torne um risco de
   disponibilidade (um serviço fora do ar não pode travar os demais).
-- Você quer desacoplar produtores de consumidores no nível organizacional — times diferentes evoluindo seus
+- Você quer desacoplar produtores de consumidores no nível organizacional: times diferentes evoluindo seus
   serviços sem coordenar deploys.
 
 ## Quando não utilizar
 
 - Comunicação estritamente request/response, onde quem chama precisa de uma resposta imediata (ex.:
-  autorizar uma transação de cartão em tempo real de ponta a ponta) — isso é papel de uma chamada síncrona
+  autorizar uma transação de cartão em tempo real de ponta a ponta); isso é papel de uma chamada síncrona
   (HTTP/gRPC), não de um evento assíncrono.
 - Sistemas pequenos, com poucos serviços e baixo volume, onde a complexidade operacional de um cluster Kafka
   não se paga. Uma fila simples ou até chamadas diretas resolvem com menos esforço.
-- Quando a equipe não tem — e não vai construir — a maturidade operacional mínima para lidar com um sistema
+- Quando a equipe não tem (e não vai construir) a maturidade operacional mínima para lidar com um sistema
   distribuído com estado (monitoramento de lag, gestão de partições, upgrades de cluster).
 
 ## Limitações
 
-- Kafka **não garante ordenação global** entre partitions — apenas dentro de uma mesma partition (voltamos a
+- Kafka **não garante ordenação global** entre partitions: apenas dentro de uma mesma partition (voltamos a
   isso no Capítulo 4).
 - Não é um banco de dados transacional; embora suporte transações (Capítulo 12), ele não substitui um banco
   relacional para consultas ad-hoc sobre o estado atual.
@@ -120,15 +120,15 @@ metade do motivo pelo qual ele foi desenhado.
 ## Como aparece em entrevistas
 
 Praticamente toda entrevista sobre Kafka começa com uma variação de "o que é Kafka" ou "por que usar Kafka
-em vez de uma fila". O entrevistador não quer a definição de dicionário — quer ver se você entende o
+em vez de uma fila". O entrevistador não quer a definição de dicionário: quer ver se você entende o
 problema de acoplamento que motivou a criação da ferramenta e se você sabe diferenciar "fila de trabalho" de
 "log de eventos compartilhado". Respostas que citam apenas "alta performance" ou "processa muitos dados"
 soam decoradas e raramente convencem.
 
 <DicaEntrevista>
-  Estruture a resposta em três passos: (1) o problema — acoplamento entre produtores e múltiplos
-  consumidores; (2) a solução — log distribuído e imutável, com múltiplos consumidores
-  independentes; (3) a consequência — replay, desacoplamento organizacional e a diferença
+  Estruture a resposta em três passos: (1) o problema: acoplamento entre produtores e múltiplos
+  consumidores; (2) a solução: log distribuído e imutável, com múltiplos consumidores
+  independentes; (3) a consequência: replay, desacoplamento organizacional e a diferença
   fundamental em relação a uma fila.
 </DicaEntrevista>
 
@@ -145,7 +145,7 @@ contabilidade.
 
 <ExemploFinanceiro title="PIX recebido, sem Kafka vs. com Kafka">
   Sem um log de eventos, o serviço que recebe a confirmação de um PIX precisaria chamar diretamente
-  o serviço de saldo, o de notificação push, o de extrato e o de antifraude — de forma síncrona ou
+  o serviço de saldo, o de notificação push, o de extrato e o de antifraude, de forma síncrona ou
   com uma fila dedicada para cada um. Com Kafka, ele publica um único evento `PixRecebido` em um
   tópico; saldo, notificação, extrato e antifraude consomem esse mesmo evento de forma independente,
   cada um no seu próprio Consumer Group, sem que o serviço de recebimento do PIX saiba que eles
@@ -155,7 +155,7 @@ contabilidade.
 <Resumo>
   Kafka resolve o problema de acoplamento entre um produtor de eventos e múltiplos consumidores
   independentes, através de um log distribuído, particionado e replicado, onde eventos são anexados
-  e retidos por um período configurável — não removidos ao serem consumidos. Isso o torna
+  e retidos por um período configurável, não removidos ao serem consumidos. Isso o torna
   estruturalmente diferente de uma fila tradicional, que modela distribuição de trabalho, não
   compartilhamento de fatos.
 </Resumo>

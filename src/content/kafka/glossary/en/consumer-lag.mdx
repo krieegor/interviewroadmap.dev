@@ -1,7 +1,7 @@
 ---
 term: "Consumer Lag"
 slug: "consumer-lag"
-shortDefinition: "The gap between the latest offset produced on a partition and the offset committed by the consumer — how far behind the consumer is."
+shortDefinition: "The gap between the latest offset produced on a partition and the offset committed by the consumer: how far behind the consumer is."
 relatedTerms: ["offset", "consumer-group", "throughput"]
 relatedChapters: ["observabilidade"]
 ---
@@ -9,6 +9,6 @@ relatedChapters: ["observabilidade"]
 Consumer lag is the most important metric for knowing whether a Consumer Group is keeping up with a
 topic's production rate. Calculated per partition as `log end offset - committed offset`, it represents how
 many messages have already been written but not yet processed. Zero lag means the consumer is caught up;
-lag that grows over time indicates the consumer is processing slower than the producer is writing — a sign
+lag that grows over time indicates the consumer is processing slower than the producer is writing: a sign
 you need to investigate processing throughput, increase parallelism (more partitions and consumers, Chapter
 6), or optimize the consumer's code.

@@ -26,7 +26,7 @@ risco (perda ou duplicidade) o sistema está disposto a aceitar.
 
 <RespostaCurta>
 Auto commit (`enable.auto.commit=true`) faz o client comitar offsets automaticamente em um intervalo
-periódico, sem relação direta com o término do processamento — pode comitar uma mensagem cujo processamento
+periódico, sem relação direta com o término do processamento: pode comitar uma mensagem cujo processamento
 ainda está em andamento ou até falhou. Commit manual (`enable.auto.commit=false` com `AckMode.MANUAL`) exige
 que a aplicação chame `acknowledgment.acknowledge()` explicitamente, tipicamente só depois que o
 processamento terminou com sucesso.
@@ -36,10 +36,10 @@ processamento terminou com sucesso.
 A diferença real está no risco que cada abordagem assume. Auto commit tende ao cenário de perda de
 mensagem: se o consumer cair entre o commit automático (que já aconteceu) e o fim real do processamento, essa
 mensagem é considerada processada pelo Kafka sem ter sido, de fato, processada com sucesso. Commit manual,
-feito estrategicamente depois que o processamento confirma sucesso, elimina esse risco de perda — mas ainda
+feito estrategicamente depois que o processamento confirma sucesso, elimina esse risco de perda, mas ainda
 permite duplicidade: se o consumer cair entre o fim do processamento e o commit em si, a mensagem será
 reentregue no próximo início. Por isso, em sistemas financeiros, prefiro sempre commit manual combinado com
-processamento idempotente (Capítulo 11) — aceito duplicidade controlada em vez de arriscar perda
+processamento idempotente (Capítulo 11): aceito duplicidade controlada em vez de arriscar perda
 silenciosa.
 </RespostaSenior>
 
@@ -49,7 +49,7 @@ Veja "Os riscos de cada abordagem" no [Capítulo 7](/pt/kafka/livro/offset-e-com
 
 <ExemploFinanceiro>
 Um consumer com auto commit processando pagamentos, se cair logo após um commit automático mas antes de
-persistir o resultado no banco, perde esse pagamento silenciosamente — sem log de erro, sem exceção, porque
+persistir o resultado no banco, perde esse pagamento silenciosamente, sem log de erro, sem exceção, porque
 do ponto de vista do Kafka a mensagem já foi processada.
 </ExemploFinanceiro>
 

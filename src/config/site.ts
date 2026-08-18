@@ -17,7 +17,7 @@ const shared = {
   contributors: [{ name: author.name, url: author.github }],
 };
 
-// Identidade da plataforma (interviewroadmap.dev) — nível acima de qualquer trilha específica.
+// Identidade da plataforma (interviewroadmap.dev), num nível acima de qualquer trilha específica.
 // Nome/descrição por trilha (Kafka, Java, Elastic) vivem em src/config/tech.ts.
 const localizedSiteConfig = {
   pt: {

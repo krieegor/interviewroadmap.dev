@@ -26,7 +26,7 @@ about which risk (loss or duplication) the system is willing to accept.
 
 <RespostaCurta>
 Auto commit (`enable.auto.commit=true`) makes the client automatically commit offsets on a periodic
-interval, with no direct relation to when processing finishes — it can commit a message whose processing
+interval, with no direct relation to when processing finishes: it can commit a message whose processing
 is still in progress or even failed. Manual commit (`enable.auto.commit=false` with `AckMode.MANUAL`)
 requires the application to explicitly call `acknowledgment.acknowledge()`, typically only after
 processing finished successfully.
@@ -37,9 +37,9 @@ The real difference is in the risk each approach accepts. Auto commit tends towa
 scenario: if the consumer crashes between the automatic commit (which already happened) and the actual end
 of processing, that message is considered processed by Kafka without having actually been processed
 successfully. Manual commit, done strategically after processing confirms success, eliminates that loss
-risk — but still allows duplication: if the consumer crashes between the end of processing and the commit
+risk, but still allows duplication: if the consumer crashes between the end of processing and the commit
 itself, the message will be redelivered on the next startup. That's why, in financial systems, I always
-prefer manual commit combined with idempotent processing (Chapter 11) — accepting controlled duplication
+prefer manual commit combined with idempotent processing (Chapter 11), accepting controlled duplication
 instead of risking silent loss.
 </RespostaSenior>
 
@@ -49,7 +49,7 @@ See "The risks of each approach" in [Chapter 7](/en/kafka/livro/offset-e-commit)
 
 <ExemploFinanceiro>
 A consumer with auto commit processing payments, if it crashes right after an automatic commit but before
-persisting the result to the database, silently loses that payment — with no error log, no exception,
+persisting the result to the database, silently loses that payment, with no error log, no exception,
 because from Kafka's point of view the message was already processed.
 </ExemploFinanceiro>
 

@@ -5,7 +5,7 @@ slug: "o-que-e-idempotencia"
 level: ["pleno", "senior"]
 topics: ["confiabilidade"]
 relatedChapters: ["idempotencia"]
-shortAnswer: "Idempotency is the property of a process that produces the same final effect, even if executed more than once with the same input — the complementary requirement to At Least Once."
+shortAnswer: "Idempotency is the property of a process that produces the same final effect, even if executed more than once with the same input: the complementary requirement to At Least Once."
 quiz:
   options:
     - "The property of a process that produces the same final effect even when executed more than once with the same input, complementing the At Least Once guarantee."
@@ -22,31 +22,31 @@ quiz:
 ## What the interviewer wants to assess
 
 Whether you understand idempotency as a structural requirement (not a "quality extra") whenever the
-delivery guarantee is At Least Once — the one most used in practice.
+delivery guarantee is At Least Once, the one most used in practice.
 
 <RespostaCurta>
 Idempotency is the ability to process the same event multiple times without producing duplicated side
-effects — the balance is credited once, the email is sent once, even if the message is delivered two or
+effects: the balance is credited once, the email is sent once, even if the message is delivered two or
 more times.
 </RespostaCurta>
 
 <RespostaSenior>
 At Least Once (Chapter 10) guarantees no message is lost, accepting as the price that it may be delivered
-more than once — after a rebalance, a commit retry, or a failure between the end of processing and the
+more than once, after a rebalance, a commit retry, or a failure between the end of processing and the
 offset commit. A consumer that doesn't handle this duplicates effects in production. The most robust
 implementation uses a unique event identifier (`eventId`) and a database uniqueness constraint, checked
-and applied **in the same transaction** that executes the business effect — not in a separate upfront
+and applied **in the same transaction** that executes the business effect, not in a separate upfront
 check, which would introduce a race condition under concurrency.
 </RespostaSenior>
 
 ## In-depth explanation
 
-See the full chapter — [Idempotency](/en/kafka/livro/idempotencia).
+See the full chapter: [Idempotency](/en/kafka/livro/idempotencia).
 
 <ExemploFinanceiro>
 The `saldo-service` keeps a `processed_events` table with a uniqueness constraint on `eventId`. Before
 crediting a PIX, it tries to insert the `eventId`; if it fails due to a uniqueness violation, the event has
-already been processed and the operation is safely skipped — all within the same database transaction.
+already been processed and the operation is safely skipped, all within the same database transaction.
 </ExemploFinanceiro>
 
 <Pegadinha title='"I check whether the eventId already exists before processing"'>

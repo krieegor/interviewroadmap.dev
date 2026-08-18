@@ -22,7 +22,7 @@ const LABELS: RetryDlqLabels = {
   dlqSub: "manual investigation",
 };
 
-const STEP_LABELS = ["Tries to process", "Retry with backoff", "Exhausted — goes to DLQ"];
+const STEP_LABELS = ["Tries to process", "Retry with backoff", "Exhausted, goes to DLQ"];
 const AUTOPLAY_INTERVAL_MS = 4500;
 
 export function RetryDlqDiagramEnSvg() {
@@ -204,7 +204,7 @@ export function RetryDlqDiagramEnSvg() {
         textAnchor="middle"
         className="fill-[var(--color-text-muted)] text-[11px]"
       >
-        The rest of the main topic&apos;s messages keep being processed normally —
+        The rest of the main topic&apos;s messages keep being processed normally.
       </text>
       <text
         x="300"
@@ -212,7 +212,7 @@ export function RetryDlqDiagramEnSvg() {
         textAnchor="middle"
         className="fill-[var(--color-text-muted)] text-[11px]"
       >
-        the problematic message doesn&apos;t block the partition (no poison pill effect).
+        The problematic message doesn&apos;t block the partition (no poison pill effect).
       </text>
     </svg>
   );

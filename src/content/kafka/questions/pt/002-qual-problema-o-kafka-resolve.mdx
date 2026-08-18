@@ -28,13 +28,13 @@ ele resolve.
 <RespostaCurta>
   Kafka resolve o problema de acoplamento: quando um evento de negócio interessa a múltiplos
   sistemas, chamar cada um via HTTP síncrono cria dependência direta entre o produtor e todos os
-  consumidores, e cada novo consumidor exige alterar o produtor. Kafka desacopla isso — o produtor
+  consumidores, e cada novo consumidor exige alterar o produtor. Kafka desacopla isso: o produtor
   publica uma vez, e qualquer número de consumidores lê de forma independente.
 </RespostaCurta>
 
 <RespostaSenior>
   Em sistemas com poucos serviços, chamadas síncronas resolvem bem. O problema aparece quando um
-  mesmo evento de negócio — por exemplo, "pagamento aprovado" — passa a interessar a múltiplos
+  mesmo evento de negócio (por exemplo, "pagamento aprovado") passa a interessar a múltiplos
   sistemas: notificação, antifraude, contabilidade, analytics. Se o serviço de pagamentos chamar
   cada um diretamente, ele fica acoplado à disponibilidade de todos eles, e adicionar um novo
   consumidor exige alterar o código do produtor. Kafka resolve isso invertendo o modelo: o produtor
@@ -52,13 +52,13 @@ incluindo por que isso não é primariamente uma questão de performance, mas de
 <ExemploFinanceiro>
   Antes do Kafka, adicionar um sistema de cashback que reage a "compra aprovada" exigiria alterar o
   serviço de autorização de cartão para chamá-lo diretamente. Com Kafka, o time de cashback
-  simplesmente cria um novo consumer no tópico `compras.aprovadas` — o serviço de autorização não
+  simplesmente cria um novo consumer no tópico `compras.aprovadas`; o serviço de autorização não
   muda uma linha.
 </ExemploFinanceiro>
 
 <Pegadinha title='"Kafka resolve o problema de volume/performance"'>
   Volume é uma consequência do desenho, não o motivo original. Um sistema pode ter Kafka mesmo com
-  volume moderado, só porque tem muitos consumidores independentes do mesmo evento — o problema
+  volume moderado, só porque tem muitos consumidores independentes do mesmo evento: o problema
   central é acoplamento, não apenas throughput.
 </Pegadinha>
 

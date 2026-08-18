@@ -8,7 +8,7 @@ relatedChapters: ["partitions-e-ordenacao", "brokers-lideres-e-replicacao"]
 shortAnswer: "Partition defines how many independent slices a topic is split into (parallelism and scale). Replication Factor defines how many copies exist of each of those slices (availability)."
 quiz:
   options:
-    - "Partition defines how many independent slices a topic has (parallelism and scale); Replication Factor defines how many copies exist of each slice (availability) — independent axes."
+    - "Partition defines how many independent slices a topic has (parallelism and scale); Replication Factor defines how many copies exist of each slice (availability), independent axes."
     - "Increasing Replication Factor increases consumption parallelism, because additional replicas can be read simultaneously by different consumers."
     - "Partition and Replication Factor are the same configuration, just different names for a topic's number of copies."
     - "Increasing a topic's number of partitions directly increases its tolerance to broker loss."
@@ -25,16 +25,16 @@ A common confusion among beginners is treating the two as the same "scale" thing
 candidates who understand a topic's two independent design axes.
 
 <RespostaCurta>
-Partition defines how many independent slices a topic is split into — the basis for consumption
+Partition defines how many independent slices a topic is split into: the basis for consumption
 parallelism and write load distribution. Replication Factor defines how many copies exist of each of those
-partitions, on different brokers — the basis for fault tolerance.
+partitions, on different brokers: the basis for fault tolerance.
 </RespostaCurta>
 
 <RespostaSenior>
 They're two completely independent design axes. A topic with 12 partitions and replication factor 3 has,
 in practice, 36 physical replicas spread across the cluster (12 partitions × 3 copies each). Increasing
 partitions increases consumption parallelism and write scale, but doesn't affect availability by itself.
-Increasing replication factor increases tolerance to broker loss, but doesn't affect parallelism — more
+Increasing replication factor increases tolerance to broker loss, but doesn't affect parallelism: more
 replicas of the same partition don't let more consumers process it simultaneously, because client reads
 and writes only happen through that partition's leader.
 </RespostaSenior>
@@ -46,12 +46,12 @@ See [Chapter 4](/en/kafka/livro/partitions-e-ordenacao) (partitions) and
 
 <ExemploFinanceiro>
 A `pix.recebido` topic with 24 partitions and replication factor 3 has 24 leaders and 48 follower replicas
-spread across the cluster's brokers — 24 is the consumption parallelism ceiling; 3 is the fault tolerance
+spread across the cluster's brokers: 24 is the consumption parallelism ceiling; 3 is the fault tolerance
 of each of those 24 slices.
 </ExemploFinanceiro>
 
 <Pegadinha title='"More Replication Factor means more consumption parallelism"'>
-No — additional replicas of a partition exist exclusively for fault tolerance (leader failover). They
+No, additional replicas of a partition exist exclusively for fault tolerance (leader failover). They
 aren't read by consumers in parallel with the leader; only the leader serves clients in the default
 configuration.
 </Pegadinha>

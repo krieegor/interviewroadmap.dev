@@ -21,23 +21,23 @@ quiz:
 
 ## O que o entrevistador quer avaliar
 
-A pergunta mais aplicada de toda essa seção — quer ver o padrão de implementação real, com atenção
+A pergunta mais aplicada de toda essa seção: quer ver o padrão de implementação real, com atenção
 específica à atomicidade sob concorrência, não só "eu uso um ID único".
 
 <RespostaCurta>
 Uso um `eventId` único por evento (gerado pelo producer), e no consumer, verifico e insiro esse `eventId` em
-uma tabela de controle (`eventos_processados`) com constraint de unicidade — na mesma transação que aplica
+uma tabela de controle (`eventos_processados`) com constraint de unicidade, na mesma transação que aplica
 o efeito de negócio. Se a inserção falhar por duplicidade, ignoro o evento com segurança.
 </RespostaCurta>
 
 <RespostaSenior>
 O ponto crítico é a atomicidade: a checagem de "já processei esse eventId?" e a aplicação do efeito
-(creditar, debitar, gravar) precisam acontecer na mesma transação de banco. Se forem passos separados — uma
-consulta seguida de uma atualização —, existe uma janela de corrida onde duas execuções concorrentes podem
+(creditar, debitar, gravar) precisam acontecer na mesma transação de banco. Se forem passos separados (uma
+consulta seguida de uma atualização), existe uma janela de corrida onde duas execuções concorrentes podem
 checar "não existe" ao mesmo tempo e aplicar o efeito duas vezes antes que qualquer uma grave o `eventId`. A
 constraint de unicidade do banco, não uma checagem em código de aplicação, é a garantia real. Para operações
 já naturalmente idempotentes (um upsert que sempre grava o mesmo valor final), esse controle explícito pode
-ser dispensado — mas para operações que acumulam estado (creditar, incrementar), ele é obrigatório.
+ser dispensado, mas para operações que acumulam estado (creditar, incrementar), ele é obrigatório.
 </RespostaSenior>
 
 ## Explicação aprofundada
@@ -60,7 +60,7 @@ public void creditarPix(PixRecebidoEvent evento) {
 
 <Pegadinha title='"Basta checar se o ID já existe antes de processar"'>
 Checagem prévia sem estar na mesma transação do efeito é vulnerável a condição de corrida. A resposta
-completa sempre menciona a atomicidade via transação — não apenas a existência de um identificador único.
+completa sempre menciona a atomicidade via transação, não apenas a existência de um identificador único.
 </Pegadinha>
 
 <PerguntaDerivada>

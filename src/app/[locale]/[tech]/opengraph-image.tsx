@@ -5,12 +5,12 @@ import { isTech, techs, type Tech } from "@/lib/tech/config";
 
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
-// Necessário com `output: "export"` — sem isso o build trata a rota como potencialmente dinâmica.
+// Necessário com `output: "export"`: sem isso o build trata a rota como potencialmente dinâmica.
 export const dynamic = "force-static";
 
 // Gera a tupla completa (locale+tech) "de baixo pra cima" em vez de depender dos params do segmento pai
-// — ver nota em perguntas/[slug]/page.tsx e specs/architecture.md seção 14 sobre o bug do Next 16 com
-// retorno vazio por combinação de pai. Rotas de imagem de metadata também precisam disso.
+// (ver nota em perguntas/[slug]/page.tsx e specs/architecture.md seção 14 sobre o bug do Next 16 com
+// retorno vazio por combinação de pai). Rotas de imagem de metadata também precisam disso.
 export function generateStaticParams() {
   const params: Array<{ locale: Locale; tech: Tech }> = [];
   for (const locale of locales) {
@@ -29,7 +29,7 @@ export default async function TechOpengraphImage({
   params: Promise<{ locale: string; tech: string }>;
 }) {
   const { locale: rawLocale, tech: rawTech } = await params;
-  // `generateStaticParams` já restringe o build a combinações válidas — fallback só evita erro de tipo.
+  // `generateStaticParams` já restringe o build a combinações válidas: fallback só evita erro de tipo.
   const techConfig =
     isLocale(rawLocale) && isTech(rawTech) ? getTechConfig(rawTech, rawLocale) : getTechConfig("kafka", "pt");
 

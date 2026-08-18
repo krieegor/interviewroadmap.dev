@@ -2,7 +2,7 @@
   "name": "interview-roadmap",
   "version": "0.1.0",
   "private": true,
-  "description": "interviewroadmap.dev — plataforma gratuita e open source de preparação para entrevistas técnicas, com trilhas por tecnologia (Kafka, Java, Elastic Search, SQL, AWS, GCP).",
+  "description": "interviewroadmap.dev: plataforma gratuita e open source de preparação para entrevistas técnicas, com trilhas por tecnologia (Kafka, Java, Elastic Search, SQL, AWS, GCP).",
   "license": "MIT",
   "scripts": {
     "dev": "next dev",

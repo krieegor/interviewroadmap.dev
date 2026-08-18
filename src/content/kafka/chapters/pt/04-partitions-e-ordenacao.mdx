@@ -1,6 +1,6 @@
----
+﻿---
 title: "Partitions e ordenação"
-part: "Parte II — Arquitetura"
+part: "Parte II: Arquitetura"
 partOrder: 2
 chapterOrder: 2
 slug: "partitions-e-ordenacao"
@@ -24,7 +24,7 @@ ao mesmo tempo:
   consumers de um mesmo Consumer Group processem partitions diferentes em paralelo (paralelismo).
 </Definicao>
 
-Sem partitions, adicionar mais consumers a um Consumer Group não aumentaria o throughput de consumo — só
+Sem partitions, adicionar mais consumers a um Consumer Group não aumentaria o throughput de consumo: só
 existiria um único fluxo sequencial para processar. Com partitions, o paralelismo de consumo escala junto
 com o número de partitions do tópico.
 
@@ -33,7 +33,7 @@ com o número de partitions do tópico.
 Os dois motivos não são a mesma coisa, e vale separá-los:
 
 - **Paralelismo de consumo**: dentro de um Consumer Group, cada partition é atribuída a exatamente um
-  consumer por vez. Mais partitions significa mais consumers processando ao mesmo tempo — até o limite de
+  consumer por vez. Mais partitions significa mais consumers processando ao mesmo tempo, até o limite de
   uma partition por consumer (Capítulo 6 aprofunda o que acontece quando esse limite é ultrapassado).
 - **Escalabilidade de armazenamento e escrita**: partitions de um mesmo tópico podem residir em brokers
   diferentes. Um tópico com 12 partitions distribuídas em 3 brokers tem 3 vezes mais capacidade de escrita
@@ -42,13 +42,13 @@ Os dois motivos não são a mesma coisa, e vale separá-los:
 ## Message key e a decisão de particionamento
 
 Quando um Producer publica uma mensagem, ele pode (opcionalmente) informar uma **key**. O broker usa essa
-key para decidir em qual partition a mensagem cai — e essa decisão é determinística: a mesma key sempre
+key para decidir em qual partition a mensagem cai, e essa decisão é determinística: a mesma key sempre
 resulta na mesma partition, para um número fixo de partitions no tópico.
 
 <Definicao title="Key e hash">
   O particionador padrão do Kafka calcula `hash(key) % número_de_partitions` para decidir a
   partition de destino. Como o hash de uma mesma key é sempre o mesmo, todas as mensagens com essa
-  key caem consistentemente na mesma partition — e, portanto, são lidas na ordem em que foram
+  key caem consistentemente na mesma partition e, portanto, são lidas na ordem em que foram
   escritas.
 </Definicao>
 
@@ -61,7 +61,7 @@ aproximadamente uniforme (as versões recentes do client Java usam uma estratég
 de mensagens em uma partition por vez antes de rotacionar, otimizando o batching sem comprometer a
 distribuição). O preço dessa distribuição é que não existe garantia de ordem alguma entre essas mensagens.
 
-## Ordenação dentro da partition — e a ausência de ordenação global
+## Ordenação dentro da partition e a ausência de ordenação global
 
 <Definicao title="Ordenação no Kafka">
   O Kafka garante que mensagens escritas em uma mesma partition são lidas na mesma ordem em que
@@ -71,13 +71,13 @@ distribuição). O preço dessa distribuição é que não existe garantia de or
 
 Isso decorre diretamente da estrutura de log: uma partition é uma sequência linear e imutável, então a ordem
 de escrita é, por construção, a ordem de leitura. Mas um tópico com múltiplas partitions não é uma única
-sequência — é um conjunto de sequências independentes, cada uma com seu próprio relógio de offsets. Duas
+sequência: é um conjunto de sequências independentes, cada uma com seu próprio relógio de offsets. Duas
 mensagens em partitions diferentes não têm relação de ordem definida entre si, mesmo que uma tenha sido
 escrita visivelmente antes da outra em tempo real.
 
-<Atencao title='"Ordenado" não é uma propriedade do tópico — é uma propriedade da partition'>
+<Atencao title='"Ordenado" não é uma propriedade do tópico: é uma propriedade da partition'>
   É comum ouvir "esse tópico é ordenado" como se fosse uma propriedade binária do tópico inteiro. A
-  frase correta é "os eventos desta key estão ordenados entre si", porque só isso é garantido — e só
+  frase correta é "os eventos desta key estão ordenados entre si", porque só isso é garantido, e só
   é garantido porque a key fixa a mensagem em uma única partition.
 </Atencao>
 
@@ -87,7 +87,7 @@ A pergunta a se fazer não é "qual key distribui melhor as partitions", mas **"
 ordenados entre si?"**. A resposta a essa pergunta é a key.
 
 - Se dois eventos do mesmo `contaId` precisam ser processados na ordem em que ocorreram (ex.: "PIX recebido"
-  seguido de "saldo debitado por estorno"), a key deve ser `contaId` — não `eventId`, que geraria melhor
+  seguido de "saldo debitado por estorno"), a key deve ser `contaId`, não `eventId`, que geraria melhor
   distribuição, mas destruiria a ordenação entre esses dois eventos.
 - Se os eventos são independentes entre si (não existe relação de ordem que importe), otimizar a
   distribuição com uma key de alta cardinalidade (ou nenhuma key) é uma escolha válida e melhora o
@@ -95,7 +95,7 @@ ordenados entre si?"**. A resposta a essa pergunta é a key.
 
 <Pegadinha title='"Sempre uso um UUID aleatório como key para distribuir bem"'>
   Um UUID aleatório por mensagem maximiza a distribuição, mas também garante que mensagens
-  relacionadas (do mesmo pedido, da mesma conta, do mesmo contrato) caiam em partitions diferentes —
+  relacionadas (do mesmo pedido, da mesma conta, do mesmo contrato) caiam em partitions diferentes,
   eliminando qualquer garantia de ordem entre elas. Se ordenação relativa importa para o domínio,
   isso é um bug de modelagem, não uma otimização.
 </Pegadinha>
@@ -104,19 +104,19 @@ ordenados entre si?"**. A resposta a essa pergunta é a key.
 
 Aumentar as partitions de um tópico existente é possível, mas tem uma consequência que passa despercebida em
 muitas entrevistas: a fórmula `hash(key) % número_de_partitions` muda de resultado quando o denominador muda.
-Mensagens novas com a mesma key de antes podem cair em uma partition diferente das mensagens antigas — a
+Mensagens novas com a mesma key de antes podem cair em uma partition diferente das mensagens antigas: a
 ordenação histórica daquela key, antes preservada em uma única partition, passa a ficar dividida entre duas.
 
 <Atencao title="Aumentar partitions não é uma operação neutra">
   Depois de aumentar o número de partitions, novas mensagens de uma key já existente podem ir para
   uma partition diferente da que continha o histórico dessa key. Isso não corrompe dados, mas quebra
-  a suposição de que "toda a história de uma key está em uma única partition" — algo que consumers
+  a suposição de que "toda a história de uma key está em uma única partition", algo que consumers
   com lógica dependente de ordem histórica precisam saber lidar (ou o time precisa planejar o
   aumento de partitions com essa consequência em mente, tipicamente migrando para um tópico novo em
   vez de só aumentar o existente).
 </Atencao>
 
-Reduzir o número de partitions de um tópico, por outro lado, não é suportado nativamente pelo Kafka — a
+Reduzir o número de partitions de um tópico, por outro lado, não é suportado nativamente pelo Kafka: a
 única forma é recriar o tópico.
 
 ## Impactos arquiteturais da escolha de partitions
@@ -124,7 +124,7 @@ Reduzir o número de partitions de um tópico, por outro lado, não é suportado
 - **Poucas partitions** limitam o paralelismo máximo de consumo do Consumer Group e concentram carga de
   escrita em poucos brokers.
 - **Partitions demais** aumentam o overhead de metadados do cluster, o tempo de rebalance (Capítulo 6) e o
-  número de file handles abertos por broker — sem benefício adicional se não há consumers suficientes para
+  número de file handles abertos por broker, sem benefício adicional se não há consumers suficientes para
   aproveitar o paralelismo extra.
 - O número de partitions deve ser dimensionado pelo throughput-alvo e pelo número máximo de consumers que o
   Consumer Group pretende escalar, não por um valor arbitrário "redondo".
@@ -132,7 +132,7 @@ Reduzir o número de partitions de um tópico, por outro lado, não é suportado
 ## Como aparece em entrevistas
 
 Depois de "o que é uma partition", a pergunta natural é sobre a key: "como o Kafka decide em qual partition
-uma mensagem cai?" e, em seguida, a pegadinha clássica: "o Kafka garante ordenação?" — que precisa ser
+uma mensagem cai?" e, em seguida, a pegadinha clássica: "o Kafka garante ordenação?", que precisa ser
 respondida com a ressalva de partition, nunca como um "sim" ou "não" isolado.
 
 <DicaEntrevista>
@@ -147,21 +147,21 @@ No Spring Kafka, a key é o segundo argumento de `KafkaTemplate.send(topic, key,
 é necessária, o overload de dois argumentos (`send(topic, value)`) publica sem key, sujeito à distribuição
 aproximadamente uniforme descrita acima. É comum ver times esquecerem de passar a key em um refactor e
 só perceberem a perda de ordenação em produção, quando processamento fora de ordem começa a gerar
-inconsistência de estado — daí a importância de tratar a key como parte do contrato do tópico, não como um
+inconsistência de estado; daí a importância de tratar a key como parte do contrato do tópico, não como um
 detalhe de implementação do producer.
 
 <ExemploFinanceiro title="Fatura de cartão: por que a key é o contaId">
   No tópico `faturas.eventos`, eventos como `FaturaFechada`, `PagamentoRegistrado` e
-  `FaturaReaberta` da mesma conta precisam ser processados na ordem em que ocorreram — processar
+  `FaturaReaberta` da mesma conta precisam ser processados na ordem em que ocorreram: processar
   `PagamentoRegistrado` antes de `FaturaFechada` levaria o serviço de cobrança a uma conclusão
   errada sobre o saldo devedor. Usar `contaId` como key garante que esses três eventos, para uma
-  mesma conta, fiquem na mesma partition e sejam lidos na ordem certa — mesmo que contas diferentes
+  mesma conta, fiquem na mesma partition e sejam lidos na ordem certa, mesmo que contas diferentes
   sejam processadas em paralelo, em partitions diferentes.
 </ExemploFinanceiro>
 
 <Resumo>
   Partitions existem para paralelizar consumo e distribuir escrita entre brokers. A key determina,
-  via hash, em qual partition uma mensagem é armazenada — e é essa escolha, não o Kafka em si, que
+  via hash, em qual partition uma mensagem é armazenada, e é essa escolha, não o Kafka em si, que
   decide quais eventos ficam ordenados entre si. Ordenação é garantida dentro da partition; não
   existe ordenação global entre partitions de um tópico. Aumentar o número de partitions muda o
   resultado do hash para novas mensagens, quebrando a suposição de que o histórico de uma key está

@@ -5,11 +5,11 @@ slug: "o-que-e-commit"
 level: ["pleno", "senior"]
 topics: ["consumo"]
 relatedChapters: ["offset-e-commit"]
-shortAnswer: "Commit é a operação que registra, para um Consumer Group, até qual offset de uma partition já foi processado com sucesso — o que torna esse progresso oficial e sobrevivente a restarts."
+shortAnswer: "Commit é a operação que registra, para um Consumer Group, até qual offset de uma partition já foi processado com sucesso, o que torna esse progresso oficial e sobrevivente a restarts."
 quiz:
   options:
     - "Commit é a operação que registra, para um Consumer Group, até qual offset de uma partition já foi processado com sucesso."
-    - "Commit e leitura são a mesma operação — ao ler uma mensagem, o consumer automaticamente registra seu progresso de processamento."
+    - "Commit e leitura são a mesma operação: ao ler uma mensagem, o consumer automaticamente registra seu progresso de processamento."
     - "Commit é a confirmação enviada pelo broker ao producer de que uma mensagem foi persistida e replicada com sucesso."
     - "Commit apaga a mensagem processada da partition, liberando espaço em disco para novos registros."
   correctIndex: 0
@@ -21,7 +21,7 @@ quiz:
 
 ## O que o entrevistador quer avaliar
 
-Se você entende commit como o ato que oficializa o progresso de leitura — e a implicação disso quando o
+Se você entende commit como o ato que oficializa o progresso de leitura, e a implicação disso quando o
 timing do commit está errado em relação ao processamento real.
 
 <RespostaCurta>
@@ -35,7 +35,7 @@ O commit é o que separa "o client já entregou essa mensagem à aplicação" de
 mensagem processada para esse Consumer Group". Entre o momento em que uma mensagem é entregue e o momento em
 que o offset dela é commitado, existe uma janela onde, se o consumer cair, aquela mensagem pode ser
 reprocessada (se ainda não commitada) ou perdida (se commitada antes do processamento terminar). É esse
-timing — não a existência do commit em si — que determina se o consumer tende a perder ou duplicar
+timing (não a existência do commit em si) que determina se o consumer tende a perder ou duplicar
 mensagens sob falha.
 </RespostaSenior>
 
@@ -45,12 +45,12 @@ Veja "Auto Commit" e "Commit Manual" no [Capítulo 7](/pt/kafka/livro/offset-e-c
 
 <ExemploFinanceiro>
 O `cobranca-service` só chama `acknowledgment.acknowledge()` (comita o offset) depois de confirmar que a
-notificação de cobrança foi enviada e registrada no banco — garantindo que uma falha no meio do processo
+notificação de cobrança foi enviada e registrada no banco, garantindo que uma falha no meio do processo
 resulte em reprocessamento, nunca em perda silenciosa do boleto.
 </ExemploFinanceiro>
 
 <Pegadinha title='"Commit e leitura são a mesma coisa"'>
-Não — um consumer pode ler (e até processar) uma mensagem sem nunca comitar o offset dela, se cair antes.
+Não: um consumer pode ler (e até processar) uma mensagem sem nunca comitar o offset dela, se cair antes.
 Nesse caso, a próxima inicialização do consumer vai reler a mesma mensagem, porque o commit nunca
 aconteceu.
 </Pegadinha>

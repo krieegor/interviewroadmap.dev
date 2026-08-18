@@ -7,8 +7,8 @@ relatedChapters: ["retry-e-dlq", "idempotencia"]
 ---
 
 The previous case studies dealt with internal failures (bugs, databases, indexes). This one covers a
-different, common problem: a consumer that needs to call an **external** system — outside the team's
-control — that's slow or unstable, and how to prevent that external instability from bringing down the
+different, common problem: a consumer that needs to call an **external** system (outside the team's
+control) that's slow or unstable, and how to prevent that external instability from bringing down the
 consumer's internal processing.
 
 ## The scenario
@@ -22,15 +22,15 @@ unavailability, outside the team's control.
 
 <Atencao title="Without timeout and circuit breaker, an external failure becomes an internal problem">
 Without a configured timeout, a slow call to the external provider holds the consumer's thread
-indefinitely — and without a circuit breaker, every message processed during a provider instability tries
+indefinitely. And without a circuit breaker, every message processed during a provider instability tries
 the same call that's doomed to be slow, multiplying the problem instead of isolating it. The result, without
 these protections: the `antifraude-service` quickly accumulates consumer lag, and the effect propagates as
-if it were a problem with Kafka or the consumer itself — when the root cause is entirely external.
+if it were a problem with Kafka or the consumer itself, when the root cause is entirely external.
 </Atencao>
 
 ## Timeout: the first layer of protection
 
-Every call to the external provider has a short, explicit timeout (for example, 2 seconds) — if the
+Every call to the external provider has a short, explicit timeout (for example, 2 seconds): if the
 provider doesn't respond within that window, the call is treated as a failure, freeing the consumer's
 thread to keep processing (or retry, depending on the retry strategy).
 
@@ -42,7 +42,7 @@ thread to keep processing (or retry, depending on the retry strategy).
 
 A circuit breaker prevents the consumer from continuing to call a provider that's already shown itself to
 be unavailable: after a number of consecutive failures, the circuit opens and starts rejecting calls
-**immediately**, without even attempting the network call — saving time and avoiding amplifying the
+**immediately**, without even attempting the network call, saving time and avoiding amplifying the
 external provider's instability with more traffic. After a configured interval, the circuit goes half-open
 and tests a single call: if it succeeds, the circuit closes and returns to normal; if it fails, it opens
 again.
@@ -58,15 +58,15 @@ difference shows understanding beyond the isolated pattern.
 
 When the circuit is closed but a call fails on its own (timeout or a 5xx error from the provider), the
 consumer treats it as a transient error (Chapter 9): retry with exponential backoff, a few attempts. If the
-circuit is open (rejecting outright) or the attempts run out, the message goes to a specific DLQ —
-`compras.autorizadas.antifraude.dlq` — for manual or automatic reprocessing as soon as the external
+circuit is open (rejecting outright) or the attempts run out, the message goes to a specific DLQ,
+`compras.autorizadas.antifraude.dlq`, for manual or automatic reprocessing as soon as the external
 provider recovers.
 
 ## Manual reprocessing
 
 <Pegadinha title='"Messages in the DLQ due to external instability should be discarded"'>
 Unlike a DLQ populated by permanent errors (malformed payload), messages in the DLQ due to an external
-provider's instability generally **should** be reprocessed as soon as the provider recovers — the error
+provider's instability generally **should** be reprocessed as soon as the provider recovers: the error
 wasn't with the data, it was the momentary availability of a third-party system. A process (manual or
 automated) monitors the provider's health and, once it responds normally again, republishes the DLQ
 messages back into the main flow.
@@ -76,7 +76,7 @@ messages back into the main flow.
 
 Even with all these protections, the consumer still needs to be idempotent (Chapter 11): if a call to the
 external provider succeeds, but the consumer crashes before committing the offset, the message will be
-reprocessed — and the call to the external provider (which may have a per-call financial cost, in the case
+reprocessed. And the call to the external provider (which may have a per-call financial cost, in the case
 of credit bureaus) shouldn't be redone unnecessarily. A result-cache table keyed by `eventId` avoids both
 duplicated effects and the unnecessary cost of repeated calls to the provider.
 
@@ -94,6 +94,6 @@ duplicated effects and the unnecessary cost of repeated calls to the provider.
 Consumers that depend on unstable external systems need specific protection layers: timeout to avoid
 holding threads indefinitely, circuit breaker to stop insisting on a provider already identified as down,
 and retry with backoff for the one-off failures still worth trying again. DLQ isolates what couldn't be
-processed during the instability, for reprocessing as soon as the external provider recovers — and
+processed during the instability, for reprocessing as soon as the external provider recovers; and
 idempotency remains mandatory, both for correctness and, in this case, for cost.
 </Resumo>

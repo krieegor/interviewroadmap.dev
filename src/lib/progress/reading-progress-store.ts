@@ -15,7 +15,7 @@ let cachedRaw: string | null = null;
 let cachedSnapshot: ReadingProgress = EMPTY_PROGRESS;
 
 // Confia no shape salvo sem checar poderia consumir um formato de versão antiga (a chave é
-// versionada com :v1, mas só na convenção — nada força o bump) como se fosse válido, produzindo
+// versionada com :v1, mas só na convenção, nada força o bump) como se fosse válido, produzindo
 // erro silencioso na UI em vez de cair pro estado vazio.
 function isReadingProgress(value: unknown): value is ReadingProgress {
   if (!value || typeof value !== "object") return false;
@@ -53,7 +53,7 @@ function write(progress: ReadingProgress) {
   try {
     localStorage.setItem(STORAGE_KEY, cachedRaw);
   } catch {
-    // localStorage indisponível (modo privado, quota excedida) — segue só para a sessão atual.
+    // localStorage indisponível (modo privado, quota excedida): segue só para a sessão atual.
   }
   for (const listener of listeners) listener();
 }

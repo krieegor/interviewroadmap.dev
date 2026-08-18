@@ -7,7 +7,7 @@ relatedChapters: ["brokers-lideres-e-replicacao"]
 ---
 
 Replication factor is configured per topic and determines how many replicas of each partition exist in the
-cluster — one acting as leader and the rest as followers. A replication factor of 3 means the cluster can
+cluster, one acting as leader and the rest as followers. A replication factor of 3 means the cluster can
 lose up to 2 brokers holding replicas of that partition without losing confirmed data, as long as the
 remaining replicas are in the ISR at the moment of failure. Replication factor shouldn't be confused with
 the number of partitions: one defines how many copies exist of each partition (availability), the other

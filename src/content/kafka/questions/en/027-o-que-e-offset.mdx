@@ -5,7 +5,7 @@ slug: "o-que-e-offset"
 level: ["pleno", "senior"]
 topics: ["consumo"]
 relatedChapters: ["arquitetura-interna", "offset-e-commit"]
-shortAnswer: "Offset is the sequential position of a record within a partition — an increasing integer, unique per partition, that uniquely identifies a message in that partition."
+shortAnswer: "Offset is the sequential position of a record within a partition: an increasing integer, unique per partition, that uniquely identifies a message in that partition."
 quiz:
   options:
     - "Offset is an increasing integer, unique per partition, that identifies a record's position within that specific partition."
@@ -31,7 +31,7 @@ For a consumer, it represents "how far I've already read" within that specific p
 </RespostaCurta>
 
 <RespostaSenior>
-Offset isn't a global property of the topic — it's local to each partition. The same offset numbering
+Offset isn't a global property of the topic: it's local to each partition. The same offset numbering
 exists independently in each partition of a topic: offset 100 on partition 0 and offset 100 on partition 1
 are completely different records, with no relationship between them. There's also an important distinction
 between the consumer's in-memory read position (where the client has already delivered messages to the
@@ -45,14 +45,14 @@ See "Offset" in [Chapter 3](/en/kafka/livro/arquitetura-interna) and the full de
 [Chapter 7](/en/kafka/livro/offset-e-commit).
 
 <ExemploFinanceiro>
-On the `pix.recebido` topic, the `saldo-service` keeps a committed offset per partition — if it restarts,
+On the `pix.recebido` topic, the `saldo-service` keeps a committed offset per partition; if it restarts,
 it resumes from exactly the last committed offset, without rereading events already confirmed as processed
 (unless the commit hadn't happened yet before the restart).
 </ExemploFinanceiro>
 
 <Pegadinha title='"Offset is a global identifier for the message in the topic"'>
 Offset is local to the partition, not the topic. Two messages from different partitions can have exactly
-the same offset number with no relationship between them — confusing this with a global message ID is a
+the same offset number with no relationship between them; confusing this with a global message ID is a
 common mistake.
 </Pegadinha>
 

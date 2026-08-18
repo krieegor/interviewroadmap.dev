@@ -18,7 +18,7 @@ export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
 }
 
-// `locales` é um conjunto fechado — sem isso, adapters de edge (ex.: OpenNext/Cloudflare Workers)
+// `locales` é um conjunto fechado: sem isso, adapters de edge (ex.: OpenNext/Cloudflare Workers)
 // tratam a rota como parcialmente dinâmica e empacotam o server-render de toda a árvore de páginas
 // na function de request, estourando o limite de tamanho do Worker.
 export const dynamicParams = false;
@@ -39,8 +39,8 @@ export async function generateMetadata({
       template: `%s · ${siteConfig.shortName}`,
     },
     description: siteConfig.description,
-    // Fallback só pra rotas que não definem o próprio `alternates` (nenhuma deveria chegar aqui hoje
-    // — cada página de conteúdo já sobrescreve com o path real via `buildAlternates`).
+    // Fallback só pra rotas que não definem o próprio `alternates` (nenhuma deveria chegar aqui hoje,
+    // cada página de conteúdo já sobrescreve com o path real via `buildAlternates`).
     alternates: buildAlternates(rawLocale, "/home"),
     icons: {
       icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
@@ -54,13 +54,13 @@ export async function generateMetadata({
       imageUrl: localeOpengraphImageUrl(siteConfig, rawLocale),
     }),
     // Sem `title`/`description` fixos aqui: a maioria dos leitores de card (incluindo X/Twitter) cai
-    // de volta pro `openGraph.title`/`description` quando o campo `twitter` não os define — e esse OG
+    // de volta pro `openGraph.title`/`description` quando o campo `twitter` não os define, e esse OG
     // já é correto por página (pergunta, capítulo etc.). Definir um valor fixo aqui bloquearia esse
     // fallback pra todo o site com o texto genérico da plataforma.
     twitter: {
       card: "summary_large_image",
     },
-    // String pública fornecida pelo Google Search Console (não é segredo — ela vai pro HTML renderizado
+    // String pública fornecida pelo Google Search Console (não é segredo, ela vai pro HTML renderizado
     // de qualquer forma). `undefined` quando não configurada: o Next omite a meta tag, sem afetar o build.
     verification: {
       google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,

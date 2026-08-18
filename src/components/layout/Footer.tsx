@@ -31,16 +31,16 @@ export function Footer({
         <p>
           {siteConfig.shortName} {dict.footer.disclaimer}
         </p>
-        <div className="flex items-center gap-4">
+        <div className="flex flex-wrap items-center gap-4">
           {version && publishedAt ? (
             <a
               href={version.url}
               target="_blank"
               rel="noreferrer"
               title={formatTemplate(dict.footer.viewRelease, { tag: version.tag })}
-              className="hover:text-[var(--color-accent)]"
+              className="whitespace-nowrap hover:text-[var(--color-accent)]"
             >
-              {version.tag} · {publishedAt}
+              {version.tag} · {formatTemplate(dict.footer.publishedOn, { date: publishedAt })}
             </a>
           ) : null}
           <Link href={`/${locale}/${tech}/sobre`} className="hover:text-[var(--color-accent)]">

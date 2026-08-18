@@ -21,7 +21,7 @@ quiz:
 
 ## O que o entrevistador quer avaliar
 
-O entendimento correto e completo do mecanismo de ordenação — não uma resposta vaga de "sim, o Kafka é
+O entendimento correto e completo do mecanismo de ordenação, não uma resposta vaga de "sim, o Kafka é
 ordenado", mas a explicação de *onde* essa garantia realmente vive.
 
 <RespostaCurta>
@@ -32,7 +32,7 @@ escrita é, por construção, a ordem de leitura.
 
 <RespostaSenior>
 Ordenação no Kafka é uma propriedade da partition, não do tópico. Cada partition é um log append-only, onde
-cada registro recebe um offset sequencial crescente — como a estrutura é estritamente sequencial, ler do
+cada registro recebe um offset sequencial crescente; como a estrutura é estritamente sequencial, ler do
 início ao fim reproduz exatamente a ordem de escrita. Um tópico com múltiplas partitions, porém, não é uma
 única sequência: é um conjunto de sequências independentes, cada uma com seu próprio relógio de offsets.
 Duas mensagens em partitions diferentes não têm relação de ordem definida entre si. É a key (Capítulo 4) que
@@ -42,18 +42,18 @@ si.
 
 ## Explicação aprofundada
 
-Veja "Ordenação dentro da partition — e a ausência de ordenação global" no
+Veja "Ordenação dentro da partition e a ausência de ordenação global" no
 [Capítulo 4](/pt/kafka/livro/partitions-e-ordenacao).
 
 <ExemploFinanceiro>
-Dois eventos do mesmo `contaId` — "PIX recebido" seguido de "saldo debitado por estorno" — chegam ao
+Dois eventos do mesmo `contaId` ("PIX recebido" seguido de "saldo debitado por estorno") chegam ao
 consumer na ordem correta porque compartilham a mesma key e, portanto, a mesma partition. Eventos de contas
-diferentes, em partitions diferentes, não têm relação de ordem entre si — o que é aceitável, porque não há
+diferentes, em partitions diferentes, não têm relação de ordem entre si, o que é aceitável, porque não há
 dependência real entre eles.
 </ExemploFinanceiro>
 
 <Pegadinha title='"Kafka processa tudo na ordem em que foi publicado"'>
-Essa afirmação ignora que um tópico com múltiplas partitions distribui mensagens entre elas — a ordem global
+Essa afirmação ignora que um tópico com múltiplas partitions distribui mensagens entre elas: a ordem global
 entre partitions diferentes não é garantida, mesmo que os eventos tenham sido publicados em sequência muito
 próxima no tempo real.
 </Pegadinha>

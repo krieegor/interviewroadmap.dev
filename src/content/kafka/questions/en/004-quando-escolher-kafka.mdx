@@ -21,7 +21,7 @@ quiz:
 
 ## What the interviewer wants to assess
 
-Architectural judgment — not "Kafka solves everything," but concrete criteria that drive the decision. It's
+Architectural judgment: not "Kafka solves everything," but concrete criteria that drive the decision. It's
 a question meant to tell apart candidates who apply technology because of hype from those who choose it
 based on real need.
 
@@ -32,12 +32,12 @@ based on real need.
 </RespostaCurta>
 
 <RespostaSenior>
-  I look at three main signals. First, multiple independent consumers of the same fact — if today only
+  I look at three main signals. First, multiple independent consumers of the same fact: if today only
   notifications react to "payment approved," but tomorrow antifraud, accounting, and analytics will
   also need to, Kafka avoids rewriting the producer for every new consumer. Second, the need for
-  replay — if the business can ask to reprocess the last 30 days of transactions because a rule was
+  replay: if the business can ask to reprocess the last 30 days of transactions because a rule was
   fixed, a traditional queue doesn't keep that history, Kafka does. Third, volume and availability
-  criticality — when I can't let a failure in a slow consumer bring down the producer, Kafka's
+  criticality: when I can't let a failure in a slow consumer bring down the producer, Kafka's
   asynchronous decoupling isolates that failure. If none of these three signals is present, there's
   usually a simpler solution (queue, synchronous call) that solves it with less operational
   complexity.
@@ -50,7 +50,7 @@ See "When to use it" in [Chapter 1](/en/kafka/livro/o-que-e-apache-kafka).
 <ExemploFinanceiro>
   A credit-granting system that needs to: (1) notify the customer, (2) update the internal score, (3)
   feed a data lake for risk models, and (4) allow reprocessing historical decisions when the score
-  model changes — is a clear case for Kafka, because it combines multiple independent consumers with a
+  model changes, is a clear case for Kafka, because it combines multiple independent consumers with a
   need for replay at the same time.
 </ExemploFinanceiro>
 
@@ -61,6 +61,6 @@ See "When to use it" in [Chapter 1](/en/kafka/livro/o-que-e-apache-kafka).
 </Pegadinha>
 
 <PerguntaDerivada>
-  Expect the follow-up question: "and when would you not choose Kafka?" — almost always asked right
+  Expect the follow-up question: "and when would you not choose Kafka?" It's almost always asked right
   after.
 </PerguntaDerivada>

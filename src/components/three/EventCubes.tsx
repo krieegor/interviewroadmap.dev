@@ -25,7 +25,7 @@ export function EventCubes({
     const mesh = meshRef.current;
     if (!mesh) return;
 
-    // Lazy-init fora do render (dentro do loop imperativo do R3F) — gerar posições
+    // Lazy-init fora do render (dentro do loop imperativo do R3F): gerar posições
     // iniciais aleatórias aqui evita chamar Math.random durante a renderização do React.
     if (phasesRef.current.length !== count) {
       phasesRef.current = Array.from({ length: count }, (_, i) => ({

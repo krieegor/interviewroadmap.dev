@@ -21,17 +21,17 @@ quiz:
 
 ## O que o entrevistador quer avaliar
 
-Se você entende retenção como independente de consumo — o ponto que mais diferencia o Kafka de uma fila
+Se você entende retenção como independente de consumo, o ponto que mais diferencia o Kafka de uma fila
 tradicional.
 
 <RespostaCurta>
 Retention period é a política que determina por quanto tempo (ou até que tamanho acumulado) os registros de
-uma partition permanecem disponíveis, configurada via `retention.ms` e/ou `retention.bytes` — o que for
+uma partition permanecem disponíveis, configurada via `retention.ms` e/ou `retention.bytes`: o que for
 atingido primeiro dispara a limpeza dos registros mais antigos.
 </RespostaCurta>
 
 <RespostaSenior>
-O ponto central é que a retenção não depende de consumo: um registro não é removido por ter sido lido — ele
+O ponto central é que a retenção não depende de consumo: um registro não é removido por ter sido lido; ele
 permanece no log até expirar pela política configurada, mesmo que todos os Consumer Groups existentes já o
 tenham processado. E o inverso também vale: um registro nunca lido por nenhum consumer some do log assim
 que a retenção expira, independentemente disso. É essa característica que viabiliza replay (Capítulo 8):
@@ -44,7 +44,7 @@ Veja "Retention Period" no [Capítulo 8](/pt/kafka/livro/retention-e-replay).
 
 <ExemploFinanceiro>
 Um tópico `transacoes.autorizadas` com retenção de 7 dias permite que um novo serviço de analytics, criado
-hoje, leia o histórico completo dos últimos 7 dias assim que é implantado — sem que o serviço de autorização
+hoje, leia o histórico completo dos últimos 7 dias assim que é implantado, sem que o serviço de autorização
 precise reenviar nada.
 </ExemploFinanceiro>
 

@@ -43,6 +43,7 @@ export const pt = {
     sobre: "Sobre",
     github: "GitHub",
     viewRelease: "Ver {tag} no GitHub",
+    publishedOn: "publicado em {date}",
   },
   copyLink: {
     copy: "Copiar link",
@@ -81,7 +82,7 @@ export const pt = {
     seeSummary: "Ver sumário completo →",
     conceptsTitle: "Principais conceitos",
     openSourceText:
-      "Este material é 100% gratuito, sem cadastro e sem paywall. O código-fonte é aberto — contribuições de conteúdo e correções são bem-vindas.",
+      "Este material é 100% gratuito, sem cadastro e sem paywall. O código-fonte é aberto: contribuições de conteúdo e correções são bem-vindas.",
     githubCta: "Ver no GitHub →",
   },
   livroIndex: {
@@ -95,7 +96,7 @@ export const pt = {
   perguntasIndex: {
     title: "Perguntas de entrevista",
     description:
-      "As perguntas de entrevista sobre Apache Kafka mais comuns para desenvolvedores Java, com resposta rápida e resposta nível sênior — {siteName}.",
+      "As perguntas de entrevista sobre Apache Kafka mais comuns para desenvolvedores Java, com resposta rápida e resposta nível sênior · {siteName}.",
     intro:
       "50 perguntas reais de entrevista sobre Kafka, cada uma com objetivo do entrevistador, resposta rápida, resposta nível sênior, explicação aprofundada, exemplo financeiro e pegadinhas comuns.",
     empty: "As perguntas ainda estão sendo publicadas.",
@@ -111,7 +112,7 @@ export const pt = {
   casosIndex: {
     title: "Estudos de caso",
     description:
-      "Estudos de caso reais de sistemas financeiros orientados a eventos com Apache Kafka — {siteName}.",
+      "Estudos de caso reais de sistemas financeiros orientados a eventos com Apache Kafka · {siteName}.",
     intro:
       "Cenários fim-a-fim de sistemas financeiros, amarrando topologia de tópicos, escolha de key, idempotência, retry, DLQ, replay e observabilidade.",
     empty: "Os estudos de caso ainda estão sendo publicados.",
@@ -122,8 +123,8 @@ export const pt = {
   glossarioIndex: {
     title: "Glossário",
     description:
-      "Termos essenciais de Apache Kafka, com definição curta, definição detalhada e relação com outros conceitos — {siteName}.",
-    intro: "Termos essenciais do Kafka. O glossário não substitui os capítulos — ele aponta para eles.",
+      "Termos essenciais de Apache Kafka, com definição curta, definição detalhada e relação com outros conceitos · {siteName}.",
+    intro: "Termos essenciais do Kafka. O glossário não substitui os capítulos: ele aponta para eles.",
     indexAriaLabel: "Índice de termos",
     empty: "O glossário ainda está sendo publicado.",
     relatedLabel: "Relacionado:",
@@ -163,7 +164,7 @@ export const pt = {
     noQuestionsFound: "Nenhuma pergunta encontrada para esse filtro.",
     back: "Voltar",
     resultTitle: "Resultado",
-    questionsCount: "{count} pergunta(s) —",
+    questionsCount: "{count} pergunta(s) ·",
     allLevelsResult: "todos os níveis",
     totalTime: "tempo total {time}",
     correct: "Acertei",
@@ -196,9 +197,9 @@ export const pt = {
   sobre: {
     title: "Sobre o projeto",
     intro1:
-      "é um material gratuito e de código aberto, criado com o objetivo de ajudar desenvolvedores Java Backend a se prepararem para entrevistas técnicas sobre Apache Kafka — dos fundamentos de arquitetura até garantias de entrega, idempotência e observabilidade.",
+      "é um material gratuito e de código aberto, criado com o objetivo de ajudar desenvolvedores Java Backend a se prepararem para entrevistas técnicas sobre Apache Kafka: dos fundamentos de arquitetura até garantias de entrega, idempotência e observabilidade.",
     intro2:
-      "O conteúdo não substitui a documentação oficial do Apache Kafka nem a experiência prática de operar o sistema em produção. Ele existe para consolidar e organizar o conhecimento necessário para explicar esses conceitos com segurança em uma entrevista — e, por consequência, no dia a dia de quem já trabalha com a ferramenta.",
+      "O conteúdo não substitui a documentação oficial do Apache Kafka nem a experiência prática de operar o sistema em produção. Ele existe para consolidar e organizar o conhecimento necessário para explicar esses conceitos com segurança em uma entrevista e, por consequência, no dia a dia de quem já trabalha com a ferramenta.",
     intro3:
       "Contribuições são bem-vindas: correções técnicas, novos capítulos, novas perguntas de entrevista ou melhorias de acessibilidade e design podem ser propostas diretamente no repositório do projeto.",
     trademarkDisclaimer:
@@ -218,7 +219,7 @@ export const pt = {
   trackSelector: {
     badge: "Gratuito & open source",
     heroIntro:
-      "Uma plataforma gratuita e open source de preparação para entrevistas técnicas. Cada trilha de tecnologia segue o mesmo formato: um livro navegável, perguntas de entrevista reais, glossário e um simulador — sem curso pago, sem cadastro, sem anúncio.",
+      "Uma plataforma gratuita e open source de preparação para entrevistas técnicas. Cada trilha de tecnologia segue o mesmo formato: um livro navegável, perguntas de entrevista reais, glossário e um simulador, sem curso pago, sem cadastro, sem anúncio.",
     tracksLabel: "Trilhas",
     heroCaptionProducer: "Producer",
     heroCaptionPartitions: "Partitions mantêm a ordem",
@@ -238,7 +239,7 @@ export const pt = {
       "Termos essenciais com definição curta e detalhada, linkados aos capítulos onde aparecem.",
     featureSimulatorTitle: "Simulador",
     featureSimulatorDescription:
-      "Pratique no seu ritmo — modo aberto (explique em voz alta) ou múltipla escolha, tudo salvo só no seu navegador.",
+      "Pratique no seu ritmo: modo aberto (explique em voz alta) ou múltipla escolha, tudo salvo só no seu navegador.",
     title: "Escolha sua trilha",
     intro: "interviewroadmap.dev é uma plataforma gratuita e open source de preparação para entrevistas técnicas, organizada por tecnologia.",
     availableBadge: "Disponível - Acesse agora!",

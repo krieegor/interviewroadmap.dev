@@ -7,7 +7,7 @@ import { siteConfig } from "@/config/site";
 import { locales } from "@/lib/i18n/config";
 import { techs, techsWithContent } from "@/lib/tech/config";
 
-// Necessário com `output: "export"` — sem isso o build trata a rota como potencialmente dinâmica.
+// Necessário com `output: "export"`: sem isso o build trata a rota como potencialmente dinâmica.
 export const dynamic = "force-static";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -17,7 +17,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     entries.push({ url: `${siteConfig.url}/${locale}/home`, lastModified: new Date() });
 
     for (const tech of techs) {
-      // Trilhas "em construção" ficam fora do sitemap — a própria página delas já é `noindex`
+      // Trilhas "em construção" ficam fora do sitemap: a própria página delas já é `noindex`
       // (ver [locale]/[tech]/layout.tsx), então submetê-las aqui mandaria um sinal contraditório.
       if (!techsWithContent.includes(tech)) continue;
 

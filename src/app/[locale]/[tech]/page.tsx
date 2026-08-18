@@ -92,7 +92,7 @@ export default async function TechHome({
 
       <ReadingProgressCard totalChapters={chapters.length} locale={locale} tech={tech} dict={dict} />
 
-      {/* Modelo Producer/Partitions/Consumer Group é específico do Kafka — não faz sentido reaproveitar
+      {/* Modelo Producer/Partitions/Consumer Group é específico do Kafka: não faz sentido reaproveitar
           pra Java/Elastic/etc. quando ganharem conteúdo real. */}
       {tech === "kafka" ? <KafkaHero dict={dict} /> : null}
 

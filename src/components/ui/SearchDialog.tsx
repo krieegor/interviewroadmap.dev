@@ -23,7 +23,7 @@ export function SearchDialog({
   const [index, setIndex] = useState<SearchEntry[] | null>(null);
   const fetchStarted = useRef(false);
 
-  // Índice gerado em build-time (scripts/build-search-index.ts) como JSON estático — não vem embutido
+  // Índice gerado em build-time (scripts/build-search-index.ts) como JSON estático: não vem embutido
   // no HTML da página (evita duplicar ~90 entradas em toda uma das 294 páginas do site). Buscado sob
   // demanda (no hover/foco do botão, ou na abertura do diálogo, o que vier primeiro).
   function loadIndex() {

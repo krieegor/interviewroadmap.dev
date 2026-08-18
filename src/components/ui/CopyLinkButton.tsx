@@ -13,7 +13,7 @@ export function CopyLinkButton({ path, dict }: { path: string; dict: Dictionary 
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      // Clipboard indisponível (permissão negada, contexto não seguro) — o usuário pode copiar a URL da barra de endereço.
+      // Clipboard indisponível (permissão negada, contexto não seguro): o usuário pode copiar a URL da barra de endereço.
     }
   }
 

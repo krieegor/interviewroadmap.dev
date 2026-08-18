@@ -5,7 +5,7 @@ slug: "o-que-e-offset"
 level: ["pleno", "senior"]
 topics: ["consumo"]
 relatedChapters: ["arquitetura-interna", "offset-e-commit"]
-shortAnswer: "Offset é a posição sequencial de um registro dentro de uma partition — um número inteiro crescente, único por partition, que identifica univocamente uma mensagem naquela partition."
+shortAnswer: "Offset é a posição sequencial de um registro dentro de uma partition: um número inteiro crescente, único por partition, que identifica univocamente uma mensagem naquela partition."
 quiz:
   options:
     - "Offset é um número inteiro crescente, único por partition, que identifica a posição de um registro dentro daquela partition específica."
@@ -30,7 +30,7 @@ Para um consumer, ele representa "até onde eu já li" dentro daquela partition 
 </RespostaCurta>
 
 <RespostaSenior>
-Offset não é uma propriedade global do tópico — é local a cada partition. A mesma numeração de offset
+Offset não é uma propriedade global do tópico: é local a cada partition. A mesma numeração de offset
 existe de forma independente em cada partition de um tópico: o offset 100 da partition 0 e o offset 100 da
 partition 1 são registros completamente diferentes, sem relação entre si. Além disso, existe uma distinção
 importante entre a posição de leitura em memória do consumer (onde o client já entregou mensagens à
@@ -44,14 +44,14 @@ Veja "Offset" no [Capítulo 3](/pt/kafka/livro/arquitetura-interna) e o aprofund
 [Capítulo 7](/pt/kafka/livro/offset-e-commit).
 
 <ExemploFinanceiro>
-No tópico `pix.recebido`, o `saldo-service` mantém um offset commitado por partition — se ele reiniciar,
+No tópico `pix.recebido`, o `saldo-service` mantém um offset commitado por partition: se ele reiniciar,
 retoma exatamente do último offset commitado, sem reler eventos já confirmados como processados (a menos
 que o commit não tenha ocorrido antes do restart).
 </ExemploFinanceiro>
 
 <Pegadinha title='"Offset é um identificador global da mensagem no tópico"'>
 Offset é local à partition, não ao tópico. Duas mensagens de partitions diferentes podem ter exatamente o
-mesmo número de offset sem qualquer relação entre elas — confundir isso com um ID global de mensagem é um
+mesmo número de offset sem qualquer relação entre elas. Confundir isso com um ID global de mensagem é um
 erro comum.
 </Pegadinha>
 

@@ -9,9 +9,9 @@ import type { SearchEntry } from "../src/types/content";
 import { chapterSchema, glossarySchema, questionSchema } from "./content-schemas";
 
 // Não reaproveita src/lib/content/** (getAllChapters etc.) porque esses loaders fazem `import()`
-// dinâmico de .mdx — só funciona dentro do pipeline de build do Next (loader MDX registrado via
+// dinâmico de .mdx: só funciona dentro do pipeline de build do Next (loader MDX registrado via
 // @next/mdx), não num script `tsx` solto. Lê frontmatter direto com gray-matter, igual
-// scripts/validate-content.ts — e valida com o mesmo schema, pra não confiar em cast sem checagem.
+// scripts/validate-content.ts, e valida com o mesmo schema, pra não confiar em cast sem checagem.
 const ROOT = process.cwd();
 const OUTPUT_DIR = path.join(ROOT, "public", "search-index");
 
@@ -78,7 +78,7 @@ function main() {
   }
 }
 
-// Só roda o build ao executar `tsx scripts/build-search-index.ts` diretamente — permite importar
+// Só roda o build ao executar `tsx scripts/build-search-index.ts` diretamente: permite importar
 // buildIndex/readFrontmatter em teste sem disparar o efeito colateral de escrever arquivos.
 const isMainModule = process.argv[1] ? import.meta.url === pathToFileURL(process.argv[1]).href : false;
 if (isMainModule) {

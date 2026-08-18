@@ -5,10 +5,10 @@ slug: "o-que-e-exactly-once"
 level: ["senior", "tech-lead"]
 topics: ["confiabilidade"]
 relatedChapters: ["garantias-de-entrega"]
-shortAnswer: "Exactly Once is processing with no loss and no duplication, via an idempotent producer and transactions, but that guarantee only holds within the Kafka ecosystem — external side effects still require their own idempotency."
+shortAnswer: "Exactly Once is processing with no loss and no duplication, via an idempotent producer and transactions, but that guarantee only holds within the Kafka ecosystem: external side effects still require their own idempotency."
 quiz:
   options:
-    - "Processing with no loss and no duplication, via an idempotent producer and transactions, but only valid within the Kafka-to-Kafka flow — external effects still require their own idempotency."
+    - "Processing with no loss and no duplication, via an idempotent producer and transactions, but only valid within the Kafka-to-Kafka flow: external effects still require their own idempotency."
     - "Processing with no loss and no duplication guaranteed end-to-end, including any database write or API call made by the consumer."
     - "A performance optimization that eliminates producer retries, with no direct relation to message loss or duplication."
     - "Equivalent to At Least Once, but with a different marketing name used by some Kafka implementations."
@@ -21,11 +21,11 @@ quiz:
 
 ## What the interviewer wants to assess
 
-This section's most important trap question — tests whether the candidate understands this guarantee's
+This section's most important trap question: tests whether the candidate understands this guarantee's
 exact **scope**, not just its name.
 
 <RespostaCurta>
-Exactly Once means the message is processed exactly once, with no loss and no duplication — via an
+Exactly Once means the message is processed exactly once, with no loss and no duplication, via an
 idempotent producer and transactions. But that guarantee covers the Kafka-to-Kafka flow; any side effect
 outside Kafka (database, HTTP call, email) still requires its own idempotency.
 </RespostaCurta>
@@ -34,7 +34,7 @@ outside Kafka (database, HTTP call, email) still requires its own idempotency.
 Kafka's exactly-once semantics (EOS) uses an idempotent producer (`enable.idempotence=true`, which avoids
 duplication caused by the producer's own automatic retries) combined with transactions
 (`KafkaTransactionManager`), guaranteeing that reading from a topic, processing, and writing to another
-topic happens as an atomic unit. That's real and it works — but only within the Kafka ecosystem. The
+topic happens as an atomic unit. That's real and it works, but only within the Kafka ecosystem. The
 moment processing includes a write to an external database or a call to an API, that write falls outside
 the Kafka transaction, and a failure right there can still produce duplication of that external effect.
 That's why, even when using exactly-once semantics, systems that integrate Kafka with external databases
@@ -48,13 +48,13 @@ See "Exactly Once: what it covers and what it doesn't" in [Chapter 10](/en/kafka
 <ExemploFinanceiro>
 A consumer that reads from a topic, transforms the data, and writes to another Kafka topic can safely use
 exactly-once semantics with full protection. But if that same consumer also writes the result to a
-relational database, that specific write still requires its own idempotency check (Chapter 11) — Kafka's
+relational database, that specific write still requires its own idempotency check (Chapter 11): Kafka's
 exactly-once doesn't protect it.
 </ExemploFinanceiro>
 
 <Pegadinha title='"Exactly Once means the message is never processed twice, full stop"'>
 That's the answer that fails senior interviews. The guarantee is real, but bounded to Kafka's internal flow
-via transactions — not to external side effects, which are the most common case in real systems.
+via transactions, not to external side effects, which are the most common case in real systems.
 </Pegadinha>
 
 <PerguntaDerivada>

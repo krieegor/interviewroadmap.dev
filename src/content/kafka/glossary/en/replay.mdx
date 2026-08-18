@@ -7,7 +7,7 @@ relatedChapters: ["o-que-e-apache-kafka", "retention-e-replay"]
 ---
 
 Replay is the ability to reread events already retained in the log, moving a Consumer Group's offset (or a
-new instance of one) to an earlier position — or to the start of the available retention window. It's used
+new instance of one) to an earlier position, or to the start of the available retention window. It's used
 to fix processing bugs, populate a new system with existing history, or rebuild derived state (like a
 search index). It depends directly on the topic's retention policy: you can only reread what hasn't
 expired yet.

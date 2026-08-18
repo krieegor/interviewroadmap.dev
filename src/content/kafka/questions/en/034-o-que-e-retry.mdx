@@ -21,20 +21,20 @@ quiz:
 
 ## What the interviewer wants to assess
 
-Whether you distinguish transient from permanent errors — the basis for knowing when retry helps and when
+Whether you distinguish transient from permanent errors: the basis for knowing when retry helps and when
 it's a waste of attempts.
 
 <RespostaCurta>
 Retry is trying to process a failed message again, expecting the error to be transient (a network timeout,
-a momentarily unavailable database). Usually combined with backoff — a growing interval between attempts —
+a momentarily unavailable database). Usually combined with backoff (a growing interval between attempts)
 to avoid overloading an already unstable system.
 </RespostaCurta>
 
 <RespostaSenior>
-Retry only makes sense for transient errors — failures with a real chance of not repeating on a new
+Retry only makes sense for transient errors: failures with a real chance of not repeating on a new
 attempt. For permanent errors (a malformed payload, a business rule that always rejects that data), retry
 is useless: it will fail the same way indefinitely, unless there's a maximum attempt limit, after which the
-message moves to a DLQ. In Kafka, the most robust implementation uses a dedicated retry topic — the
+message moves to a DLQ. In Kafka, the most robust implementation uses a dedicated retry topic: the
 failing message is republished to it with a header indicating how many attempts have already happened, and
 a separate listener reprocesses it after the backoff, without blocking the main topic (avoiding the poison
 pill effect).

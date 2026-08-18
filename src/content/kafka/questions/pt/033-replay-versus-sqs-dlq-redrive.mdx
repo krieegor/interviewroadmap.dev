@@ -21,20 +21,20 @@ quiz:
 
 ## O que o entrevistador quer avaliar
 
-Conhecimento comparativo entre ecossistemas — comum em empresas com infraestrutura AWS que também usam
+Conhecimento comparativo entre ecossistemas, comum em empresas com infraestrutura AWS que também usam
 Kafka. Testa se você entende que são mecanismos de reprocessamento com escopos diferentes, não sinônimos.
 
 <RespostaCurta>
-Replay no Kafka reprocessa qualquer intervalo de eventos ainda retidos no tópico, processados ou não —
+Replay no Kafka reprocessa qualquer intervalo de eventos ainda retidos no tópico, processados ou não:
 basta resetar o offset do Consumer Group. DLQ Redrive no SQS reencaminha apenas as mensagens que já haviam
 falhado e sido movidas para a fila de DLQ, devolvendo-as à fila original.
 </RespostaCurta>
 
 <RespostaSenior>
 A diferença de escopo é a chave: replay atua sobre o histórico completo do tópico, dentro da janela de
-retenção — inclui até mensagens que foram processadas com sucesso, se você quiser reprocessá-las (por
+retenção, incluindo até mensagens que foram processadas com sucesso, se você quiser reprocessá-las (por
 exemplo, para reconstruir um estado derivado). Redrive do SQS só resolve o subconjunto de mensagens que já
-foram isoladas por falha — ele não tem como reencaminhar uma mensagem que foi processada "com sucesso", mas
+foram isoladas por falha: ele não tem como reencaminhar uma mensagem que foi processada "com sucesso", mas
 incorretamente, porque o SQS não retém histórico de mensagens já confirmadas. Isso reflete a diferença de
 modelo: Kafka é um log retido; SQS é uma fila que remove a mensagem ao confirmar processamento.
 </RespostaSenior>
@@ -46,13 +46,13 @@ no [Capítulo 2](/pt/kafka/livro/kafka-versus-outras-ferramentas).
 
 <ExemploFinanceiro>
 Se um bug de cálculo afetou o valor de cashback de compras já processadas com sucesso nos últimos 2 dias, o
-Kafka permite replay desse intervalo inteiro para recalcular. No SQS, isso não seria possível via redrive —
+Kafka permite replay desse intervalo inteiro para recalcular. No SQS, isso não seria possível via redrive:
 só as mensagens que já estavam na DLQ (ou seja, que já haviam falhado) poderiam ser reencaminhadas.
 </ExemploFinanceiro>
 
 <Pegadinha title='"São a mesma coisa com nomes diferentes"'>
 Tratar os dois como equivalentes ignora que redrive só resolve mensagens que já falharam, enquanto replay
-resolve reprocessamento de qualquer parte do histórico retido — processada corretamente ou não.
+resolve reprocessamento de qualquer parte do histórico retido, processada corretamente ou não.
 </Pegadinha>
 
 <PerguntaDerivada>

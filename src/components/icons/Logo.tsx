@@ -1,4 +1,4 @@
-// Logo próprio do interviewroadmap.dev — lambda (λ) estilizada, geométrica, inspirada na iconografia
+// Logo próprio do interviewroadmap.dev: lambda (λ) estilizada, geométrica, inspirada na iconografia
 // "hazard stripe" de jogos como Half-Life/Black Mesa, mas com traço e proporções originais
 // (não é o símbolo oficial da Valve). Usa currentColor pra herdar a cor de destaque do projeto.
 export function Logo({ className }: { className?: string }) {

@@ -5,7 +5,7 @@ slug: "o-que-e-rebalance"
 level: ["pleno", "senior"]
 topics: ["arquitetura"]
 relatedChapters: ["consumer-groups-e-rebalance"]
-shortAnswer: "Rebalance is the redistribution of a topic's partitions among a group's active consumers, triggered whenever the group's membership changes — a consumer joins, leaves, or is considered dead."
+shortAnswer: "Rebalance is the redistribution of a topic's partitions among a group's active consumers, triggered whenever the group's membership changes: a consumer joins, leaves, or is considered dead."
 quiz:
   options:
     - "Rebalance is the redistribution of partitions among a group's active consumers, triggered whenever the group's membership changes."
@@ -21,7 +21,7 @@ quiz:
 
 ## What the interviewer wants to assess
 
-Whether you understand rebalance as an automatic process, but with a real cost — not something
+Whether you understand rebalance as an automatic process, but with a real cost, not something
 transparent and without consequences.
 
 <RespostaCurta>
@@ -31,11 +31,11 @@ declared dead for not sending a heartbeat in time.
 </RespostaCurta>
 
 <RespostaSenior>
-The most common trigger in production isn't an abrupt process crash — it's a consumer that takes too long
+The most common trigger in production isn't an abrupt process crash; it's a consumer that takes too long
 processing a batch of messages (exceeding `max.poll.interval.ms`) and gets declared dead by the group even
 though it's still alive, just slow. In the classic rebalance strategy (eager), every consumer in the group
 revokes all of its partitions at the start of the process, even the ones that will stay with the same
-consumer afterward — the entire group pauses processing during the reassignment window. More recent
+consumer afterward, and the entire group pauses processing during the reassignment window. More recent
 strategies (cooperative sticky) reduce that impact, only revoking the partitions that actually need to
 change owners.
 </RespostaSenior>
@@ -47,13 +47,13 @@ See "What triggers a rebalance" and "The impact of a rebalance" in
 
 <ExemploFinanceiro>
 A `saldo-service` deploy that restarts every replica at the same time triggers a rebalance on every
-restart — if the deploy doesn't use a rolling update, the Consumer Group can go through multiple successive
+restart; if the deploy doesn't use a rolling update, the Consumer Group can go through multiple successive
 rebalances, repeatedly pausing processing during the deploy window.
 </ExemploFinanceiro>
 
 <Pegadinha title='"Rebalance is instant and transparent"'>
 Rebalance is automatic, but it's neither instant nor free. During the detection and reassignment window,
-that group's processing (partial or total, depending on the assignor strategy) is paused — a detail often
+that group's processing (partial or total, depending on the assignor strategy) is paused, a detail often
 forgotten in shallow answers.
 </Pegadinha>
 

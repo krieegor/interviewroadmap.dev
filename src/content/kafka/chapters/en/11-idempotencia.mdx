@@ -1,13 +1,13 @@
----
+﻿---
 title: "Idempotency"
-part: "Part IV — Reliability"
+part: "Part IV: Reliability"
 partOrder: 4
 chapterOrder: 2
 slug: "idempotencia"
 description: "Why consumers need to be idempotent, and how to implement it with eventId, a uniqueness constraint, and atomicity."
 ---
 
-Chapter 10 ended by pointing here: At Least Once — the guarantee most used in financial systems — accepts
+Chapter 10 ended by pointing here: At Least Once (the guarantee most used in financial systems) accepts
 duplication as a structural possibility. This chapter shows how a consumer absorbs that duplication without
 producing duplicated side effects.
 
@@ -16,7 +16,7 @@ producing duplicated side effects.
 <Definicao title="Idempotency">
 A process is idempotent when it produces the same final effect regardless of whether it runs once or
 multiple times with the same input. For a Kafka consumer, that means: processing the same event twice
-shouldn't produce double the effect — the balance is credited once, the email is sent once, the record
+shouldn't produce double the effect: the balance is credited once, the email is sent once, the record
 exists once.
 </Definicao>
 
@@ -24,7 +24,7 @@ exists once.
 
 <Atencao title="Duplication is not a remote possibility">
 At Least Once (Chapter 10) guarantees no message is lost, accepting as the price that it may be delivered
-more than once — after a rebalance (Chapter 6), a commit retry, or a crash between finishing processing and
+more than once: after a rebalance (Chapter 6), a commit retry, or a crash between finishing processing and
 committing the offset (Chapter 7). This isn't a rare bug: it's the expected, documented behavior of that
 guarantee. A consumer that doesn't handle this will duplicate effects in production, sooner or later.
 </Atencao>
@@ -48,12 +48,12 @@ Checking and processing as separate steps (a `SELECT` query, then a business `IN
 race condition: under concurrency (two consumers, or simultaneous reprocessing), both can check "doesn't
 exist" at the same time and apply the effect twice before either one writes the `eventId`. The check and the
 effect need to happen in the **same database transaction**, with the uniqueness constraint as the real
-guarantee — not an upfront check in application code.
+guarantee, not an upfront check in application code.
 </Pegadinha>
 
 In practice, this means: inserting the `eventId` into the control table and applying the business effect
 (debit, credit, write) in the same transaction. If the uniqueness constraint rejects the insert, the entire
-transaction fails and is rolled back — no partial effect is applied, even under concurrency.
+transaction fails and is rolled back: no partial effect is applied, even under concurrency.
 
 ## eventId vs. transactionId
 
@@ -66,24 +66,24 @@ transaction fails and is rolled back — no partial effect is applied, even unde
 
 Normally `eventId` is enough to handle Kafka redelivery. But in scenarios where the same business fact can
 arrive through different paths (e.g., a bank notification duplicated at the source channel, producing two
-distinct Kafka events for the same real transaction), deduplication by `eventId` alone isn't enough — a
+distinct Kafka events for the same real transaction), deduplication by `eventId` alone isn't enough: a
 unique business identifier is also needed (`transactionId`, `endToEndId` in the case of PIX) to catch that
 duplication at the source, even before it reaches Kafka.
 
 ## When natural idempotency makes the control table unnecessary
 
-Not every consumer needs the `processed_events` table. If the operation is already naturally idempotent — an
-*upsert* that always writes the same final value, regardless of how many times it runs — explicit `eventId`
+Not every consumer needs the `processed_events` table. If the operation is already naturally idempotent (an
+*upsert* that always writes the same final value, regardless of how many times it runs), explicit `eventId`
 control is redundant.
 
 <ExemploFinanceiro title="Credit score upsert">
 The `risco-service` writes each customer's latest score with an `UPDATE ... WHERE clienteId = ?` (upsert).
-Processing the same event twice simply writes the same value twice — with no additional side effect. This
+Processing the same event twice simply writes the same value twice, with no additional side effect. This
 consumer is naturally idempotent and doesn't need `eventId` control.
 </ExemploFinanceiro>
 
 Operations that **increment** or **accumulate** state (crediting a balance, incrementing a counter, sending
-a notification), on the other hand, aren't naturally idempotent — processing them twice duplicates the
+a notification), on the other hand, aren't naturally idempotent: processing them twice duplicates the
 effect, which is why they require explicit `eventId` control.
 
 ## How this shows up in interviews
@@ -91,11 +91,11 @@ effect, which is why they require explicit `eventId` control.
 "How would you avoid duplicate processing?" is almost guaranteed whenever At Least Once comes up in
 conversation. The weak answer just mentions "a unique eventId." The strong answer explains atomicity: check
 and apply the effect in the same transaction, with the uniqueness constraint as the real guarantee under
-concurrency — not an upfront check in code.
+concurrency, not an upfront check in code.
 
 <DicaEntrevista>
 When describing idempotency, always mention the uniqueness constraint and transaction atomicity. That
-detail — not the mere existence of an `eventId` — is what separates a correct implementation from one that
+detail (not the mere existence of an `eventId`) is what separates a correct implementation from one that
 still has a race condition under concurrency.
 </DicaEntrevista>
 
@@ -104,7 +104,7 @@ still has a race condition under concurrency.
 In Spring Boot, this typically translates into a table with an `event_id` column marked `UNIQUE`, and the
 processing code inside a method annotated with `@Transactional`, which tries to insert the control record
 and apply the business effect before any commit. If the insert throws a `DataIntegrityViolationException`
-(constraint violation), the code catches that exception specifically and treats it as "already processed" —
+(constraint violation), the code catches that exception specifically and treats it as "already processed",
 not as a generic error to be propagated to the retry mechanism (Chapter 9).
 
 <ExemploFinanceiro title="Idempotent PIX credit">
@@ -119,14 +119,14 @@ public void creditarPix(PixRecebidoEvent evento) {
     contaRepository.creditar(evento.getContaId(), evento.getValor());
 }
 ```
-Inserting the `eventId` and crediting the balance happen in the same transaction — if the insert fails due
+Inserting the `eventId` and crediting the balance happen in the same transaction: if the insert fails due
 to duplication, the credit is never applied a second time.
 </ExemploFinanceiro>
 
 <Resumo>
 Idempotency is what lets a consumer absorb At Least Once's structural duplication without duplicating
 business effects. The central pattern is a unique `eventId`, checked and inserted in the same transaction
-that applies the effect — the database's uniqueness constraint, not an upfront check in code, is what
+that applies the effect: the database's uniqueness constraint, not an upfront check in code, is what
 guarantees atomicity under concurrency. Naturally idempotent operations (upsert) can skip this control;
 operations that accumulate state (credit, increment) cannot.
 </Resumo>

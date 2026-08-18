@@ -5,7 +5,7 @@ slug: "o-que-e-idempotencia"
 level: ["pleno", "senior"]
 topics: ["confiabilidade"]
 relatedChapters: ["idempotencia"]
-shortAnswer: "Idempotência é a propriedade de um processamento que produz o mesmo efeito final, mesmo se executado mais de uma vez com a mesma entrada — o requisito complementar do At Least Once."
+shortAnswer: "Idempotência é a propriedade de um processamento que produz o mesmo efeito final, mesmo se executado mais de uma vez com a mesma entrada: o requisito complementar do At Least Once."
 quiz:
   options:
     - "Propriedade de um processamento que produz o mesmo efeito final mesmo executado mais de uma vez com a mesma entrada, complementar à garantia At Least Once."
@@ -22,31 +22,31 @@ quiz:
 ## O que o entrevistador quer avaliar
 
 Se você entende idempotência como requisito estrutural (não um "extra de qualidade") sempre que a garantia
-de entrega é At Least Once — a mais usada na prática.
+de entrega é At Least Once, a mais usada na prática.
 
 <RespostaCurta>
 Idempotência é a capacidade de processar o mesmo evento múltiplas vezes sem gerar efeitos colaterais
-duplicados — o saldo é creditado uma vez, o e-mail é enviado uma vez, mesmo que a mensagem seja entregue
+duplicados: o saldo é creditado uma vez, o e-mail é enviado uma vez, mesmo que a mensagem seja entregue
 duas ou mais vezes.
 </RespostaCurta>
 
 <RespostaSenior>
 At Least Once (Capítulo 10) garante que nenhuma mensagem é perdida, aceitando como preço que ela pode ser
-entregue mais de uma vez — depois de um rebalance, de um retry de commit, ou de uma falha entre o fim do
+entregue mais de uma vez, depois de um rebalance, de um retry de commit, ou de uma falha entre o fim do
 processamento e o commit do offset. Um consumer que não trata isso duplica efeitos em produção. A
 implementação mais robusta usa um identificador único do evento (`eventId`) e uma constraint de unicidade em
-banco, verificada e aplicada **na mesma transação** que executa o efeito de negócio — não em uma checagem
+banco, verificada e aplicada **na mesma transação** que executa o efeito de negócio, não em uma checagem
 prévia separada, que introduziria condição de corrida sob concorrência.
 </RespostaSenior>
 
 ## Explicação aprofundada
 
-Veja o capítulo completo — [Idempotência](/pt/kafka/livro/idempotencia).
+Veja o capítulo completo: [Idempotência](/pt/kafka/livro/idempotencia).
 
 <ExemploFinanceiro>
 O `saldo-service` mantém uma tabela `eventos_processados` com constraint de unicidade em `eventId`. Antes de
 creditar um PIX, ele tenta inserir o `eventId`; se falhar por violação de unicidade, o evento já foi
-processado e a operação é ignorada com segurança — tudo na mesma transação de banco.
+processado e a operação é ignorada com segurança, tudo na mesma transação de banco.
 </ExemploFinanceiro>
 
 <Pegadinha title='"Eu checo se o eventId já existe antes de processar"'>

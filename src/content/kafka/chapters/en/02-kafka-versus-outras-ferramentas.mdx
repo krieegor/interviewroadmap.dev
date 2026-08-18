@@ -1,6 +1,6 @@
----
+﻿---
 title: "Kafka versus other tools"
-part: "Part I — Fundamentals"
+part: "Part I: Fundamentals"
 partOrder: 1
 chapterOrder: 2
 slug: "kafka-versus-outras-ferramentas"
@@ -8,7 +8,7 @@ description: "A technical comparison between Kafka, RabbitMQ, AWS SQS, AWS SNS, 
 ---
 
 One of the most common interview questions is comparing Kafka to some other messaging tool the candidate
-has already used. This isn't naming pedantry — each tool was designed for a different usage model, and
+has already used. This isn't naming pedantry: each tool was designed for a different usage model, and
 choosing wrong has a real cost in production.
 
 ## The axis that actually matters: work queue vs. event log
@@ -17,7 +17,7 @@ Before comparing features, it's worth splitting these tools into two families:
 
 - **Work queues** (RabbitMQ, AWS SQS): each message should be processed by exactly one consumer; once
   processed (ack), it normally disappears.
-- **Event log / pub-sub with retention** (Kafka, and — with caveats — AWS SNS + Google Pub/Sub): the same
+- **Event log / pub-sub with retention** (Kafka, and, with caveats, AWS SNS + Google Pub/Sub): the same
   event can be read by multiple independent consumers, and can stay available after being read.
 
 Ignoring this difference is the most common cause of choosing the wrong tool.
@@ -29,15 +29,15 @@ Ignoring this difference is the most common cause of choosing the wrong tool.
 |---|---|---|
 | Model | Distributed, partitioned log | Message queue (with exchanges/routing) |
 | Retention | Configurable (time/size), message persists after consumption | Message disappears after ack (unless configured otherwise) |
-| Replay | Native — resetting the offset rereads history | Not native — requires manual resend |
+| Replay | Native: resetting the offset rereads history | Not native: requires manual resend |
 | Ordering | Guaranteed per partition | Guaranteed per queue (FIFO), simpler to reason about in a single queue |
 | Multiple consumers of the same data | Natural, via separate Consumer Groups | Requires explicit fan-out (a *fanout* exchange) |
 | Throughput at high scale | Very high, designed for volume | High, but with more routing overhead per message |
-| Complex routing (rules, priority) | Limited — routing is by topic/partition/key | Rich — exchanges, routing keys, message priority |
+| Complex routing (rules, priority) | Limited: routing is by topic/partition/key | Rich: exchanges, routing keys, message priority |
 | Operational curve | Higher (cluster, partitions, retention) | Lower for simple cases |
 </Comparacao>
 
-RabbitMQ shines when the requirement is sophisticated routing of work messages — priorities, fine-grained
+RabbitMQ shines when the requirement is sophisticated routing of work messages: priorities, fine-grained
 dead lettering, multiple exchange patterns. Kafka shines when the requirement is an event history shared by
 multiple consumers, with a need for replay.
 
@@ -47,8 +47,8 @@ multiple consumers, with a need for replay.
 | Criterion | Kafka | AWS SQS |
 |---|---|---|
 | Model | Distributed log | Managed queue (Standard or FIFO) |
-| Retention after consumption | Yes (up to the topic's retention limit) | No — message is removed after ack (or expires) |
-| Replay | Native | No — only via DLQ redrive (reprocessing failed messages, not full history) |
+| Retention after consumption | Yes (up to the topic's retention limit) | No, message is removed after ack (or expires) |
+| Replay | Native | No, only via DLQ redrive (reprocessing failed messages, not full history) |
 | Ordering | Per partition | FIFO guarantees order per *message group*; Standard guarantees no order |
 | Operations | You manage the cluster (or use a managed service like MSK/Confluent Cloud) | Fully managed by AWS, zero infrastructure |
 | Independent consumer scaling | Native (multiple Consumer Groups) | Requires SNS + multiple queues for fan-out |
@@ -56,7 +56,7 @@ multiple consumers, with a need for replay.
 </Comparacao>
 
 <Atencao title="SQS FIFO is not Kafka">
-  SQS FIFO guarantees order within a *message group* and avoids duplication — but it's still a
+  SQS FIFO guarantees order within a *message group* and avoids duplication, but it's still a
   queue: the message disappears from the queue once read. It solves ordering, not
   retention/replay, and not multiple independent consumers of the same data without duplicating the
   message via SNS.
@@ -66,7 +66,7 @@ multiple consumers, with a need for replay.
 
 SNS is a **pure pub/sub** service (fan-out): a published message is delivered to every subscriber (SQS
 queues, HTTP endpoints, Lambda). It's common to find the **SNS + SQS** pattern: SNS distributes, each SQS
-queue consumes independently — this partially reproduces what Kafka does natively with Consumer Groups, but
+queue consumes independently; this partially reproduces what Kafka does natively with Consumer Groups, but
 without long-term retention or history replay: once delivered and processed, the message can't be reread
 from SNS.
 
@@ -89,7 +89,7 @@ that stack.
 ## A practical decision criterion
 
 <DicaEntrevista>
-  When asked to compare, don't memorize the table — explain the decision criterion: "if I need
+  When asked to compare, don't memorize the table: explain the decision criterion: "if I need
   multiple independent services to read the same event, with the possibility of replay, I think
   Kafka; if I need to distribute work among workers, with rich routing and low retention needs, I
   think RabbitMQ or SQS." This shows reasoning, not memorization.
@@ -104,7 +104,7 @@ that stack.
 </ExemploFinanceiro>
 
 <Resumo>
-  RabbitMQ and SQS model work queues — a processed message disappears. Kafka models a retained event
+  RabbitMQ and SQS model work queues: a processed message disappears. Kafka models a retained event
   log, read by multiple independent consumers, with native replay. SNS solves fan-out, but not
   long-term retention. Google's Pub/Sub is operationally the closest thing to Kafka "without
   operating a cluster," but with different ordering and retention semantics. The right choice

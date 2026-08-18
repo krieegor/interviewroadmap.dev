@@ -1,6 +1,6 @@
----
+﻿---
 title: "Partitions and ordering"
-part: "Part II — Architecture"
+part: "Part II: Architecture"
 partOrder: 2
 chapterOrder: 2
 slug: "partitions-e-ordenacao"
@@ -23,7 +23,7 @@ up to the number of partitions it has. Partitions exist to solve two problems at
   same Consumer Group process different partitions in parallel (parallelism).
 </Definicao>
 
-Without partitions, adding more consumers to a Consumer Group wouldn't increase consumption throughput —
+Without partitions, adding more consumers to a Consumer Group wouldn't increase consumption throughput:
 there would only be a single sequential stream to process. With partitions, consumption parallelism scales
 along with the topic's partition count.
 
@@ -32,7 +32,7 @@ along with the topic's partition count.
 The two reasons aren't the same thing, and it's worth separating them:
 
 - **Consumption parallelism**: within a Consumer Group, each partition is assigned to exactly one consumer
-  at a time. More partitions means more consumers processing at the same time — up to the limit of one
+  at a time. More partitions means more consumers processing at the same time, up to the limit of one
   partition per consumer (Chapter 6 dives into what happens when that limit is exceeded).
 - **Storage and write scalability**: partitions of the same topic can live on different brokers. A topic
   with 12 partitions spread across 3 brokers has 3 times more simultaneous write capacity than if it lived
@@ -41,13 +41,13 @@ The two reasons aren't the same thing, and it's worth separating them:
 ## Message key and the partitioning decision
 
 When a Producer publishes a message, it can (optionally) provide a **key**. The broker uses that key to
-decide which partition the message lands on — and that decision is deterministic: the same key always
+decide which partition the message lands on, and that decision is deterministic: the same key always
 results in the same partition, for a fixed number of partitions in the topic.
 
 <Definicao title="Key and hash">
   Kafka's default partitioner computes `hash(key) % number_of_partitions` to decide the destination
   partition. Since the hash of the same key is always the same, all messages with that key
-  consistently land on the same partition — and are therefore read in the order they were written.
+  consistently land on the same partition, and are therefore read in the order they were written.
 </Definicao>
 
 <Diagrama legenda="Messages with the same key (account-101, account-204) are hash-routed to the same partition every time.">
@@ -60,7 +60,7 @@ messages into one partition at a time before rotating, optimizing batching witho
 distribution). The price of that distribution is that there's no ordering guarantee at all between those
 messages.
 
-## Ordering within a partition — and the absence of global ordering
+## Ordering within a partition, and the absence of global ordering
 
 <Definicao title="Ordering in Kafka">
   Kafka guarantees that messages written to the same partition are read in the same order they were
@@ -69,14 +69,14 @@ messages.
 </Definicao>
 
 This follows directly from the log structure: a partition is a linear, immutable sequence, so write order
-is, by construction, read order. But a topic with multiple partitions isn't a single sequence — it's a set
+is, by construction, read order. But a topic with multiple partitions isn't a single sequence: it's a set
 of independent sequences, each with its own offset clock. Two messages in different partitions have no
 defined ordering relationship between them, even if one was visibly written before the other in real time.
 
-<Atencao title='"Ordered" is not a property of the topic — it is a property of the partition'>
+<Atencao title='"Ordered" is not a property of the topic: it is a property of the partition'>
   It's common to hear "this topic is ordered" as if it were a binary property of the whole topic. The
   correct phrasing is "this key's events are ordered relative to each other," because that's all
-  that's guaranteed — and it's only guaranteed because the key pins the message to a single partition.
+  that's guaranteed, and it's only guaranteed because the key pins the message to a single partition.
 </Atencao>
 
 ## Choosing the key: the most important decision when modeling a topic
@@ -85,7 +85,7 @@ The question to ask isn't "which key distributes best across partitions," but **
 ordered relative to each other?"** The answer to that question is the key.
 
 - If two events for the same `accountId` need to be processed in the order they occurred (e.g., "PIX
-  received" followed by "balance debited due to chargeback"), the key should be `accountId` — not
+  received" followed by "balance debited due to chargeback"), the key should be `accountId`, not
   `eventId`, which would give better distribution but would destroy the ordering between those two events.
 - If the events are independent of each other (there's no ordering relationship that matters), optimizing
   distribution with a high-cardinality key (or no key) is a valid choice and improves load balancing across
@@ -93,7 +93,7 @@ ordered relative to each other?"** The answer to that question is the key.
 
 <Pegadinha title='"I always use a random UUID as the key to distribute well"'>
   A random UUID per message maximizes distribution, but it also guarantees that related messages
-  (from the same order, the same account, the same contract) land on different partitions — wiping
+  (from the same order, the same account, the same contract) land on different partitions, wiping
   out any ordering guarantee between them. If relative ordering matters for the domain, that's a
   modeling bug, not an optimization.
 </Pegadinha>
@@ -102,19 +102,19 @@ ordered relative to each other?"** The answer to that question is the key.
 
 Increasing the partitions of an existing topic is possible, but has a consequence that goes unnoticed in
 many interviews: the formula `hash(key) % number_of_partitions` changes result when the denominator changes.
-New messages with a previously-used key can land on a different partition than the old messages did — the
+New messages with a previously-used key can land on a different partition than the old messages did: the
 key's historical ordering, previously preserved in a single partition, ends up split across two.
 
 <Atencao title="Increasing partitions is not a neutral operation">
   After increasing the number of partitions, new messages for an already-existing key may go to a
   different partition than the one holding that key's history. This doesn't corrupt data, but it
-  breaks the assumption that "a key's entire history lives in a single partition" — something
+  breaks the assumption that "a key's entire history lives in a single partition", something
   consumers with logic dependent on historical order need to handle (or the team needs to plan the
   partition increase with this consequence in mind, typically migrating to a new topic instead of just
   increasing the existing one).
 </Atencao>
 
-Reducing the number of partitions of a topic, on the other hand, isn't natively supported by Kafka — the
+Reducing the number of partitions of a topic, on the other hand, isn't natively supported by Kafka: the
 only way is to recreate the topic.
 
 ## Architectural impacts of the partition choice
@@ -122,7 +122,7 @@ only way is to recreate the topic.
 - **Too few partitions** limit the Consumer Group's maximum consumption parallelism and concentrate write
   load on few brokers.
 - **Too many partitions** increase the cluster's metadata overhead, rebalance time (Chapter 6), and the
-  number of open file handles per broker — with no added benefit if there aren't enough consumers to take
+  number of open file handles per broker, with no added benefit if there aren't enough consumers to take
   advantage of the extra parallelism.
 - The number of partitions should be sized based on target throughput and the maximum number of consumers
   the Consumer Group intends to scale to, not an arbitrary "round" value.
@@ -130,7 +130,7 @@ only way is to recreate the topic.
 ## How this shows up in interviews
 
 After "what is a partition," the natural follow-up is about the key: "how does Kafka decide which partition
-a message lands on?" and then the classic trap question: "does Kafka guarantee ordering?" — which needs to
+a message lands on?" and then the classic trap question: "does Kafka guarantee ordering?", which needs to
 be answered with the partition caveat, never as an isolated "yes" or "no."
 
 <DicaEntrevista>
@@ -145,22 +145,22 @@ In Spring Kafka, the key is the second argument of `KafkaTemplate.send(topic, ke
 needed, the two-argument overload (`send(topic, value)`) publishes without a key, subject to the
 approximately uniform distribution described above. It's common to see teams forget to pass the key during a
 refactor and only notice the loss of ordering in production, when out-of-order processing starts generating
-state inconsistencies — which is why the key should be treated as part of the topic's contract, not as a
+state inconsistencies, which is why the key should be treated as part of the topic's contract, not as a
 producer implementation detail.
 
 <ExemploFinanceiro title="Card statement: why the key is the accountId">
   In the `faturas.eventos` topic, events like `FaturaFechada` (statement closed),
   `PagamentoRegistrado` (payment recorded), and `FaturaReaberta` (statement reopened) for the same
-  account need to be processed in the order they occurred — processing `PagamentoRegistrado` before
+  account need to be processed in the order they occurred: processing `PagamentoRegistrado` before
   `FaturaFechada` would lead the billing service to a wrong conclusion about the outstanding balance.
   Using `accountId` as the key guarantees that these three events, for a given account, land on the
-  same partition and are read in the right order — even as different accounts are processed in
+  same partition and are read in the right order, even as different accounts are processed in
   parallel, on different partitions.
 </ExemploFinanceiro>
 
 <Resumo>
   Partitions exist to parallelize consumption and distribute writes across brokers. The key
-  determines, via hash, which partition a message is stored in — and it's this choice, not Kafka
+  determines, via hash, which partition a message is stored in; it's this choice, not Kafka
   itself, that decides which events stay ordered relative to each other. Ordering is guaranteed
   within a partition; there is no global ordering across a topic's partitions. Increasing the number
   of partitions changes the hash result for new messages, breaking the assumption that a key's history

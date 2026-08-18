@@ -26,15 +26,15 @@ servidores juntos" sem entender a coordenação entre eles.
 
 <RespostaCurta>
 Cluster é o conjunto de brokers que, juntos, armazenam e servem todos os tópicos de uma instalação Kafka. Os
-brokers se coordenam entre si — hoje via KRaft — para eleger um controlador, distribuir partitions e
+brokers se coordenam entre si (hoje via KRaft) para eleger um controlador, distribuir partitions e
 detectar falhas, tudo isso de forma transparente para producers e consumers.
 </RespostaCurta>
 
 <RespostaSenior>
 Um cluster existe para que o Kafka não dependa de uma única máquina: as partitions de cada tópico são
 distribuídas entre os brokers do cluster, e cada uma delas é replicada (Capítulo 5) para tolerar a perda de
-um ou mais brokers, dependendo do replication factor configurado. A coordenação entre brokers — quem é o
-controlador do cluster, qual broker é leader de cada partition, quais brokers estão vivos — é feita via
+um ou mais brokers, dependendo do replication factor configurado. A coordenação entre brokers (quem é o
+controlador do cluster, qual broker é leader de cada partition, quais brokers estão vivos) é feita via
 KRaft (Kafka Raft), que substituiu o ZooKeeper nas versões atuais, eliminando uma dependência externa que o
 Kafka historicamente precisava para metadados de cluster.
 </RespostaSenior>

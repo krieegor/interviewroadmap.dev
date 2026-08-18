@@ -26,7 +26,7 @@ failure-detection and redistribution mechanism, not just the end result ("anothe
 
 <RespostaCurta>
 The group coordinator detects the missing heartbeat within the configured `session.timeout.ms`, declares
-the consumer dead, and triggers a rebalance — the partitions that were assigned to it are redistributed
+the consumer dead, and triggers a rebalance: the partitions that were assigned to it are redistributed
 among the group's remaining consumers.
 </RespostaCurta>
 
@@ -35,7 +35,7 @@ Each consumer sends periodic heartbeats to the group coordinator (one of the bro
 doesn't receive a heartbeat within `session.timeout.ms`, it considers the consumer dead and starts a
 rebalance, redistributing the orphaned partitions among the active consumers. A subtle point: if processing
 a message takes longer than `max.poll.interval.ms`, the consumer is considered dead even if the heartbeat
-thread keeps responding — because the poll loop, not the heartbeat alone, is the real signal that the
+thread keeps responding, because the poll loop, not the heartbeat alone, is the real signal that the
 consumer is processing normally. This is a common cause of "false" rebalances, where a healthy but slow
 consumer gets kicked out of the group.
 </RespostaSenior>
@@ -46,12 +46,12 @@ See "What triggers a rebalance" in [Chapter 6](/en/kafka/livro/consumer-groups-e
 
 <ExemploFinanceiro>
 If one of the `notificacao-service`'s 4 replicas goes down due to an out-of-memory error, its partitions
-are redistributed among the 3 remaining replicas within seconds — with no manual intervention, but with a
+are redistributed among the 3 remaining replicas within seconds, with no manual intervention but with a
 brief processing pause during the transition.
 </ExemploFinanceiro>
 
 <Pegadinha title='"A consumer is only considered dead if the process actually crashes"'>
-No — a consumer that's alive but takes too long to process a message (exceeding
+No, a consumer that's alive but takes too long to process a message (exceeding
 `max.poll.interval.ms`) also gets kicked out of the group, even with no real infrastructure failure at all.
 </Pegadinha>
 

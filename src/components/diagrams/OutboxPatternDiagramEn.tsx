@@ -189,7 +189,7 @@ export function OutboxPatternDiagramEnSvg() {
         textAnchor="middle"
         className="fill-[var(--color-text-muted)] text-[11px]"
       >
-        If the transaction fails, neither the payment nor the outbox event exists — never one without the other.
+        If the transaction fails, neither the payment nor the outbox event exists: never one without the other.
       </text>
     </svg>
   );

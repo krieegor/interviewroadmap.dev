@@ -18,7 +18,7 @@ type ConsumerLagSvgLabels = {
 };
 
 // Base compartilhada entre PT (`ConsumerLagDiagram`) e EN (`ConsumerLagDiagramEn`, no arquivo
-// irmão) — só o texto muda entre os dois idiomas, a geometria do SVG é idêntica. Ver
+// irmão): só o texto muda entre os dois idiomas, a geometria do SVG é idêntica. Ver
 // specs/roadmap.md (spike de consolidação de diagramas) antes de replicar esse padrão pros outros
 // 12 pares PT/EN.
 export function ConsumerLagDiagramBase({ labels }: { labels: ConsumerLagSvgLabels }) {

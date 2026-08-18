@@ -9,7 +9,7 @@ type TypewriterOptions = {
   typingMs?: number;
   deletingMs?: number;
   pauseMs?: number;
-  // Para depois de digitar a primeira palavra por completo — sem pausa/exclusão/loop. Pensado pra
+  // Para depois de digitar a primeira palavra por completo, sem pausa/exclusão/loop. Pensado pra
   // um wordmark de marca (digita uma vez, fica parado), diferente do uso cíclico normal.
   once?: boolean;
 };
@@ -19,7 +19,7 @@ export function useTypewriter(words: string[], options?: TypewriterOptions): str
   const [display, setDisplay] = useState("");
   const stateRef = useRef({ wordIndex: 0, charIndex: 0, phase: "typing" as TypewriterPhase });
 
-  // `words`/`options` são lidos via ref (sincronizado em efeito próprio, sem dependências —
+  // `words`/`options` são lidos via ref (sincronizado em efeito próprio, sem dependências;
   // roda a cada commit) em vez de entrarem nas deps do efeito do timer: um array/objeto novo por
   // render (comum quando o chamador passa um literal inline) não pode reiniciar a cadeia de timers
   // no meio de uma pausa/exclusão.

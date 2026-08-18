@@ -21,12 +21,12 @@ quiz:
 
 ## O que o entrevistador quer avaliar
 
-Entendimento do papel da DLQ como mecanismo de isolamento de falha — não apenas "onde as mensagens com erro
+Entendimento do papel da DLQ como mecanismo de isolamento de falha, não apenas "onde as mensagens com erro
 vão parar".
 
 <RespostaCurta>
 DLQ (Dead Letter Topic, no vocabulário do Kafka) é um tópico separado para onde mensagens que falharam
-repetidamente são publicadas, depois de esgotadas as tentativas de retry — permitindo investigação manual
+repetidamente são publicadas, depois de esgotadas as tentativas de retry, permitindo investigação manual
 sem bloquear o processamento das mensagens seguintes.
 </RespostaCurta>
 
@@ -34,7 +34,7 @@ sem bloquear o processamento das mensagens seguintes.
 A função da DLQ é isolar o efeito poison pill: sem ela, uma mensagem que falha indefinidamente travaria o
 processamento de tudo que vem depois dela na mesma partition. Ao mover a mensagem problemática para um
 tópico separado depois de esgotar as tentativas de retry, o consumer principal segue processando
-normalmente as mensagens seguintes. A DLQ não corrige o problema — ela só o isola para investigação
+normalmente as mensagens seguintes. A DLQ não corrige o problema: ela só o isola para investigação
 posterior, seja reprocessamento manual depois de corrigir a causa raiz, seja simplesmente descarte, se a
 mensagem for de fato inválida.
 </RespostaSenior>
@@ -45,12 +45,12 @@ Veja "DLQ no Kafka: não é nativa" no [Capítulo 9](/pt/kafka/livro/retry-e-dlq
 
 <ExemploFinanceiro>
 Um evento `BoletoGerado` com CPF malformado falha nas 3 tentativas de retry configuradas e é publicado em
-`boletos.gerados.DLT` — enquanto isso, os boletos seguintes da mesma partition continuam sendo processados
+`boletos.gerados.DLT`; enquanto isso, os boletos seguintes da mesma partition continuam sendo processados
 sem atraso.
 </ExemploFinanceiro>
 
 <Pegadinha title='"A DLQ corrige o problema automaticamente"'>
-A DLQ apenas isola a mensagem problemática — ela não tenta corrigi-la nem reprocessá-la sozinha. Alguém (ou
+A DLQ apenas isola a mensagem problemática; ela não tenta corrigi-la nem reprocessá-la sozinha. Alguém (ou
 algum processo) precisa investigar o motivo da falha e decidir o que fazer com a mensagem isolada.
 </Pegadinha>
 

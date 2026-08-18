@@ -9,7 +9,7 @@ export type EnAvailability = {
   glossario: string[];
 };
 
-// English content is a pilot subset (see specs/roadmap.md) — used by LocaleSwitcher to avoid
+// English content is a pilot subset (see specs/roadmap.md), used by LocaleSwitcher to avoid
 // linking to an untranslated detail page when switching from pt to en.
 export async function getEnAvailability(tech: Tech): Promise<EnAvailability> {
   const [chapters, questions, terms] = await Promise.all([

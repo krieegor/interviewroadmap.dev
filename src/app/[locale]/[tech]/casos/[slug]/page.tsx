@@ -13,7 +13,7 @@ import { isTech, techsWithContent, type Tech } from "@/lib/tech/config";
 import { buildAlternates, buildOpenGraph, techOpengraphImageUrl } from "@/lib/seo";
 
 // Gera a tupla completa (locale+tech+slug) "de baixo pra cima", em vez de depender dos params do
-// segmento pai — quando o retorno varia entre vazio (techs sem conteúdo) e não-vazio (kafka) por
+// segmento pai: quando o retorno varia entre vazio (techs sem conteúdo) e não-vazio (kafka) por
 // combinação de pai, o Next 16 falha silenciosamente e não gera NENHUMA página para essa rota,
 // nem as combinações válidas (confirmado empiricamente; ver specs/architecture.md seção 14).
 export async function generateStaticParams() {
@@ -29,7 +29,7 @@ export async function generateStaticParams() {
   return params;
 }
 
-// Conjunto fechado (todo slug válido já está em `params` acima) — ver nota em
+// Conjunto fechado (todo slug válido já está em `params` acima): ver nota em
 // src/app/[locale]/layout.tsx sobre por que isso importa para o deploy em Cloudflare Workers.
 export const dynamicParams = false;
 

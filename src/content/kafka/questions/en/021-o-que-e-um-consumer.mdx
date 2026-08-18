@@ -32,7 +32,7 @@ topic's partitions are split among the running instances.
 
 <RespostaSenior>
 A consumer is the role played by any application using the Kafka client to read records from partitions.
-It doesn't read the topic as a whole — it reads the partitions specifically assigned to it within its
+It doesn't read the topic as a whole; it reads the partitions specifically assigned to it within its
 Consumer Group, advancing sequentially from the last committed offset. In Spring Boot, this typically shows
 up as a method annotated with `@KafkaListener`, which receives each deserialized record and processes it
 within the application's business logic.
@@ -50,7 +50,7 @@ consumers of the same event.
 </ExemploFinanceiro>
 
 <Pegadinha title='"A Consumer reads the entire topic"'>
-An individual consumer only reads the partitions assigned to it within its Consumer Group — not the whole
+An individual consumer only reads the partitions assigned to it within its Consumer Group, not the whole
 topic, unless the topic has only one partition or it's the only consumer in the group.
 </Pegadinha>
 

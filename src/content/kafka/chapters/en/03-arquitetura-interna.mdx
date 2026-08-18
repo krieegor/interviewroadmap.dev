@@ -1,10 +1,10 @@
----
+﻿---
 title: "Internal architecture"
-part: "Part II — Architecture"
+part: "Part II: Architecture"
 partOrder: 2
 chapterOrder: 1
 slug: "arquitetura-interna"
-description: "Producer, Broker, Cluster, Topic, Partition, Offset, Consumer, and Consumer Group — the pieces that make up Kafka."
+description: "Producer, Broker, Cluster, Topic, Partition, Offset, Consumer, and Consumer Group: the pieces that make up Kafka."
 ---
 
 This chapter precisely defines the pieces that will show up in practically the rest of the book. If Chapter
@@ -19,7 +19,7 @@ This chapter precisely defines the pieces that will show up in practically the r
 </Definicao>
 
 A Producer decides which **topic** to send to, which **key** to use (Chapter 4), and how to serialize the
-value (JSON, Avro, Protobuf). It doesn't know — and shouldn't need to know — how many consumers exist or
+value (JSON, Avro, Protobuf). It doesn't know (and shouldn't need to know) how many consumers exist or
 what they do with the event. In Spring Boot, a Producer is typically a `@Service` using
 `KafkaTemplate<K, V>` (Chapter 13).
 
@@ -48,20 +48,20 @@ forming a **cluster**, for fault tolerance and load distribution.
 ## Topic
 
 <Definicao title="Topic">
-  A Topic is the logical name under which related events are published and consumed — for
+  A Topic is the logical name under which related events are published and consumed, for
   example, `pagamentos.aprovados` or `pix.recebido`. A topic is an abstraction; physically, it's
   split into one or more partitions.
 </Definicao>
 
 A topic has no schema imposed by Kafka itself (the schema, when it exists, is the responsibility of a layer
 like the Schema Registry, outside this chapter's scope). What Kafka guarantees is delivery order **within**
-each partition of the topic — not across different topics, and not necessarily across partitions of the
+each partition of the topic, not across different topics, and not necessarily across partitions of the
 same topic.
 
 ## Partition
 
 <Definicao title="Partition">
-  A Partition is an ordered, immutable subdivision of a topic — the actual physical log. Each
+  A Partition is an ordered, immutable subdivision of a topic: the actual physical log. Each
   partition is a sequence of records identified by an increasing offset, stored on a broker (with
   replicas on other brokers, see Chapter 5).
 </Definicao>
@@ -74,7 +74,7 @@ that's the most important design decision when modeling a topic.
 ## Offset
 
 <Definicao title="Offset">
-  An Offset is the sequential position of a record within a partition — an increasing integer,
+  An Offset is the sequential position of a record within a partition: an increasing integer,
   unique per partition, that uniquely identifies a message in that partition.
 </Definicao>
 
@@ -96,7 +96,7 @@ method annotated with `@KafkaListener` (Chapter 14).
 
 <Definicao title="Consumer Group">
   A Consumer Group is a set of consumer instances identifying with the same `group.id`, splitting
-  a topic's partitions among themselves — each partition is read by exactly one consumer in the
+  a topic's partitions among themselves: each partition is read by exactly one consumer in the
   group at a given time.
 </Definicao>
 
@@ -118,14 +118,14 @@ independently, each group advancing its own set of offsets.
 
 ## When this model is the right choice
 
-This design pays off when the number of events and independent consumers justifies the complexity —
+This design pays off when the number of events and independent consumers justifies the complexity,
 typically starting from a handful of microservices reacting to the same event domain. For a single
 producer/consumer with low volume, the same architecture technically works, but the operational cost of
 maintaining partitions, replicas, and a cluster rarely pays off.
 
 ## Limitations to keep in mind
 
-- A topic's number of partitions defines the maximum consumption parallelism within a Consumer Group —
+- A topic's number of partitions defines the maximum consumption parallelism within a Consumer Group:
   increasing it later is possible, but redistributes the keys (Chapter 4).
 - More partitions isn't always better: each partition consumes broker resources (file handles, memory) and
   increases rebalance time.
@@ -135,12 +135,12 @@ maintaining partitions, replicas, and a cluster rarely pays off.
 Interviewers often ask you to draw this flow on a whiteboard (or describe it verbally) and then vary the
 parameters: "what changes if I have 2 partitions and 5 consumers in the group?", "what if I have two
 different Consumer Groups reading the same topic?". Answering precisely that the offset is local to the
-partition — not the topic — is a signal often used to tell apart someone who's just used Kafka from someone
+partition (not the topic) is a signal often used to tell apart someone who's just used Kafka from someone
 who understands it.
 
 <DicaEntrevista>
   When describing the architecture, make it explicit that the offset is per partition, not per
-  topic, and that different Consumer Groups are completely independent of each other — two groups
+  topic, and that different Consumer Groups are completely independent of each other: two groups
   reading the same topic don't compete for the same messages.
 </DicaEntrevista>
 
@@ -155,7 +155,7 @@ commit) or automatically by the client, depending on configuration (Chapter 7).
   The `faturas.fechadas` topic might have 12 partitions, a key strategy by `accountId` (to
   guarantee that all events for the same account stay ordered on the same partition), and two
   Consumer Groups: one for the billing service (which generates the invoice) and another for the
-  analytics service (which feeds a dashboard) — both read the same topic, completely
+  analytics service (which feeds a dashboard), both read the same topic, completely
   independently, each at its own pace.
 </ExemploFinanceiro>
 

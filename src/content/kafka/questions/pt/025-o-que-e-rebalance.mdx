@@ -5,7 +5,7 @@ slug: "o-que-e-rebalance"
 level: ["pleno", "senior"]
 topics: ["arquitetura"]
 relatedChapters: ["consumer-groups-e-rebalance"]
-shortAnswer: "Rebalance é a redistribuição das partitions de um tópico entre os consumers ativos de um grupo, disparada sempre que a composição do grupo muda — um consumer entra, sai, ou é considerado morto."
+shortAnswer: "Rebalance é a redistribuição das partitions de um tópico entre os consumers ativos de um grupo, disparada sempre que a composição do grupo muda: um consumer entra, sai, ou é considerado morto."
 quiz:
   options:
     - "Rebalance é a redistribuição das partitions entre os consumers ativos de um grupo, disparada sempre que a composição do grupo muda."
@@ -21,7 +21,7 @@ quiz:
 
 ## O que o entrevistador quer avaliar
 
-Se você entende o rebalance como um processo automático, mas com custo real — não algo transparente e sem
+Se você entende o rebalance como um processo automático, mas com custo real: não algo transparente e sem
 consequências.
 
 <RespostaCurta>
@@ -31,11 +31,11 @@ Group, disparado sempre que a composição do grupo muda: um consumer entra, um 
 </RespostaCurta>
 
 <RespostaSenior>
-O gatilho mais comum em produção não é uma queda abrupta de processo — é um consumer que demora demais para
+O gatilho mais comum em produção não é uma queda abrupta de processo: é um consumer que demora demais para
 processar um lote de mensagens (excedendo `max.poll.interval.ms`) e é considerado morto pelo grupo mesmo
 continuando vivo, só lento. Na estratégia clássica de rebalance (eager), todos os consumers do grupo
 revogam todas as suas partitions no início do processo, mesmo aquelas que continuarão com o mesmo consumer
-depois — o grupo inteiro pausa de processar durante a janela de reatribuição. Estratégias mais recentes
+depois: o grupo inteiro pausa de processar durante a janela de reatribuição. Estratégias mais recentes
 (cooperative sticky) reduzem esse impacto, revogando apenas as partitions que realmente precisam mudar de
 dono.
 </RespostaSenior>
@@ -47,13 +47,13 @@ Veja "O que dispara um rebalance" e "O impacto de um rebalance" no
 
 <ExemploFinanceiro>
 Um deploy do `saldo-service` que reinicia todas as réplicas ao mesmo tempo dispara um rebalance a cada
-reinício — se o deploy não usar rolling update, o Consumer Group pode passar por múltiplos rebalances
+reinício: se o deploy não usar rolling update, o Consumer Group pode passar por múltiplos rebalances
 sucessivos, pausando o processamento repetidamente durante a janela de deploy.
 </ExemploFinanceiro>
 
 <Pegadinha title='"Rebalance é instantâneo e transparente"'>
 Rebalance é automático, mas não é instantâneo nem gratuito. Durante a janela de detecção e reatribuição, o
-processamento daquele grupo (parcial ou total, dependendo da estratégia de assignor) fica pausado — um
+processamento daquele grupo (parcial ou total, dependendo da estratégia de assignor) fica pausado, um
 detalhe frequentemente esquecido em respostas superficiais.
 </Pegadinha>
 

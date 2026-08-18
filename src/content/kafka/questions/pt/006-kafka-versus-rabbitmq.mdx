@@ -25,8 +25,8 @@ Se você conhece as duas ferramentas por experiência real ou só por nome. A re
 decisão, não apenas uma lista de features.
 
 <RespostaCurta>
-  RabbitMQ é uma fila de mensagens com roteamento sofisticado — exchanges, routing keys, prioridades
-  — voltada a distribuir trabalho entre workers; a mensagem some depois de processada. Kafka é um
+  RabbitMQ é uma fila de mensagens com roteamento sofisticado (exchanges, routing keys, prioridades),
+  voltada a distribuir trabalho entre workers; a mensagem some depois de processada. Kafka é um
   log distribuído com retenção configurável, voltado a compartilhar eventos entre múltiplos
   consumidores independentes, com replay nativo. Escolho RabbitMQ quando preciso de roteamento fino
   de tarefas; Kafka quando preciso que vários sistemas reajam ao mesmo fato de negócio, com
@@ -36,12 +36,12 @@ decisão, não apenas uma lista de features.
 <RespostaSenior>
   A diferença central não é performance, é modelo de dados. RabbitMQ modela filas de trabalho: uma
   mensagem roteada por uma exchange chega a uma fila e é consumida por um worker; após o ack, ela
-  desaparece. O ponto forte do RabbitMQ é o roteamento — exchanges do tipo direct, topic, fanout e
+  desaparece. O ponto forte do RabbitMQ é o roteamento: exchanges do tipo direct, topic, fanout e
   headers permitem regras complexas de distribuição, prioridade de mensagem e dead lettering fino
   por fila. Kafka modela um log: eventos são anexados a uma partition e retidos por um período
   configurável, independentemente de terem sido lidos. Isso permite que múltiplos Consumer Groups
   leiam o mesmo tópico de forma totalmente independente, e que um novo consumidor leia o histórico
-  retido via replay — coisa que RabbitMQ não oferece nativamente. Na prática, escolho RabbitMQ para
+  retido via replay, algo que RabbitMQ não oferece nativamente. Na prática, escolho RabbitMQ para
   filas de trabalho internas (processar um envio de e-mail, gerar um PDF) e Kafka para eventos de
   domínio que múltiplos sistemas de diferentes times consomem.
 </RespostaSenior>

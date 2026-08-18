@@ -12,7 +12,7 @@ export function hasWebGL(): boolean {
   }
 }
 
-// Suporte a WebGL não muda em runtime — não precisa de subscribe real, só de uma leitura
+// Suporte a WebGL não muda em runtime: não precisa de subscribe real, só de uma leitura
 // segura entre servidor (sempre `false`) e cliente, sem cair no padrão setState-em-effect.
 function subscribe() {
   return () => {};
@@ -32,7 +32,7 @@ function isPrintMedia(): boolean {
 
 // A geração do PDF do livro (scripts/generate-pdf.ts) renderiza a mesma página via Playwright/
 // Chromium headless com `page.emulateMedia({ media: "print" })`. O canvas WebGL dos diagramas 3D
-// não sobrevive a essa captura de impressão (sai em branco, e os rótulos <Html> do drei somem) —
+// não sobrevive a essa captura de impressão (sai em branco, e os rótulos <Html> do drei somem);
 // forçar o fallback SVG sob `@media print` evita diagramas quebrados no PDF.
 function subscribePrintMedia(callback: () => void) {
   if (typeof window === "undefined") return () => {};

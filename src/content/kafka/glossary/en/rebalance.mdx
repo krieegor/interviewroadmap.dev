@@ -7,7 +7,7 @@ relatedChapters: ["consumer-groups-e-rebalance"]
 ---
 
 Rebalance is the process by which the Consumer Group coordinator redistributes a topic's partitions among
-the active consumers, whenever the group's membership changes — a consumer goes down, a new one joins, or
+the active consumers, whenever the group's membership changes: a consumer goes down, a new one joins, or
 a consumer is considered dead for not sending a heartbeat in time. During the rebalance, the group's
 consumption pauses briefly while partitions are reassigned; more recent rebalance strategies (cooperative
 sticky) reduce that impact by avoiding revoking partitions from consumers that remain active.

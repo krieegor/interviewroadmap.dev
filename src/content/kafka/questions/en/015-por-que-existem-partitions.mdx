@@ -21,7 +21,7 @@ quiz:
 
 ## What the interviewer wants to assess
 
-Whether you understand the motivation behind partitions, not just the definition — this question usually
+Whether you understand the motivation behind partitions, not just the definition. This question usually
 comes right after "what is a partition," testing whether the candidate understands the "why," not just
 memorized the "what."
 
@@ -32,7 +32,7 @@ topic can live on different brokers, spreading the load).
 </RespostaCurta>
 
 <RespostaSenior>
-A topic could, in principle, be a single giant log — but that would limit consumption parallelism to a
+A topic could, in principle, be a single giant log, but that would limit consumption parallelism to a
 single sequential stream, no matter how many consumers were added to the group. Partitions solve this by
 splitting the topic into independent units: within a Consumer Group, each partition is assigned to exactly
 one consumer at a time, so consumption parallelism scales with the number of partitions. On the write side,
@@ -46,12 +46,12 @@ See "Why partitions exist" in [Chapter 4](/en/kafka/livro/partitions-e-ordenacao
 
 <ExemploFinanceiro>
 A card transactions topic with a single partition would limit processing to one consumer at a time, even
-if the team scaled the service to 10 replicas — 9 of them would sit idle. With 10 partitions, all 10
+if the team scaled the service to 10 replicas, 9 of them would sit idle. With 10 partitions, all 10
 replicas process in genuine parallel.
 </ExemploFinanceiro>
 
 <Pegadinha title='"Partitions only exist for write performance"'>
-Write performance is half the answer. The other half — just as important and often forgotten — is
+Write performance is half the answer. The other half (just as important and often forgotten) is
 consumption parallelism: without partitions, adding more consumers to a Consumer Group wouldn't increase
 processing throughput at all.
 </Pegadinha>

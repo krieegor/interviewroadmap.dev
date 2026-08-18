@@ -7,7 +7,7 @@ relatedChapters: ["arquitetura-interna", "consumer-groups-e-rebalance"]
 ---
 
 Within a Consumer Group, each partition of a topic is assigned to exactly one consumer in the group at any
-given time — which distributes work, similar to a queue. Different Consumer Groups, however, are completely
+given time, which distributes work, similar to a queue. Different Consumer Groups, however, are completely
 independent of each other: each group keeps its own set of offsets and can read the same topic without
 interfering with the others. It's this combination that lets Kafka both distribute work and share the same
 data with multiple systems.

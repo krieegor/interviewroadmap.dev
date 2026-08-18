@@ -5,10 +5,10 @@ slug: "o-que-acontece-quando-o-leader-cai"
 level: ["senior", "tech-lead"]
 topics: ["arquitetura", "confiabilidade"]
 relatedChapters: ["brokers-lideres-e-replicacao"]
-shortAnswer: "The cluster controller detects the missing heartbeat and automatically promotes a follower from the ISR to new leader — automatic, but with a real unavailability window, not instant."
+shortAnswer: "The cluster controller detects the missing heartbeat and automatically promotes a follower from the ISR to new leader: automatic, but with a real unavailability window, not instant."
 quiz:
   options:
-    - "The controller detects the missing heartbeat and automatically promotes a follower from the ISR to new leader — automatic, but with a real unavailability window."
+    - "The controller detects the missing heartbeat and automatically promotes a follower from the ISR to new leader: automatic, but with a real unavailability window."
     - "Electing a new leader is instant and transparent, with no unavailability window for the partition."
     - "An operator needs to manually promote a follower to new leader as soon as the broker failure is detected."
     - "The controller promotes the geographically closest follower, regardless of its sync state with the previous leader."
@@ -22,20 +22,20 @@ quiz:
 ## What the interviewer wants to assess
 
 Whether you know the election is automatic, comes specifically from the ISR (not from any follower), and
-has a real unavailability cost — it's not transparent and instantaneous.
+has a real unavailability cost: it's not transparent and instantaneous.
 
 <RespostaCurta>
 The cluster controller detects the broker's missing heartbeat and automatically promotes a follower from
-the ISR to new leader for that partition — with no manual intervention. Producers and consumers get a
+the ISR to new leader for that partition, with no manual intervention. Producers and consumers get a
 transient error, automatically rediscover the new leader, and resume operation.
 </RespostaCurta>
 
 <RespostaSenior>
 The process is automatic, but neither instant nor free: during the detection (heartbeat) and election
-window — typically seconds in a healthy cluster — writes and reads for that specific partition are
+window (typically seconds in a healthy cluster), writes and reads for that specific partition are
 temporarily unavailable. The new leader is chosen only among the replicas in the ISR, never a lagging
 replica, specifically to avoid losing data already confirmed to producers with `acks=all`. From the
-application's point of view, this shows up as a brief latency spike, not a visible failure — as long as the
+application's point of view, this shows up as a brief latency spike, not a visible failure, as long as the
 client's retry configuration is correct.
 </RespostaSenior>
 
@@ -45,7 +45,7 @@ See "What happens when the Leader goes down" in [Chapter 5](/en/kafka/livro/brok
 
 <ExemploFinanceiro>
 If the leader broker for the partition hosting a batch of accounts' transactions goes down during a
-traffic peak, the cluster elects a new leader within seconds — but producers in that window may experience
+traffic peak, the cluster elects a new leader within seconds, but producers in that window may experience
 a momentary latency spike until the election finishes.
 </ExemploFinanceiro>
 

@@ -25,7 +25,7 @@ Whether you know both tools from real experience or just by name. The ideal answ
 criteria, not just a feature list.
 
 <RespostaCurta>
-  RabbitMQ is a message queue with sophisticated routing — exchanges, routing keys, priorities — built
+  RabbitMQ is a message queue with sophisticated routing (exchanges, routing keys, priorities) built
   to distribute work among workers; the message disappears once processed. Kafka is a distributed log
   with configurable retention, built to share events across multiple independent consumers, with
   native replay. I choose RabbitMQ when I need fine-grained task routing; Kafka when I need several
@@ -35,11 +35,11 @@ criteria, not just a feature list.
 <RespostaSenior>
   The core difference isn't performance, it's data model. RabbitMQ models work queues: a message
   routed by an exchange arrives at a queue and is consumed by a worker; after the ack, it disappears.
-  RabbitMQ's strength is routing — direct, topic, fanout, and headers exchanges enable complex
+  RabbitMQ's strength is routing: direct, topic, fanout, and headers exchanges enable complex
   distribution rules, message priority, and fine-grained dead lettering per queue. Kafka models a log:
   events are appended to a partition and retained for a configurable period, regardless of whether
   they've been read. This lets multiple Consumer Groups read the same topic completely independently,
-  and lets a new consumer read the retained history via replay — something RabbitMQ doesn't offer
+  and lets a new consumer read the retained history via replay, something RabbitMQ doesn't offer
   natively. In practice, I choose RabbitMQ for internal work queues (processing an email send,
   generating a PDF) and Kafka for domain events that multiple systems from different teams consume.
 </RespostaSenior>

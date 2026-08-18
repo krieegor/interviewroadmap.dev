@@ -25,7 +25,7 @@ export function OffsetLog3D({
   accentTo?: number;
   /** Tracejado = "em andamento" (ex.: reprocessando); sólido = estado already-final (ex.: commitado). */
   accentDashed?: boolean;
-  /** Faixa neutra/esmaecida (ex.: processado mas ainda não commitado — zona de risco). */
+  /** Faixa neutra/esmaecida (ex.: processado mas ainda não commitado, zona de risco). */
   pendingFrom?: number;
   pendingTo?: number;
   markers?: OffsetMarker[];

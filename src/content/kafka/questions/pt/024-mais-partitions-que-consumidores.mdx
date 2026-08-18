@@ -5,10 +5,10 @@ slug: "mais-partitions-que-consumidores"
 level: ["pleno", "senior"]
 topics: ["arquitetura"]
 relatedChapters: ["consumer-groups-e-rebalance"]
-shortAnswer: "Alguns consumers processam mais de uma partition — o processamento continua paralelo, mas desbalanceado, já que cada consumer com múltiplas partitions absorve mais carga que os demais."
+shortAnswer: "Alguns consumers processam mais de uma partition: o processamento continua paralelo, mas desbalanceado, já que cada consumer com múltiplas partitions absorve mais carga que os demais."
 quiz:
   options:
-    - "Alguns consumers recebem mais de uma partition — o processamento continua paralelo, mas fica desbalanceado entre as instâncias do grupo."
+    - "Alguns consumers recebem mais de uma partition: o processamento continua paralelo, mas fica desbalanceado entre as instâncias do grupo."
     - "Esse desbalanceamento é sempre um problema que precisa ser corrigido imediatamente, independentemente do volume de mensagens processado."
     - "As partitions excedentes ficam sem nenhum consumer atribuído até que uma nova instância seja adicionada ao grupo."
     - "O Kafka distribui exatamente uma partition por consumer e descarta as mensagens das partitions que excedem esse número."
@@ -22,19 +22,19 @@ possui?"
 
 ## O que o entrevistador quer avaliar
 
-O contraponto da pergunta anterior — testa se o candidato entende o cenário oposto e suas implicações de
+O contraponto da pergunta anterior: testa se o candidato entende o cenário oposto e suas implicações de
 balanceamento de carga, não só o caso "ideal" de 1:1.
 
 <RespostaCurta>
-Alguns consumers recebem mais de uma partition. O processamento continua paralelo — cada partition ainda
-tem exatamente um consumer atribuído — mas fica desbalanceado, porque os consumers com múltiplas
+Alguns consumers recebem mais de uma partition. O processamento continua paralelo (cada partition ainda
+tem exatamente um consumer atribuído), mas fica desbalanceado, porque os consumers com múltiplas
 partitions processam mais carga que os demais.
 </RespostaCurta>
 
 <RespostaSenior>
 O Kafka distribui as partitions restantes entre os consumers disponíveis da forma mais equilibrada possível
 (dependendo da estratégia de assignor configurada), mas se o número de partitions não é múltiplo do número
-de consumers, a distribuição nunca é perfeitamente igual — um consumer pode ficar com 3 partitions e outro
+de consumers, a distribuição nunca é perfeitamente igual: um consumer pode ficar com 3 partitions e outro
 com 2, por exemplo. Isso não é um problema em si, mas significa que o consumer com mais partitions
 atribuídas tende a acumular mais consumer lag (Capítulo 15) se o volume por partition for parecido entre
 elas, porque ele precisa processar o dobro ou triplo de mensagens no mesmo intervalo de tempo.
@@ -47,12 +47,12 @@ Veja "O que acontece com números diferentes de consumers" no
 
 <ExemploFinanceiro>
 Um tópico com 5 partitions e um Consumer Group com 2 réplicas resulta em uma réplica processando 3
-partitions e a outra processando 2 — ainda paralelo, mas com uma réplica absorvendo 50% mais carga que a
+partitions e a outra processando 2, ainda paralelo, mas com uma réplica absorvendo 50% mais carga que a
 outra.
 </ExemploFinanceiro>
 
 <Pegadinha title='"Isso é um problema que preciso corrigir imediatamente"'>
-Nem sempre. É uma distribuição válida e funcional — o alerta real é quando esse desbalanceamento se traduz
+Nem sempre. É uma distribuição válida e funcional: o alerta real é quando esse desbalanceamento se traduz
 em consumer lag desproporcional e sustentado em uma das instâncias, sinal de que o paralelismo total do
 grupo está insuficiente para o volume, não apenas mal distribuído.
 </Pegadinha>

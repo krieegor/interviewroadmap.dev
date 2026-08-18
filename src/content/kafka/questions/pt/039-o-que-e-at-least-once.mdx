@@ -5,7 +5,7 @@ slug: "o-que-e-at-least-once"
 level: ["pleno", "senior"]
 topics: ["confiabilidade"]
 relatedChapters: ["garantias-de-entrega", "idempotencia"]
-shortAnswer: "At Least Once é a garantia em que a mensagem nunca é perdida, mas pode ser duplicada — o padrão prático em sistemas financeiros, sempre combinado com processamento idempotente no consumer."
+shortAnswer: "At Least Once é a garantia em que a mensagem nunca é perdida, mas pode ser duplicada: o padrão prático em sistemas financeiros, sempre combinado com processamento idempotente no consumer."
 quiz:
   options:
     - "A garantia em que a mensagem nunca é perdida, mas pode ser duplicada, exigindo processamento idempotente no consumer para lidar com reentregas."
@@ -34,7 +34,7 @@ reprocessamento em caso de falha entre a confirmação e o registro dela.
 É o padrão prático mais usado em sistemas financeiros porque, entre perder e duplicar, duplicar é o risco
 mais gerenciável: uma mensagem duplicada é detectável e corrigível com idempotência (Capítulo 11), enquanto
 uma mensagem perdida sequer deixa rastro. Na prática, isso significa `acks=all` no producer (com retry) e
-commit manual no consumer, feito só depois que o processamento termina com sucesso — se o consumer cair
+commit manual no consumer, feito só depois que o processamento termina com sucesso; se o consumer cair
 entre o fim do processamento e o commit, a mensagem é reentregue no próximo início, e é o processamento
 idempotente que garante que essa reentrega não duplique o efeito de negócio.
 </RespostaSenior>
@@ -46,12 +46,12 @@ Veja "At Least Once" no [Capítulo 10](/pt/kafka/livro/garantias-de-entrega) e o
 
 <ExemploFinanceiro>
 O `notificacao-service` roda com At Least Once: se ele cair depois de enviar a notificação mas antes de
-comitar o offset, a notificação pode ser enviada duas vezes — aceitável para esse fluxo, e mitigável se
-necessário com uma checagem de idempotência.
+comitar o offset, a notificação pode ser enviada duas vezes (aceitável para esse fluxo, e mitigável se
+necessário com uma checagem de idempotência).
 </ExemploFinanceiro>
 
 <Pegadinha title='"At Least Once garante que a mensagem é processada exatamente uma vez, só que com mais segurança"'>
-Não — At Least Once explicitamente permite duplicidade. Quem precisa de processamento único de verdade
+Não: At Least Once explicitamente permite duplicidade. Quem precisa de processamento único de verdade
 precisa somar idempotência (ou usar exactly-once semantics dentro do escopo do Kafka).
 </Pegadinha>
 

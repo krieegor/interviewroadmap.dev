@@ -9,5 +9,5 @@ relatedChapters: ["arquitetura-interna", "brokers-lideres-e-replicacao"]
 A broker is a running instance of the Kafka server. It physically stores the data for one or more
 partitions and responds to requests from producers (writes) and consumers (reads) for those partitions. A
 Kafka cluster is made up of multiple brokers, each responsible for a subset of the partitions across all
-topics — and, for each partition, one broker acts as leader while the rest (if there are replicas) act as
+topics; for each partition, one broker acts as leader while the rest (if there are replicas) act as
 followers.

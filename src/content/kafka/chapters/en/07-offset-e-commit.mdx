@@ -1,6 +1,6 @@
----
+﻿---
 title: "Offset and Commit"
-part: "Part III — Consumption and reprocessing"
+part: "Part III: Consumption and reprocessing"
 partOrder: 3
 chapterOrder: 1
 slug: "offset-e-commit"
@@ -8,14 +8,14 @@ description: "How a consumer marks how far it has read, the difference between a
 ---
 
 Previous chapters mentioned offset as "a record's position in the log." This chapter goes into the detail
-that shows up most often in production incidents: how and when that position is saved — and what happens
+that shows up most often in production incidents: how and when that position is saved, and what happens
 when it's saved at the wrong moment.
 
 ## Offset as read position
 
 <Definicao title="Offset">
 Offset is an increasing integer, unique per partition, that identifies a record's position in the log. For
-a consumer, the offset also represents "how far I've already read" — but that position is only officially
+a consumer, the offset also represents "how far I've already read", but that position is only officially
 recorded when the consumer commits it.
 </Definicao>
 
@@ -32,12 +32,12 @@ officially marked as processed.
 ## Offset is per partition and per Consumer Group
 
 <Atencao title="Two dimensions that can't be confused">
-The committed offset isn't a global property of the topic or of the consumer in isolation — it's stored
+The committed offset isn't a global property of the topic or of the consumer in isolation: it's stored
 per combination of **partition** and **Consumer Group**. That means two different Consumer Groups reading
 the same topic each have their own set of committed offsets, completely independent of each other.
 </Atencao>
 
-That's why a new Consumer Group, when it starts consuming an existing topic, has no committed offset yet —
+That's why a new Consumer Group, when it starts consuming an existing topic, has no committed offset yet,
 and the `auto.offset.reset` setting (`earliest` or `latest`) decides whether it starts from the beginning of
 the available retention window or only from new events going forward.
 
@@ -50,14 +50,14 @@ explicitly.
 </Definicao>
 
 The advantage is simplicity: the developer writes no commit-related code. The risk is that the commit
-happens on a time interval, not in sync with the actual message processing — it's perfectly possible for
+happens on a time interval, not in sync with the actual message processing: it's perfectly possible for
 the client to commit an offset whose processing by the application is still in progress, or worse, that
 failed silently.
 
 ## Manual Commit
 
 <Definicao title="Manual Commit">
-With `enable.auto.commit=false`, the application explicitly decides when to commit — typically right after
+With `enable.auto.commit=false`, the application explicitly decides when to commit, typically right after
 confirming that processing of a message (or batch) finished successfully, via
 `Acknowledgment.acknowledge()` in Spring Kafka or `consumer.commitSync()`/`commitAsync()` in the plain
 client.
@@ -71,12 +71,12 @@ the cost of more code and more developer responsibility for getting that couplin
 <Comparacao title="Auto commit vs. manual commit: what can go wrong">
 | Order | Risk |
 |---|---|
-| Commit before processing finishes | If the consumer crashes mid-processing, the message is considered processed even though it wasn't — **message loss** |
-| Processing finishes before the commit | If the consumer crashes before the commit happens, the message will be redelivered on the next startup — **duplication** |
+| Commit before processing finishes | If the consumer crashes mid-processing, the message is considered processed even though it wasn't: **message loss** |
+| Processing finishes before the commit | If the consumer crashes before the commit happens, the message will be redelivered on the next startup: **duplication** |
 </Comparacao>
 
 <Pegadinha title='"Auto commit is safer because it is automatic"'>
-Automatic doesn't mean safe — it means the commit's timing is outside the application's control. Auto
+Automatic doesn't mean safe: it means the commit's timing is outside the application's control. Auto
 commit tends toward the **message loss** scenario: it can commit an offset whose processing hasn't finished
 yet (or failed), because the commit interval knows nothing about the real processing state.
 </Pegadinha>
@@ -84,20 +84,20 @@ yet (or failed), because the commit interval knows nothing about the real proces
 Manual commit, done **after** processing finishes successfully, eliminates the risk of message loss, but
 doesn't eliminate duplication: if the consumer crashes exactly between "I finished processing" and "I
 committed," the message will be reprocessed. That's why **at-least-once** (Chapter 10) requires idempotent
-processing (Chapter 11) — duplication isn't a bug to be eliminated, it's a structural possibility the
+processing (Chapter 11): duplication isn't a bug to be eliminated, it's a structural possibility the
 consumer needs to know how to absorb.
 
 ## When this turns into a real incident
 
-Teams that use auto commit in asynchronous or multi-threaded processing — where the message is delivered
-to the application and actual processing happens on another thread or internal queue — often discover too
+Teams that use auto commit in asynchronous or multi-threaded processing (where the message is delivered
+to the application and actual processing happens on another thread or internal queue) often discover too
 late that the client already committed the offset before processing actually finished. An application crash
-in that window silently loses the message, with no exception, no error log — because, from Kafka's point of
+in that window silently loses the message, with no exception, no error log, because, from Kafka's point of
 view, it was already processed.
 
 <DicaEntrevista>
 When explaining the difference between auto commit and manual commit, don't stop at "one is automatic and
-the other manual" — explain the consequence: auto commit tends to lose messages under failure,
+the other manual", explain the consequence: auto commit tends to lose messages under failure,
 well-positioned manual commit (after processing) tends to duplicate messages under failure. Neither is
 "safer" in the abstract; the correct design depends on accepting duplication and handling processing with
 idempotency.
@@ -108,12 +108,12 @@ idempotency.
 In Spring Kafka, `enable.auto.commit=false` combined with `AckMode.MANUAL` (or `MANUAL_IMMEDIATE`) on the
 `ContainerFactory` is the recommended default for processing with real guarantees: the method annotated
 with `@KafkaListener` receives an `Acknowledgment` parameter, and calls `acknowledgment.acknowledge()` only
-after all of the message's business logic — including any database write — finished successfully.
+after all of the message's business logic (including any database write) finished successfully.
 
 <ExemploFinanceiro title="Processing overdue invoices">
 The `cobranca-service` consumes the `boletos.vencidos` topic with manual commit: it only calls
 `acknowledgment.acknowledge()` after confirming the collection notification was sent and recorded in the
-database. If the service crashes mid-send, the offset doesn't advance — the invoice will be reprocessed on
+database. If the service crashes mid-send, the offset doesn't advance: the invoice will be reprocessed on
 the next startup, producing at most a duplicate notification (mitigated by an idempotency check, Chapter
 11), never a silently lost charge.
 </ExemploFinanceiro>
@@ -122,7 +122,7 @@ the next startup, producing at most a duplicate notification (mitigated by an id
 Offset marks the read position within a partition; commit is what actually persists that position for a
 Consumer Group. Auto commit is simple, but commits on a time interval misaligned with actual processing,
 tending to lose messages under failure. Manual commit, done after processing is confirmed, tends to
-duplicate messages under failure instead of losing them — which is why idempotent processing is a
+duplicate messages under failure instead of losing them, which is why idempotent processing is a
 requirement, not an extra, in any consumer with at-least-once guarantees.
 </Resumo>
 

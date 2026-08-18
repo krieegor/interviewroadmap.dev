@@ -7,7 +7,7 @@ relatedChapters: ["idempotencia"]
 ---
 
 Idempotency, in the context of Kafka consumers, is the ability to process the same event multiple times
-without producing duplicated side effects — crediting a balance twice, sending two emails, generating two
+without producing duplicated side effects: crediting a balance twice, sending two emails, generating two
 charges. It's a requirement, not a nice-to-have, because at-least-once guarantees (the most common setup in
 production) imply the same event can be delivered more than once, due to retries, rebalances, or failures
 between processing and committing the offset. The most common implementation uses a unique event

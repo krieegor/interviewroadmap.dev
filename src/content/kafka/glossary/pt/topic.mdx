@@ -6,7 +6,7 @@ relatedTerms: ["partition", "producer", "consumer"]
 relatedChapters: ["arquitetura-interna"]
 ---
 
-Um topic é a abstração que producers e consumers enxergam — por exemplo, `pagamentos.aprovados`. Ele não
+Um topic é a abstração que producers e consumers enxergam, por exemplo, `pagamentos.aprovados`. Ele não
 tem um schema imposto pelo Kafka em si; o que ele garante é a divisão em partitions, cada uma um log
 ordenado e imutável. A ordem de entrega é garantida dentro de cada partition do tópico, não entre tópicos
 diferentes, nem necessariamente entre partitions do mesmo tópico.

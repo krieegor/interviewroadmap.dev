@@ -5,7 +5,7 @@ slug: "como-escolher-a-quantidade-de-partitions"
 level: ["senior", "tech-lead"]
 topics: ["arquitetura"]
 relatedChapters: ["partitions-e-ordenacao", "consumer-groups-e-rebalance"]
-shortAnswer: "Size it by target throughput divided by per-partition throughput, and by the maximum number of consumers the Consumer Group plans to scale to — never by an arbitrary 'round' number."
+shortAnswer: "Size it by target throughput divided by per-partition throughput, and by the maximum number of consumers the Consumer Group plans to scale to, never by an arbitrary 'round' number."
 quiz:
   options:
     - "Size it by target throughput divided by per-partition throughput, and by the maximum number of consumers planned for the Consumer Group."
@@ -21,22 +21,22 @@ quiz:
 
 ## What the interviewer wants to assess
 
-Sizing judgment — not a generic "it depends" answer, but concrete criteria and the consequences of
+Sizing judgment: not a generic "it depends" answer, but concrete criteria and the consequences of
 under- or over-provisioning.
 
 <RespostaCurta>
 Two main variables: the topic's target throughput divided by a single partition's sustainable throughput,
-and the maximum number of consumers the Consumer Group plans to scale to in the future — since the number
+and the maximum number of consumers the Consumer Group plans to scale to in the future, since the number
 of partitions is the real ceiling on consumption parallelism.
 </RespostaCurta>
 
 <RespostaSenior>
 I start from expected throughput: if a partition sustains, say, a few MB/s of writes and the topic needs
 throughput well above that, I need enough partitions to split that load across brokers. Next, I consider
-the desired consumption parallelism — if the team plans to scale the consumer up to 20 replicas at peak,
+the desired consumption parallelism: if the team plans to scale the consumer up to 20 replicas at peak,
 the topic needs at least 20 partitions, or 15 of them will sit idle (Chapter 6). I'd rather overshoot a bit
 than undershoot, because increasing partitions later changes the partitioning hash's result for new
-messages (Chapter 4), breaking the assumption that an entire key's history lives in a single partition — in
+messages (Chapter 4), breaking the assumption that an entire key's history lives in a single partition. In
 general I'd rather migrate to a new topic than increase partitions on an already-in-production topic with
 meaningful history.
 </RespostaSenior>
@@ -49,7 +49,7 @@ See "Increasing the number of partitions: what changes" and "Architectural impac
 
 <ExemploFinanceiro>
 A card transactions topic that currently processes 500 transactions/second, with a plan to grow to 5,000
-in two years, is sized with that ceiling already in mind — avoiding a mid-way partition increase, which
+in two years, is sized with that ceiling already in mind, avoiding a mid-way partition increase, which
 would break historical ordering by `cartaoId`.
 </ExemploFinanceiro>
 

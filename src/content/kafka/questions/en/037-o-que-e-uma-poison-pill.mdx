@@ -21,7 +21,7 @@ quiz:
 
 ## What the interviewer wants to assess
 
-Whether you understand the practical consequence of not having a bounded retry + DLQ strategy — the real
+Whether you understand the practical consequence of not having a bounded retry + DLQ strategy: the real
 scenario these mechanisms exist to prevent.
 
 <RespostaCurta>
@@ -34,9 +34,9 @@ following ones.
 The poison pill effect happens when a consumer treats every error as transient and tries to reprocess
 indefinitely, with no attempt limit or isolation strategy. Since the consumer doesn't advance the offset
 while the message hasn't been processed successfully, every following message in that partition sits
-stuck behind it — even completely healthy messages unrelated to the problem. Prevention is exactly the
+stuck behind it, even completely healthy messages unrelated to the problem. Prevention is exactly the
 Chapter 9 pattern: distinguish transient from permanent errors, cap the number of retry attempts, and move
-the message to a DLQ once that limit is reached — letting the consumer advance and keep processing the
+the message to a DLQ once that limit is reached, letting the consumer advance and keep processing the
 following messages.
 </RespostaSenior>
 
@@ -52,7 +52,7 @@ even if they were perfectly valid.
 
 <Pegadinha title='"Poison pill is a rare problem not worth preventing"'>
 All it takes is a serialization bug, an unexpected null field, or a poorly handled business rule to create
-this scenario — it's common enough to justify always configuring a retry limit and DLQ in any production
+this scenario; it's common enough to justify always configuring a retry limit and DLQ in any production
 consumer, not just the "critical" ones.
 </Pegadinha>
 

@@ -21,19 +21,19 @@ quiz:
 
 ## What the interviewer wants to assess
 
-Fundamental replication knowledge — usually the entry point for questions about failover and ISR.
+Fundamental replication knowledge, usually the entry point for questions about failover and ISR.
 
 <RespostaCurta>
-A partition's leader is the broker that serves all of its reads and writes — producers and consumers only
+A partition's leader is the broker that serves all of its reads and writes: producers and consumers only
 interact with the leader. The follower continuously replicates the leader's data, without serving clients
 directly, staying ready to take over as the new leader if the current one fails.
 </RespostaCurta>
 
 <RespostaSenior>
 Every partition has exactly one leader and zero or more followers, depending on the configured replication
-factor — never two replicas of the same partition on the same broker, which would defeat the protection
+factor, never two replicas of the same partition on the same broker, which would defeat the protection
 against losing that broker. Not every follower is necessarily ready to become leader at any given moment:
-only the ones in the ISR (In-Sync Replicas) — replicas sufficiently caught up with confirmed data — are
+only the ones in the ISR (In-Sync Replicas), replicas sufficiently caught up with confirmed data, are
 eligible. A lagging follower (due to a slow network, for example) is removed from the ISR until it catches
 up again, preventing an outdated replica from taking over and "forgetting" messages already confirmed to
 producers.
@@ -51,7 +51,7 @@ passively, ready to take over if the leader broker fails.
 
 <Pegadinha title='"Followers also respond to read requests, to balance load"'>
 In Kafka's default configuration, only the leader serves client reads and writes. Followers exist
-exclusively for replication and failover — it's not a distributed-read mechanism like in some databases.
+exclusively for replication and failover: it's not a distributed-read mechanism like in some databases.
 </Pegadinha>
 
 <PerguntaDerivada>

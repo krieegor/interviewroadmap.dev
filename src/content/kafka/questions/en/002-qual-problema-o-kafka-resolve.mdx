@@ -28,13 +28,13 @@ business problem it solves.
 <RespostaCurta>
   Kafka solves the coupling problem: when a business event matters to multiple systems, calling each
   one via synchronous HTTP creates a direct dependency between the producer and every consumer, and
-  each new consumer requires changing the producer. Kafka decouples this — the producer publishes
+  each new consumer requires changing the producer. Kafka decouples this: the producer publishes
   once, and any number of consumers read independently.
 </RespostaCurta>
 
 <RespostaSenior>
   In systems with few services, synchronous calls work fine. The problem shows up when the same
-  business event — say, "payment approved" — starts to matter to multiple systems: notifications,
+  business event (say, "payment approved") starts to matter to multiple systems: notifications,
   antifraud, accounting, analytics. If the payments service calls each one directly, it becomes
   coupled to all of their availability, and adding a new consumer requires changing the producer's
   code. Kafka solves this by inverting the model: the producer publishes the event once to a topic and
@@ -52,12 +52,12 @@ including why this isn't primarily a performance question, but a coupling one.
 <ExemploFinanceiro>
   Before Kafka, adding a cashback system that reacts to "purchase approved" would require changing the
   card authorization service to call it directly. With Kafka, the cashback team simply creates a new
-  consumer on the `compras.aprovadas` topic — the authorization service doesn't change a single line.
+  consumer on the `compras.aprovadas` topic; the authorization service doesn't change a single line.
 </ExemploFinanceiro>
 
 <Pegadinha title='"Kafka solves the volume/performance problem"'>
   Volume is a consequence of the design, not the original motivation. A system can justify Kafka even
-  with moderate volume, just because it has many independent consumers of the same event — the core
+  with moderate volume, just because it has many independent consumers of the same event: the core
   problem is coupling, not just throughput.
 </Pegadinha>
 

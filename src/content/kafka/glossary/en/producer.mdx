@@ -6,7 +6,7 @@ relatedTerms: ["topic", "key", "consumer"]
 relatedChapters: ["arquitetura-interna", "o-que-e-apache-kafka"]
 ---
 
-The producer is the role played by any application — typically a microservice — that sends messages to a
+The producer is the role played by any application (typically a microservice) that sends messages to a
 topic. It decides the destination topic, the message's key (which determines the partition), and the
 value's serialization format. A producer doesn't know its consumers; that absence of coupling is what
 makes event-driven architecture possible.

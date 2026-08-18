@@ -5,7 +5,7 @@ slug: "o-que-e-message-key"
 level: ["pleno", "senior"]
 topics: ["arquitetura"]
 relatedChapters: ["partitions-e-ordenacao"]
-shortAnswer: "Message key is an optional value attached to each message that determines, via hash, which partition it will be stored in — the decision that defines which events stay ordered relative to each other."
+shortAnswer: "Message key is an optional value attached to each message that determines, via hash, which partition it will be stored in: the decision that defines which events stay ordered relative to each other."
 quiz:
   options:
     - "Message key is an optional value that determines, via hash, which partition a message is stored in, fixing which events stay ordered relative to each other."
@@ -26,7 +26,7 @@ a technical parameter of the `send` method.
 
 <RespostaCurta>
 Message key is an optional value the producer attaches to each message. Kafka uses that key (via hash) to
-decide which partition the message lands on — messages with the same key always go to the same partition,
+decide which partition the message lands on: messages with the same key always go to the same partition,
 preserving their relative order.
 </RespostaCurta>
 
@@ -36,7 +36,7 @@ events need to be ordered relative to each other." The key locks in that relatio
 key stay on the same partition and are read in the order they were written; events with different keys
 have no guaranteed ordering relationship between them, even if published seconds apart. A
 high-cardinality key (like a UUID per message) distributes better across partitions, but eliminates any
-ordering guarantee between related messages — a common mistake made by people optimizing for distribution
+ordering guarantee between related messages, a common mistake made by people optimizing for distribution
 without considering the domain's real ordering requirement.
 </RespostaSenior>
 
@@ -47,13 +47,13 @@ See "Choosing the key: the most important decision when modeling a topic" in
 
 <ExemploFinanceiro>
 On the `faturas.eventos` topic, using `contaId` as the key guarantees that `FaturaFechada`,
-`PagamentoRegistrado`, and `FaturaReaberta` for the same account reach the consumer in the correct order —
-processing them out of order would lead to a wrong conclusion about the outstanding balance.
+`PagamentoRegistrado`, and `FaturaReaberta` for the same account reach the consumer in the correct order.
+Processing them out of order would lead to a wrong conclusion about the outstanding balance.
 </ExemploFinanceiro>
 
 <Pegadinha title='"I always use a random UUID as the key to distribute well"'>
 A random UUID per message maximizes distribution, but guarantees related messages (from the same order,
-the same account) land on different partitions — destroying any ordering guarantee between them. If
+the same account) land on different partitions, destroying any ordering guarantee between them. If
 relative ordering matters, that's a modeling bug.
 </Pegadinha>
 

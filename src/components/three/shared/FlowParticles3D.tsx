@@ -7,7 +7,7 @@ type Phase = { offset: number; speed: number };
 const dummy = new THREE.Object3D();
 
 // Generalização do EventCubes do hero: em vez de uma lane reta fixa, aceita qualquer caminho
-// (2+ pontos) — usa CatmullRomCurve3 pra suportar tanto linhas retas quanto o loop do retry/DLQ.
+// (2+ pontos); usa CatmullRomCurve3 pra suportar tanto linhas retas quanto o loop do retry/DLQ.
 export function FlowParticles3D({
   path,
   count = 4,

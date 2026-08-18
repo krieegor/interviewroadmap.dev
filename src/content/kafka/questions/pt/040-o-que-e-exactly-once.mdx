@@ -5,10 +5,10 @@ slug: "o-que-e-exactly-once"
 level: ["senior", "tech-lead"]
 topics: ["confiabilidade"]
 relatedChapters: ["garantias-de-entrega"]
-shortAnswer: "Exactly Once é o processamento sem perda nem duplicação, via producer idempotente e transações, mas essa garantia só vale dentro do ecossistema Kafka — efeitos colaterais externos ainda exigem idempotência própria."
+shortAnswer: "Exactly Once é o processamento sem perda nem duplicação, via producer idempotente e transações, mas essa garantia só vale dentro do ecossistema Kafka: efeitos colaterais externos ainda exigem idempotência própria."
 quiz:
   options:
-    - "Processamento sem perda nem duplicação, via producer idempotente e transações, mas válido só dentro do fluxo Kafka-para-Kafka — efeitos externos ainda exigem idempotência própria."
+    - "Processamento sem perda nem duplicação, via producer idempotente e transações, mas válido só dentro do fluxo Kafka-para-Kafka: efeitos externos ainda exigem idempotência própria."
     - "Processamento sem perda nem duplicação garantido de ponta a ponta, incluindo qualquer escrita em banco de dados ou chamada de API feita pelo consumer."
     - "Uma otimização de performance que elimina retries do producer, sem relação direta com perda ou duplicação de mensagens."
     - "Equivalente ao At Least Once, mas com um nome comercial diferente usado por algumas implementações do Kafka."
@@ -21,11 +21,11 @@ quiz:
 
 ## O que o entrevistador quer avaliar
 
-A pegadinha mais importante desta seção do livro — testa se o candidato entende o **escopo** exato dessa
+A pegadinha mais importante desta seção do livro: testa se o candidato entende o **escopo** exato dessa
 garantia, não apenas seu nome.
 
 <RespostaCurta>
-Exactly Once significa que a mensagem é processada exatamente uma vez, sem perda nem duplicação — via
+Exactly Once significa que a mensagem é processada exatamente uma vez, sem perda nem duplicação, via
 producer idempotente e transações. Mas essa garantia cobre o fluxo Kafka-para-Kafka; qualquer efeito
 colateral fora do Kafka (banco de dados, chamada HTTP, e-mail) continua exigindo idempotência própria.
 </RespostaCurta>
@@ -34,7 +34,7 @@ colateral fora do Kafka (banco de dados, chamada HTTP, e-mail) continua exigindo
 Exactly-once semantics (EOS) do Kafka usa producer idempotente (`enable.idempotence=true`, que evita
 duplicação causada por retries automáticos do próprio producer) combinado com transações
 (`KafkaTransactionManager`), garantindo que ler de um tópico, processar, e escrever em outro tópico aconteça
-como uma unidade atômica. Isso é real e funciona — mas só dentro do ecossistema Kafka. No momento em que o
+como uma unidade atômica. Isso é real e funciona, mas só dentro do ecossistema Kafka. No momento em que o
 processamento inclui uma escrita em um banco de dados externo ou uma chamada a uma API, essa escrita fica
 fora da transação Kafka, e uma falha exatamente ali ainda pode gerar duplicidade desse efeito externo. Por
 isso, mesmo usando exactly-once semantics, sistemas que integram Kafka com bancos e APIs externas continuam
@@ -48,13 +48,13 @@ Veja "Exactly Once: o que ela cobre e o que não cobre" no [Capítulo 10](/pt/ka
 <ExemploFinanceiro>
 Um consumer que lê de um tópico, transforma o dado e escreve em outro tópico Kafka pode usar exactly-once
 semantics com segurança total. Mas se esse mesmo consumer também grava o resultado em um banco relacional,
-essa escrita específica continua exigindo uma checagem de idempotência própria (Capítulo 11) — o
+essa escrita específica continua exigindo uma checagem de idempotência própria (Capítulo 11); o
 exactly-once do Kafka não a protege.
 </ExemploFinanceiro>
 
 <Pegadinha title='"Exactly Once significa que a mensagem nunca é processada duas vezes, ponto final"'>
 Essa é a resposta que reprova em entrevistas sênior. A garantia é real, mas delimitada ao fluxo interno do
-Kafka via transações — não a efeitos colaterais externos, que são o caso mais comum em sistemas reais.
+Kafka via transações, não a efeitos colaterais externos, que são o caso mais comum em sistemas reais.
 </Pegadinha>
 
 <PerguntaDerivada>

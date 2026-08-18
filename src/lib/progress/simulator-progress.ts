@@ -87,7 +87,7 @@ export function saveSimulatorResult(result: SimulatorResult) {
   try {
     localStorage.setItem(STORAGE_KEY, cachedRaw);
   } catch {
-    // localStorage indisponível — resultado não persiste, mas a sessão atual continua funcionando.
+    // localStorage indisponível: resultado não persiste, mas a sessão atual continua funcionando.
   }
   for (const listener of listeners) listener();
 }

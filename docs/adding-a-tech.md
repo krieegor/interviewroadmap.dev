@@ -1,14 +1,14 @@
 # Como adicionar uma trilha (`tech`) nova
 
-Este guia é para quem vai adicionar uma trilha nova ao seletor (`/[locale]/home`) — seja uma trilha "em
+Este guia é para quem vai adicionar uma trilha nova ao seletor (`/[locale]/home`), seja uma trilha "em
 construção" (só a página existe, sem conteúdo ainda, como Java/Elastic/SQL/AWS/GCP hoje) ou uma trilha que
 já nasce com conteúdo real. Para escrever capítulos/perguntas/glossário/estudos de caso **dentro** de uma
-trilha que já existe, veja [`docs/content-authoring.md`](./content-authoring.md) — este guia aqui é só sobre
+trilha que já existe, veja [`docs/content-authoring.md`](./content-authoring.md). Este guia aqui é só sobre
 dar de alta a trilha em si. Contexto arquitetural completo em
 [`specs/architecture.md`](../specs/architecture.md) §14.
 
 Pré-requisito: decida se a trilha já entra com conteúdo real ou só como placeholder "em construção". A
-imensa maioria das trilhas novas entra como placeholder — escrever o conteúdo completo (livro + 50 perguntas
+imensa maioria das trilhas novas entra como placeholder: escrever o conteúdo completo (livro + 50 perguntas
 + glossário + estudos de caso, nos dois idiomas) é o trabalho grande e separado, coberto por
 [`docs/content-authoring.md`](./content-authoring.md).
 
@@ -54,7 +54,7 @@ e ajuste conforme o padrão do Kafka (`localizedTechConfig.kafka` no mesmo arqui
 
 ## 3. Ícone
 
-Adicione um `case` novo em `src/components/icons/TechIcon.tsx` — um SVG simples de linha (`currentColor`,
+Adicione um `case` novo em `src/components/icons/TechIcon.tsx`: um SVG simples de linha (`currentColor`,
 `strokeWidth="2"`, sem preenchimento), no mesmo estilo dos existentes. Não é o logo oficial da tecnologia,
 só um glifo que ajuda a diferenciar a trilha no seletor.
 
@@ -62,13 +62,13 @@ só um glifo que ajuda a diferenciar a trilha no seletor.
 
 Em `src/app/globals.css`, adicione um bloco `[data-tech="sua-trilha"]` (light) e
 `.dark [data-tech="sua-trilha"]` (dark), definindo `--color-accent` e `--color-accent-subtle`. Kafka
-continua sendo o default herdado de `:root`/`.dark` — só defina overrides para trilhas novas.
+continua sendo o default herdado de `:root`/`.dark`; só defina overrides para trilhas novas.
 
 **Valide contraste AA (4.5:1) de `--color-accent` contra `--color-bg`** no tema em que ele é usado, antes de
 commitar. Toda cor de trilha existente já foi validada assim (ver comentário acima dos blocos
 `[data-tech]` em `globals.css`).
 
-Não precisa tocar em `layout.tsx` nem nos cards do seletor — ambos já leem `data-tech` dinamicamente a
+Não precisa tocar em `layout.tsx` nem nos cards do seletor: ambos já leem `data-tech` dinamicamente a
 partir do `tech` da rota/loop.
 
 ## 5. Disclaimer de marca
@@ -76,14 +76,14 @@ partir do `tech` da rota/loop.
 Se a tecnologia pertence a uma empresa/fundação (como Apache Kafka → Apache Software Foundation, Elastic →
 Elastic NV, AWS → Amazon, GCP → Google), adicione o nome dela em `footer.disclaimer` e
 `sobre.trademarkDisclaimer`, nos dois dicionários (`src/lib/i18n/dictionaries/pt.ts` e `en.ts`). É a mesma
-frase que já cita Apache Kafka/Confluent/Apache Software Foundation/Elastic NV/Oracle/AWS/Google Cloud —
+frase que já cita Apache Kafka/Confluent/Apache Software Foundation/Elastic NV/Oracle/AWS/Google Cloud;
 só estenda a lista.
 
 ## 6. `Content-Type` da imagem OG (Cloudflare)
 
 `src/app/[locale]/[tech]/opengraph-image.tsx` gera uma rota por trilha sem extensão no path
 (`/pt/sua-trilha/opengraph-image`). O Cloudflare Workers (hosting atual, ver
-[`deployment.md`](./deployment.md)) infere `Content-Type` pela extensão do arquivo — sem extensão, ele serve
+[`deployment.md`](./deployment.md)) infere `Content-Type` pela extensão do arquivo: sem extensão, ele serve
 o PNG com `HTTP 200` mas **sem** header `Content-Type`, e crawlers de redes sociais (WhatsApp, Twitter,
 etc.) descartam a imagem silenciosamente mesmo com o body correto. Adicione as duas linhas novas (pt + en)
 em `public/_headers`:
@@ -96,12 +96,12 @@ em `public/_headers`:
   Content-Type: image/png
 ```
 
-Depois do deploy, confirme com `curl -sD - https://interviewroadmap.dev/pt/sua-trilha/opengraph-image -o /dev/null` — a resposta precisa ter `Content-Type: image/png` na lista de headers.
+Depois do deploy, confirme com `curl -sD - https://interviewroadmap.dev/pt/sua-trilha/opengraph-image -o /dev/null`: a resposta precisa ter `Content-Type: image/png` na lista de headers.
 
 ## 7. O que **não** precisa mudar
 
 Rotas (`src/app/[locale]/[tech]/**`), `sitemap.ts`, `robots.ts`, `scripts/build-search-index.ts` e o
-`LocaleSwitcher`/`TrackSwitcher` já iteram sobre `techs`/`techsWithContent` dinamicamente — nenhum deles tem
+`LocaleSwitcher`/`TrackSwitcher` já iteram sobre `techs`/`techsWithContent` dinamicamente: nenhum deles tem
 lista própria de tecnologias para manter sincronizada. Se você adicionou uma trilha e algo não apareceu,
 o problema quase sempre está em `techs`/`techsWithContent` desatualizado, não em código de rota.
 
@@ -110,7 +110,7 @@ o problema quase sempre está em `techs`/`techsWithContent` desatualizado, não 
 Siga [`docs/content-authoring.md`](./content-authoring.md) para criar os arquivos `.mdx`
 (`src/content/<tech>/...`), depois:
 
-1. Adicione `<tech>` a `techsWithContent` em `src/lib/tech/config.ts` — isso sozinho liga sitemap, busca e
+1. Adicione `<tech>` a `techsWithContent` em `src/lib/tech/config.ts`: isso sozinho liga sitemap, busca e
    todas as rotas de conteúdo (`livro`, `perguntas`, `glossario`, `casos`, `simulador`) para a trilha.
 2. Atualize a `description` em `src/config/tech.ts` (deixa de ser "em construção").
 3. Rode `npm run validate-content`, `npm run lint`, `npm run test` e `npm run build` antes de considerar a

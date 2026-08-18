@@ -5,7 +5,7 @@ slug: "mais-consumidores-que-partitions"
 level: ["pleno", "senior"]
 topics: ["arquitetura"]
 relatedChapters: ["consumer-groups-e-rebalance"]
-shortAnswer: "The extra consumers sit idle — there's no partition left to assign them. They only start processing if another consumer in the group goes down."
+shortAnswer: "The extra consumers sit idle: there's no partition left to assign them. They only start processing if another consumer in the group goes down."
 quiz:
   options:
     - "The extra consumers sit idle, with no partition assigned, because the number of partitions is the real parallelism ceiling for the group."
@@ -21,7 +21,7 @@ quiz:
 
 ## What the interviewer wants to assess
 
-Whether you understand the real parallelism limit imposed by partitions — a common mistake is assuming
+Whether you understand the real parallelism limit imposed by partitions: a common mistake is assuming
 adding consumers always increases throughput.
 
 <RespostaCurta>
@@ -30,11 +30,11 @@ only start receiving partitions if another consumer in the group goes down or le
 </RespostaCurta>
 
 <RespostaSenior>
-The rule is one partition, one consumer, per Consumer Group — never two instances from the same group
+The rule is one partition, one consumer, per Consumer Group: never two instances from the same group
 reading the same partition at the same time. If the topic has 4 partitions and the group scales to 6
 instances, 2 of them are completely idle, receiving no assignment at all. This surprises teams that scale
 consumers via Kubernetes/HPA expecting proportional throughput gains, without considering that the number
-of partitions is the real parallelism ceiling — scaling beyond that number adds zero processing capacity,
+of partitions is the real parallelism ceiling: scaling beyond that number adds zero processing capacity,
 it just wastes resources.
 </RespostaSenior>
 
@@ -45,7 +45,7 @@ See "What happens with different numbers of consumers" in
 
 <ExemploFinanceiro>
 The `antifraude-service` runs with 4 partitions on the topic and scales to 6 replicas for Black Friday
-expecting more throughput — but 2 replicas sit idle, because there are no partitions left, and actual
+expecting more throughput, but 2 replicas sit idle, because there are no partitions left, and actual
 throughput doesn't change.
 </ExemploFinanceiro>
 

@@ -7,13 +7,13 @@ relatedChapters: ["o-que-e-apache-kafka", "arquitetura-interna", "retention-e-re
 ---
 
 Este estudo de caso descreve, de ponta a ponta, como um banco digital modela o recebimento de um PIX como um
-fluxo orientado a eventos — cobrindo as decisões que normalmente aparecem em entrevista quando o
+fluxo orientado a eventos, cobrindo as decisões que normalmente aparecem em entrevista quando o
 entrevistador pede "descreva um sistema real que você projetaria com Kafka".
 
 ## O evento de domínio
 
 Quando o Sistema de Pagamentos Instantâneos (SPI) do Banco Central confirma a liquidação de um PIX, o
-serviço responsável por essa integração publica um evento `PixRecebido` — um fato que já aconteceu, não um
+serviço responsável por essa integração publica um evento `PixRecebido`: um fato que já aconteceu, não um
 comando.
 
 ```json
@@ -43,11 +43,11 @@ comando.
 ## Por que a key é `contaId`
 
 <DicaEntrevista>
-  A escolha da key não é sobre distribuir uniformemente — é sobre **quais eventos precisam ficar
+  A escolha da key não é sobre distribuir uniformemente: é sobre **quais eventos precisam ficar
   ordenados entre si**. Todos os eventos da mesma conta (PIX recebido, PIX enviado, bloqueio de
   saldo) devem cair na mesma partition para que os consumidores processem-os na ordem correta. Usar
   `eventId` como key, por exemplo, distribuiria melhor entre partitions, mas destruiria a ordenação
-  por conta — um erro comum de quem otimiza para throughput sem entender o requisito de ordenação.
+  por conta, um erro comum de quem otimiza para throughput sem entender o requisito de ordenação.
 </DicaEntrevista>
 
 ## Consumidores independentes
@@ -63,19 +63,19 @@ comando.
   curto intervalo).
 
 Cada um desses é um Consumer Group independente. Uma lentidão no antifraude-service não atrasa o crédito do
-saldo — eles avançam offsets de forma totalmente desacoplada.
+saldo; eles avançam offsets de forma totalmente desacoplada.
 
 ## Idempotência
 
 <Atencao title="Por que idempotência é obrigatória aqui">
   Garantias de entrega *at-least-once* (a configuração mais comum em produção) implicam que o mesmo
-  evento `PixRecebido` pode ser entregue mais de uma vez ao `saldo-service` — por exemplo, após um
+  evento `PixRecebido` pode ser entregue mais de uma vez ao `saldo-service`, por exemplo, após um
   rebalance ou um retry de commit. Sem proteção, isso creditaria o mesmo PIX duas vezes.
 </Atencao>
 
 O `saldo-service` mantém uma tabela `eventos_processados` com uma constraint de unicidade em `eventId`. Antes
 de aplicar o crédito, ele tenta inserir o `eventId`; se a inserção falhar por violação de unicidade, o evento
-já foi processado e a operação é ignorada — a checagem e a aplicação do crédito acontecem na mesma transação
+já foi processado e a operação é ignorada; a checagem e a aplicação do crédito acontecem na mesma transação
 de banco, garantindo atomicidade mesmo sob concorrência.
 
 ## Retry e DLQ
@@ -83,7 +83,7 @@ de banco, garantindo atomicidade mesmo sob concorrência.
 Se o `saldo-service` falhar ao processar um evento (ex.: banco de dados indisponível momentaneamente), o
 erro é tratado como transitório: o Spring Kafka reprocessa com backoff exponencial. Depois de um número
 configurado de tentativas, o evento é publicado no tópico `pix.recebido.dlq` (Dead Letter Topic) para
-investigação manual — sem bloquear o processamento dos eventos seguintes na mesma partition (evitando o
+investigação manual, sem bloquear o processamento dos eventos seguintes na mesma partition (evitando o
 efeito "poison pill").
 
 ## Replay
@@ -91,7 +91,7 @@ efeito "poison pill").
 Se um bug no `extrato-service` gerar lançamentos com valor errado, a correção envolve: (1) corrigir o bug,
 (2) resetar o offset do Consumer Group `extrato-service` para o início do intervalo afetado (respeitando a
 retenção de 7 dias) e (3) deixar o serviço corrigido reprocessar os eventos, reconstruindo os lançamentos do
-extrato do zero para esse intervalo — sem qualquer interação com o `saldo-service`, `notificacao-service` ou
+extrato do zero para esse intervalo, sem qualquer interação com o `saldo-service`, `notificacao-service` ou
 `antifraude-service`, que não são afetados pelo replay de outro grupo.
 
 ## Observabilidade
@@ -109,6 +109,6 @@ extrato do zero para esse intervalo — sem qualquer interação com o `saldo-se
   O fluxo de PIX recebido ilustra por que Kafka é escolhido para esse tipo de problema: um único
   evento de domínio, key escolhida para preservar ordenação por conta, múltiplos consumidores
   independentes, idempotência obrigatória por causa de garantias at-least-once, DLQ para isolar
-  falhas persistentes e replay como ferramenta de correção — tudo isso sem acoplar o serviço que
+  falhas persistentes e replay como ferramenta de correção, tudo isso sem acoplar o serviço que
   recebe o PIX aos serviços que reagem a ele.
 </Resumo>

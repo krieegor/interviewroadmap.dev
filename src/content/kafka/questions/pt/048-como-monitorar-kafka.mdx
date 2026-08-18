@@ -5,10 +5,10 @@ slug: "como-monitorar-kafka"
 level: ["senior", "tech-lead"]
 topics: ["observabilidade"]
 relatedChapters: ["observabilidade"]
-shortAnswer: "Combine consumer lag e throughput (capacidade), taxa de mensagens na DLQ e taxa de erro (qualidade), taxa de rebalance (estabilidade) e logs estruturados com correlationId (rastreabilidade) — nunca uma métrica isolada."
+shortAnswer: "Combine consumer lag e throughput (capacidade), taxa de mensagens na DLQ e taxa de erro (qualidade), taxa de rebalance (estabilidade) e logs estruturados com correlationId (rastreabilidade); nunca uma métrica isolada."
 quiz:
   options:
-    - "Combinar consumer lag e throughput, taxa de mensagens na DLQ e taxa de erro, taxa de rebalance, e logs estruturados com correlationId — nunca uma métrica isolada."
+    - "Combinar consumer lag e throughput, taxa de mensagens na DLQ e taxa de erro, taxa de rebalance, e logs estruturados com correlationId; nunca uma métrica isolada."
     - "Instalar Prometheus e Grafana e monitorar as métricas padrão de infraestrutura dos brokers já é suficiente."
     - "Acompanhar exclusivamente a taxa de erro dos consumers, pois ela antecipa qualquer problema de capacidade antes que aconteça."
     - "Uma taxa alta de rebalance é sempre esperada em produção e não costuma indicar problema de configuração."
@@ -21,7 +21,7 @@ quiz:
 
 ## O que o entrevistador quer avaliar
 
-A última pergunta técnica típica de uma entrevista sobre Kafka — testa se o candidato pensa em operação
+A última pergunta técnica típica de uma entrevista sobre Kafka: testa se o candidato pensa em operação
 real, conectando métricas a decisões, não apenas citando nomes de ferramentas.
 
 <RespostaCurta>
@@ -34,7 +34,7 @@ de consumers) e logs estruturados com correlationId para rastreabilidade entre s
 Nenhuma métrica isolada conta a história completa. Consumer lag crescente antecipa atraso de processamento
 antes que o usuário sinta; throughput baixo, combinado com lag crescente, aponta que o gargalo é capacidade
 de consumo, não volume anormal de produção. Taxa de mensagens na DLQ sinaliza falhas persistentes que já
-passaram do retry — um sintoma de qualidade, não de capacidade. Taxa de rebalance frequente costuma indicar
+passaram do retry: um sintoma de qualidade, não de capacidade. Taxa de rebalance frequente costuma indicar
 `max.poll.interval.ms` mal configurado ou instabilidade de infraestrutura, não do Kafka em si. E logs
 estruturados com `correlationId`, agregados em uma ferramenta como Kibana ou Datadog, permitem reconstruir o
 caminho de uma transação específica através de múltiplos serviços quando um alerta dispara. A escolha de
@@ -44,11 +44,11 @@ independente desse conjunto de métricas.
 
 ## Explicação aprofundada
 
-Veja o capítulo completo — [Observabilidade](/pt/kafka/livro/observabilidade).
+Veja o capítulo completo: [Observabilidade](/pt/kafka/livro/observabilidade).
 
 <ExemploFinanceiro>
 O time de pagamentos monitora consumer lag do `saldo-service`, taxa de mensagens na DLQ do tópico
-`pix.recebido`, e propaga `correlationId` desde a chamada HTTP original até cada consumer — permitindo, em
+`pix.recebido`, e propaga `correlationId` desde a chamada HTTP original até cada consumer, o que permite, em
 um incidente, encontrar em segundos todos os serviços que processaram um PIX específico.
 </ExemploFinanceiro>
 

@@ -7,7 +7,7 @@ relatedChapters: ["arquitetura-interna", "consumer-groups-e-rebalance"]
 ---
 
 Dentro de um Consumer Group, cada partition de um tópico é atribuída a exatamente um consumer do grupo em um
-dado momento — o que distribui trabalho, similar a uma fila. Consumer Groups diferentes, no entanto, são
+dado momento, o que distribui trabalho, similar a uma fila. Consumer Groups diferentes, no entanto, são
 totalmente independentes entre si: cada grupo mantém seu próprio conjunto de offsets e pode ler o mesmo
 tópico sem interferir nos demais. É essa combinação que permite ao Kafka tanto distribuir trabalho quanto
 compartilhar o mesmo dado com múltiplos sistemas.

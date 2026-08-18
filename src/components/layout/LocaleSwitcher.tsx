@@ -15,7 +15,7 @@ function resolveHref(
   tech: Tech,
   enAvailable: EnAvailability,
 ): string {
-  // Descarta locale e tech do path atual (ambos já são conhecidos) — o que sobra é
+  // Descarta locale e tech do path atual (ambos já são conhecidos): o que sobra é
   // seção/slug dentro da trilha.
   const segments = pathname.split("/").filter(Boolean).slice(2);
   if (segments.length === 0) return `/${target}/${tech}`;

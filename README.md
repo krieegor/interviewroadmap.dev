@@ -28,11 +28,11 @@ financeiro e pegadinhas comuns para cada pergunta de entrevista.
 | Trilha             | Status           | Conteúdo hoje                                                         |
 | ------------------ | ---------------- | --------------------------------------------------------------------- |
 | **Kafka**          | ✅ Completa      | 15 capítulos, 50 perguntas, 24 termos de glossário, 5 estudos de caso |
-| **Java**           | 🚧 Em construção | —                                                                     |
-| **Elastic Search** | 🚧 Em construção | —                                                                     |
-| **SQL**            | 🚧 Em construção | —                                                                     |
-| **AWS**            | 🚧 Em construção | —                                                                     |
-| **GCP**            | 🚧 Em construção | —                                                                     |
+| **Java**           | 🚧 Em construção | Nenhum ainda                                                          |
+| **Elastic Search** | 🚧 Em construção | Nenhum ainda                                                          |
+| **SQL**            | 🚧 Em construção | Nenhum ainda                                                          |
+| **AWS**            | 🚧 Em construção | Nenhum ainda                                                          |
+| **GCP**            | 🚧 Em construção | Nenhum ainda                                                          |
 
 ## Funcionalidades
 
@@ -41,10 +41,10 @@ financeiro e pegadinhas comuns para cada pergunta de entrevista.
   financeiro e pegadinhas comuns.
 - Glossário com termos essenciais, cada um com página própria e deep link.
 - Estudos de caso de sistemas financeiros reais (PIX, cartões, faturas).
-- Simulador de entrevista local, sem backend — modo aberto (você explica em voz alta) e modo múltipla
+- Simulador de entrevista local, sem backend: modo aberto (você explica em voz alta) e modo múltipla
   escolha (estilo Enem), com painel lateral para ver a resposta completa sem sair da sessão.
 - Exportação do livro em PDF (capa com contribuidores da versão e data).
-- Busca local (`Ctrl+K`), progresso de leitura e tema claro/escuro — tudo salvo só no seu navegador.
+- Busca local (`Ctrl+K`), progresso de leitura e tema claro/escuro, tudo salvo só no seu navegador.
 - Internacionalização completa em português e inglês.
 - Identidade visual própria por trilha: a cor de destaque muda conforme a tecnologia (Kafka laranja, Java
   vermelho, Elastic teal, SQL azul, AWS laranja queimado, GCP azul Google).
@@ -75,8 +75,8 @@ npm install
 npm run dev
 ```
 
-Acesse `http://localhost:3000` — redireciona pro seletor de trilha (`/pt/home`), de onde você escolhe Kafka,
-Java, Elastic Search, SQL, AWS ou GCP.
+Acesse `http://localhost:3000`, que redireciona pro seletor de trilha (`/pt/home`), de onde você escolhe
+Kafka, Java, Elastic Search, SQL, AWS ou GCP.
 
 ## Scripts
 
@@ -93,12 +93,12 @@ npm run validate-content                # valida frontmatter e links internos do
 
 ## Documentação do projeto
 
-- [`CLAUDE.md`](./CLAUDE.md) — guia de arquitetura e convenções para contribuição (humana ou assistida por IA).
-- [`specs/`](./specs) — especificações de produto, arquitetura, diretrizes de conteúdo, design system e roadmap.
-- [`docs/contributing.md`](./docs/contributing.md) — como contribuir.
-- [`docs/content-authoring.md`](./docs/content-authoring.md) — como escrever capítulos, perguntas, glossário e estudos de caso.
-- [`docs/adding-a-tech.md`](./docs/adding-a-tech.md) — pré-requisitos e passo a passo para adicionar uma trilha (`tech`) nova.
-- [`docs/deployment.md`](./docs/deployment.md) — como publicar em Vercel, Cloudflare (Workers ou Pages),
+- [`CLAUDE.md`](./CLAUDE.md): guia de arquitetura e convenções para contribuição (humana ou assistida por IA).
+- [`specs/`](./specs): especificações de produto, arquitetura, diretrizes de conteúdo, design system e roadmap.
+- [`docs/contributing.md`](./docs/contributing.md): como contribuir.
+- [`docs/content-authoring.md`](./docs/content-authoring.md): como escrever capítulos, perguntas, glossário e estudos de caso.
+- [`docs/adding-a-tech.md`](./docs/adding-a-tech.md): pré-requisitos e passo a passo para adicionar uma trilha (`tech`) nova.
+- [`docs/deployment.md`](./docs/deployment.md): como publicar em Vercel, Cloudflare (Workers ou Pages),
   Netlify ou GitHub Pages.
 
 ## Contribuindo

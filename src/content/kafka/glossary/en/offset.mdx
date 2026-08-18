@@ -1,12 +1,12 @@
 ---
 term: "Offset"
 slug: "offset"
-shortDefinition: "The sequential position of a record within a partition — uniquely identifies a message in that partition."
+shortDefinition: "The sequential position of a record within a partition: uniquely identifies a message in that partition."
 relatedTerms: ["partition", "consumer", "commit"]
 relatedChapters: ["arquitetura-interna", "offset-e-commit"]
 ---
 
 The offset is an increasing integer, unique per partition, marking a record's position in the log. It's
-not global to the topic — it's local to each partition; the same offset numbering exists independently in
+not global to the topic: it's local to each partition; the same offset numbering exists independently in
 each partition. Consumers use the offset to know how far they've read, and committing the offset
 (automatically or manually) is what marks that progress.

@@ -46,7 +46,7 @@ export default function BrokerClusterScene({ labels }: { labels: BrokerClusterLa
       <Node3D position={POSITIONS[1]!} label={labels.broker2} sublabel={labels.follower} colors={colors} variant="neutral" />
       <Node3D position={POSITIONS[2]!} label={labels.broker3} sublabel={labels.follower} colors={colors} variant="neutral" />
 
-      {/* Replicação parte sempre do leader pra cada follower — nunca follower-a-follower. */}
+      {/* Replicação parte sempre do leader pra cada follower, nunca follower-a-follower. */}
       <Connector3D from={POSITIONS[0]!} to={POSITIONS[1]!} color={lineColor} dashed />
       <Connector3D from={POSITIONS[0]!} to={POSITIONS[2]!} color={lineColor} dashed />
 

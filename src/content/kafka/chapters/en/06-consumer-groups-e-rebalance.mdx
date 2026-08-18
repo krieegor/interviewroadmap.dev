@@ -1,6 +1,6 @@
----
+﻿---
 title: "Consumer Groups and Rebalance"
-part: "Part II — Architecture"
+part: "Part II: Architecture"
 partOrder: 2
 chapterOrder: 4
 slug: "consumer-groups-e-rebalance"
@@ -16,11 +16,11 @@ misunderstood Kafka topics in production.
 
 <Definicao title="Consumer Group">
 A Consumer Group is a set of consumer instances identified by the same `group.id`. Kafka guarantees that,
-at any given time, each partition of a subscribed topic is assigned to exactly one consumer in the group —
+at any given time, each partition of a subscribed topic is assigned to exactly one consumer in the group:
 never two consumers from the same group reading the same partition at the same time.
 </Definicao>
 
-This rule — one partition, one consumer, per group — is what makes consumption parallelism predictable: if
+This rule (one partition, one consumer, per group) is what makes consumption parallelism predictable: if
 a topic has 6 partitions and the group has 3 consumers, each consumer processes, on average, 2 partitions.
 It also defines the upper bound of parallelism: there's no way for a Consumer Group to process a topic with
 more parallelism than the number of partitions allows.
@@ -30,12 +30,12 @@ more parallelism than the number of partitions allows.
 <Comparacao title="Partitions vs. consumers in the same Consumer Group">
 | Scenario | What happens |
 |---|---|
-| Partitions = Consumers | Each consumer processes exactly 1 partition — maximum parallelism reached |
-| Partitions > Consumers | Some consumers process more than one partition — still parallel, but unbalanced |
-| Consumers > Partitions | The extra consumers sit idle — there are no partitions left to assign them |
+| Partitions = Consumers | Each consumer processes exactly 1 partition, maximum parallelism reached |
+| Partitions > Consumers | Some consumers process more than one partition, still parallel, but unbalanced |
+| Consumers > Partitions | The extra consumers sit idle: there are no partitions left to assign them |
 </Comparacao>
 
-<Atencao title="Idle consumers aren't a bug — they're a known limit">
+<Atencao title="Idle consumers aren't a bug: they're a known limit">
 If a topic has 4 partitions and the Consumer Group scales to 6 instances, 2 of them simply receive no
 partition and sit idle, processing nothing, until one of the other 4 goes down or the number of partitions
 increases. This tends to surprise teams that scale consumers via Kubernetes expecting proportional
@@ -54,7 +54,7 @@ consumer is declared dead for not sending a heartbeat within the configured time
   <RebalanceDiagramEn />
 </Diagrama>
 
-The most common trigger in production isn't an abrupt process crash — it's a consumer that takes too long
+The most common trigger in production isn't an abrupt process crash: it's a consumer that takes too long
 processing a batch of messages (`max.poll.interval.ms` exceeded) and gets declared dead by the group even
 though it's still alive, just slow. That scenario causes an unnecessary rebalance that kicks out a healthy
 consumer, and it's a classic cause of "infinite rebalances" in production when per-message processing is
@@ -63,7 +63,7 @@ consistently slower than the configured interval.
 ## The impact of a rebalance
 
 In the classic strategy ("eager rebalance"), every consumer in the group revokes **all** of its partitions
-at the start of the rebalance, even the ones that will stay with the same consumer afterward — the entire
+at the start of the rebalance, even the ones that will stay with the same consumer afterward: the entire
 group stops processing during the reassignment window. In large groups or with heavy per-partition
 processing, that pause can be noticeable.
 
@@ -79,13 +79,13 @@ through a reassignment pause.
 Scaling a Consumer Group horizontally (for example, via HPA on Kubernetes, reacting to consumer lag) has a
 direct consequence: every scale-up or scale-down event for the deployment triggers a rebalance, because the
 group's consumer count changes. An aggressively configured HPA (scaling up and down frequently) can produce
-constant rebalances, degrading the throughput the scaling was supposed to improve — the opposite of the
+constant rebalances, degrading the throughput the scaling was supposed to improve, the opposite of the
 intended effect.
 
 <DicaEntrevista>
 If asked about scaling consumers on Kubernetes, mention that the topic's number of partitions is the real
-parallelism ceiling — scaling the deployment beyond that number doesn't increase throughput, it just
-produces idle consumers — and that HPAs need proper cooldown to avoid causing excessive rebalances.
+parallelism ceiling: scaling the deployment beyond that number doesn't increase throughput, it just
+produces idle consumers, and that HPAs need proper cooldown to avoid causing excessive rebalances.
 </DicaEntrevista>
 
 ## When this becomes an architectural problem
@@ -93,9 +93,9 @@ produces idle consumers — and that HPAs need proper cooldown to avoid causing 
 - Sizing a topic's number of partitions without considering the maximum number of consumers the team plans
   to scale to limits future scale without a topic migration (Chapter 4).
 - Per-message processing slower than `max.poll.interval.ms` causes recurring rebalances, even with no real
-  infrastructure failure at all — the symptom looks like Kafka instability, but the cause is a timeout
+  infrastructure failure at all: the symptom looks like Kafka instability, but the cause is a timeout
   configuration misaligned with actual processing time.
-- Multiple Consumer Groups reading the same topic don't compete for partitions with each other — a
+- Multiple Consumer Groups reading the same topic don't compete for partitions with each other: a
   rebalance in one group doesn't affect other groups reading the same topic.
 
 ## How this shows up in interviews
@@ -110,12 +110,12 @@ transition.
 
 In Spring Kafka, `group.id` is configured on the `@KafkaListener` (or in the `ConsumerFactory`'s global
 configuration), and `concurrency` defines how many consumer threads the application itself instantiates
-internally for that listener — each thread behaves as an additional Consumer Group member from Kafka's
+internally for that listener: each thread behaves as an additional Consumer Group member from Kafka's
 point of view. Setting `concurrency` higher than the number of partitions available to that instance
 creates idle threads, for the same reason as the "Consumers > Partitions" scenario above.
 
 <ExemploFinanceiro title="Scaling the antifraud service">
-The `antifraude-service` runs with 4 replicas on Kubernetes, consuming a topic with 8 partitions — healthy
+The `antifraude-service` runs with 4 replicas on Kubernetes, consuming a topic with 8 partitions: healthy
 parallelism, 2 partitions per replica. On a Black Friday, the team scales up to 12 replicas expecting more
 throughput, but the topic still has 8 partitions: 4 replicas sit idle, and actual throughput doesn't
 change, because the parallelism ceiling is the number of partitions, not the number of pods.
@@ -124,7 +124,7 @@ change, because the parallelism ceiling is the number of partitions, not the num
 <Resumo>
 A Consumer Group guarantees each partition is processed by exactly one consumer in the group at a time,
 with the number of partitions defining the parallelism ceiling. Rebalance redistributes partitions
-whenever the group's membership changes — a consumer joins, leaves, or is declared dead by timeout — and
+whenever the group's membership changes (a consumer joins, leaves, or is declared dead by timeout) and
 has a real pause cost, reduced but not eliminated by cooperative strategies. Scaling consumers beyond the
 number of partitions produces idle consumers, not more throughput.
 </Resumo>

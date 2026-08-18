@@ -7,7 +7,7 @@ relatedChapters: ["consumer-groups-e-rebalance"]
 ---
 
 Rebalance é o processo pelo qual o coordenador do Consumer Group redistribui as partitions de um tópico
-entre os consumers ativos, sempre que a composição do grupo muda — um consumer cai, um novo entra, ou um
+entre os consumers ativos, sempre que a composição do grupo muda: um consumer cai, um novo entra, ou um
 consumer é considerado morto por não enviar heartbeat a tempo. Durante o rebalance, o consumo do grupo pausa
 brevemente enquanto as partitions são reatribuídas; estratégias de rebalance mais recentes (cooperative
 sticky) reduzem esse impacto ao evitar revogar partitions de consumers que continuam ativos.

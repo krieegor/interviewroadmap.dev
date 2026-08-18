@@ -21,18 +21,18 @@ quiz:
 
 ## What the interviewer wants to assess
 
-Whether you understand retention as independent of consumption — the point that most differentiates Kafka
+Whether you understand retention as independent of consumption: the point that most differentiates Kafka
 from a traditional queue.
 
 <RespostaCurta>
 Retention period is the policy that determines how long (or up to what accumulated size) a partition's
-records stay available, configured via `retention.ms` and/or `retention.bytes` — whichever is hit first
+records stay available, configured via `retention.ms` and/or `retention.bytes`; whichever is hit first
 triggers cleanup of the oldest records.
 </RespostaCurta>
 
 <RespostaSenior>
 The central point is that retention doesn't depend on consumption: a record isn't removed for having been
-read — it stays in the log until it expires under the configured policy, even if every existing Consumer
+read; it stays in the log until it expires under the configured policy, even if every existing Consumer
 Group has already processed it. The reverse also holds: a record never read by any consumer disappears
 from the log as soon as retention expires, regardless of that. It's this characteristic that enables replay
 (Chapter 8): reprocessing old events is only possible while they're still within the retention window.
@@ -44,7 +44,7 @@ See "Retention Period" in [Chapter 8](/en/kafka/livro/retention-e-replay).
 
 <ExemploFinanceiro>
 A `transacoes.autorizadas` topic with 7 days of retention lets a new analytics service, created today, read
-the full history of the last 7 days as soon as it's deployed — without the authorization service needing to
+the full history of the last 7 days as soon as it's deployed, without the authorization service needing to
 resend anything.
 </ExemploFinanceiro>
 

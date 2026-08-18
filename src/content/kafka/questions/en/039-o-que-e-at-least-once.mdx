@@ -5,7 +5,7 @@ slug: "o-que-e-at-least-once"
 level: ["pleno", "senior"]
 topics: ["confiabilidade"]
 relatedChapters: ["garantias-de-entrega", "idempotencia"]
-shortAnswer: "At Least Once is the guarantee where the message is never lost, but it can be duplicated — the practical default in financial systems, always combined with idempotent processing in the consumer."
+shortAnswer: "At Least Once is the guarantee where the message is never lost, but it can be duplicated: the practical default in financial systems, always combined with idempotent processing in the consumer."
 quiz:
   options:
     - "The guarantee where the message is never lost, but it can be duplicated, requiring idempotent processing in the consumer to handle redeliveries."
@@ -34,8 +34,8 @@ reprocessing in case of a failure between the confirmation and recording it.
 It's the most-used practical default in financial systems because, between losing and duplicating,
 duplicating is the more manageable risk: a duplicated message is detectable and fixable with idempotency
 (Chapter 11), while a lost message doesn't even leave a trace. In practice, this means `acks=all` on the
-producer (with retry) and manual commit on the consumer, done only after processing finishes successfully
-— if the consumer crashes between the end of processing and the commit, the message is redelivered on the
+producer (with retry) and manual commit on the consumer, done only after processing finishes successfully:
+if the consumer crashes between the end of processing and the commit, the message is redelivered on the
 next startup, and it's idempotent processing that guarantees that redelivery doesn't duplicate the business
 effect.
 </RespostaSenior>
@@ -47,12 +47,12 @@ See "At Least Once" in [Chapter 10](/en/kafka/livro/garantias-de-entrega) and th
 
 <ExemploFinanceiro>
 The `notificacao-service` runs with At Least Once: if it crashes after sending the notification but before
-committing the offset, the notification may be sent twice — acceptable for this flow, and mitigable if
+committing the offset, the notification may be sent twice, acceptable for this flow, and mitigable if
 needed with an idempotency check.
 </ExemploFinanceiro>
 
 <Pegadinha title='"At Least Once guarantees the message is processed exactly once, just more safely"'>
-No — At Least Once explicitly allows duplication. Anyone who needs true single processing needs to add
+No, At Least Once explicitly allows duplication. Anyone who needs true single processing needs to add
 idempotency on top (or use exactly-once semantics within Kafka's scope).
 </Pegadinha>
 

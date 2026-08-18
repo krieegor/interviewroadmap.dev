@@ -1,6 +1,6 @@
 import type { Tech } from "@/lib/tech/config";
 
-// Ícones próprios e simples (linha, currentColor) — não são os logos oficiais de cada tecnologia,
+// Ícones próprios e simples (linha, currentColor); não são os logos oficiais de cada tecnologia,
 // só um glifo que ajuda a identificar a trilha visualmente no seletor.
 export function TechIcon({ tech, className }: { tech: Tech; className?: string }) {
   switch (tech) {
