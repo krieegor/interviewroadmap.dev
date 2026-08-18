@@ -8,6 +8,7 @@ import { getTechConfig } from "@/config/tech";
 import { getTechBreadcrumb } from "@/config/navigation";
 import { isLocale, type Locale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/get-dictionary";
+import { formatTemplate } from "@/lib/i18n/format";
 import { isTech, techsWithContent, type Tech } from "@/lib/tech/config";
 import { buildAlternates, buildOpenGraph, buildPersonJsonLd, techOpengraphImageUrl } from "@/lib/seo";
 
@@ -64,10 +65,11 @@ export default async function SobrePage({
       <h1 className="text-3xl font-semibold text-[var(--color-text)]">{dict.sobre.title}</h1>
 
       <div className="prose-content mt-6">
+        <p>{dict.sobre.intro1}</p>
         <p>
-          {techConfig.name} {dict.sobre.intro1}
+          {formatTemplate(dict.sobre.trackIntro, { tech: techConfig.name })} {techConfig.description}
         </p>
-        <p>{dict.sobre.intro2}</p>
+        <p>{formatTemplate(dict.sobre.intro2, { tech: techConfig.shortName })}</p>
         <p>{dict.sobre.intro3}</p>
       </div>
 

@@ -198,9 +198,10 @@ export const en: Dictionary = {
   sobre: {
     title: "About the project",
     intro1:
-      "is free, open source material created to help Java Backend developers prepare for Apache Kafka technical interviews: from architecture fundamentals to delivery guarantees, idempotency, and observability.",
+      "interviewroadmap.dev is a free, open-source technical interview prep platform, organized by technology track.",
+    trackIntro: "This is the {tech} track:",
     intro2:
-      "This content doesn't replace the official Apache Kafka documentation or the hands-on experience of running the system in production. It exists to consolidate and organize the knowledge needed to explain these concepts confidently in an interview and, as a result, in the day-to-day work of anyone already using the tool.",
+      "This content doesn't replace the official {tech} documentation or the hands-on experience of running the system in production. It exists to consolidate and organize the knowledge needed to explain these concepts confidently in an interview and, as a result, in the day-to-day work of anyone already using the tool.",
     intro3:
       "Contributions are welcome: technical corrections, new chapters, new interview questions, or accessibility and design improvements can be proposed directly in the project's repository.",
     trademarkDisclaimer:

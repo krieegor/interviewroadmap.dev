@@ -197,9 +197,10 @@ export const pt = {
   sobre: {
     title: "Sobre o projeto",
     intro1:
-      "é um material gratuito e de código aberto, criado com o objetivo de ajudar desenvolvedores Java Backend a se prepararem para entrevistas técnicas sobre Apache Kafka: dos fundamentos de arquitetura até garantias de entrega, idempotência e observabilidade.",
+      "interviewroadmap.dev é uma plataforma gratuita e open source de preparação para entrevistas técnicas, organizada por trilhas de tecnologia.",
+    trackIntro: "Esta é a trilha {tech}:",
     intro2:
-      "O conteúdo não substitui a documentação oficial do Apache Kafka nem a experiência prática de operar o sistema em produção. Ele existe para consolidar e organizar o conhecimento necessário para explicar esses conceitos com segurança em uma entrevista e, por consequência, no dia a dia de quem já trabalha com a ferramenta.",
+      "O conteúdo não substitui a documentação oficial de {tech} nem a experiência prática de operar o sistema em produção. Ele existe para consolidar e organizar o conhecimento necessário para explicar esses conceitos com segurança em uma entrevista e, por consequência, no dia a dia de quem já trabalha com a ferramenta.",
     intro3:
       "Contribuições são bem-vindas: correções técnicas, novos capítulos, novas perguntas de entrevista ou melhorias de acessibilidade e design podem ser propostas diretamente no repositório do projeto.",
     trademarkDisclaimer:
